@@ -1,0 +1,315 @@
+import { Request, Response, NextFunction } from 'express'
+import { logger } from '../utils/logger'
+import { prisma } from '../lib/prisma'
+import axios from 'axios'
+
+interface AuthRequest extends Request {
+  userId?: string
+}
+
+export class ChatController {
+  static async sendMessage(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId
+      const { message, sessionId } = req.body
+
+      if (!message) {
+        return res.status(400).json({
+          error: 'Message content is required'
+        })
+      }
+
+      // 保存用户消息到数据库
+      let userMessage
+      if (userId) {
+        userMessage = await prisma.chatMessagess.create({
+          data: {
+            userId,
+            sessionId: sessionId || null,
+            content: message,
+            type: 'USER'
+          }
+        })
+      }
+
+      // 调用AI服务
+      let aiResponse
+      try {
+        // 先尝试调用新的AI服务
+        const aiServiceResponse = await axios.post('http://127.0.0.1:8010/chat', {
+          message: message,
+          user_id: userId,
+          session_id: sessionId
+        }, {
+          timeout: 30000, // 30秒超时
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+
+        if (aiServiceResponse.data && aiServiceResponse.data.message) {
+          aiResponse = {
+            id: 'ai-response-' + Date.now(),
+            content: aiServiceResponse.data.message,
+            type: 'assistant',
+            timestamp: new Date().toISOString(),
+            teamUsed: aiServiceResponse.data.team_used || 'GENERAL_QA',
+            confidence: aiServiceResponse.data.rag_similarity || 0.9,
+            thinkingProcess: aiServiceResponse.data.thinking_process,
+            referenceLinks: aiServiceResponse.data.reference_links,
+            strategy: aiServiceResponse.data.strategy,
+            source: aiServiceResponse.data.source
+          }
+          logger.info(`AI service responded with team: ${aiServiceResponse.data.team_used}`)
+
+          // 保存AI回复到数据库
+          if (userId) {
+            await prisma.chatMessages.create({
+              data: {
+                userId,
+                sessionId: sessionId || null,
+                content: aiServiceResponse.data.message,
+                type: 'ASSISTANT',
+                metadata: {
+                  teamUsed: aiServiceResponse.data.team_used || 'GENERAL_QA',
+                  confidence: aiServiceResponse.data.rag_similarity || 0.9,
+                  thinkingProcess: aiServiceResponse.data.thinking_process,
+                  referenceLinks: aiServiceResponse.data.reference_links,
+                  strategy: aiServiceResponse.data.strategy,
+                  source: aiServiceResponse.data.source
+                }
+              }
+            })
+          }
+        } else {
+          throw new Error('Invalid AI service response format')
+        }
+      } catch (aiError) {
+        logger.warn(`AI service error: ${aiError}. Falling back to mock response.`)
+
+        // 降级到模拟响应
+        aiResponse = {
+          id: 'mock-response-id',
+          content: '感谢您的咨询！作为您的留学顾问，我来帮您分析：\n\n基于您的问题，我建议您考虑以下几个方面：\n\n1. **学术背景评估** - 请告诉我您的GPA和专业背景\n2. **目标院校定位** - 根据您的条件匹配合适的大学\n3. **申请时间规划** - 制定详细的申请时间表\n\n请提供更多信息，我将为您制定个性化的留学方案！',
+          type: 'assistant',
+          timestamp: new Date().toISOString(),
+          teamUsed: 'FALLBACK',
+          confidence: 0.8,
+          fallback: true
+        }
+      }
+
+      logger.info(`Message sent by user: ${userId}`)
+
+      res.json({
+        message: 'Message sent successfully',
+        userMessage: userMessage ? {
+          id: userMessage.id,
+          content: userMessage.content,
+          type: 'user',
+          timestamp: userMessage.createdAt.toISOString()
+        } : {
+          id: 'temp-user-msg-id',
+          content: message,
+          type: 'user',
+          timestamp: new Date().toISOString()
+        },
+        aiResponse
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async getChatHistory(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId
+      const { limit = 50, offset = 0 } = req.query
+
+      // 从数据库获取聊天历史
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' })
+      }
+
+      const messages = await prisma.chatMessages.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+        take: Number(limit),
+        skip: Number(offset)
+      })
+
+      const formattedMessages = messages.map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        type: msg.type.toLowerCase(),
+        timestamp: msg.createdAt.toISOString(),
+        metadata: msg.metadata
+      }))
+
+      res.json({
+        messages: formattedMessages,
+        total: messages.length
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async createSession(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId
+      const { title } = req.body
+
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' })
+      }
+
+      // 创建新的聊天会话
+      const session = await prisma.chatSessions.create({
+        data: {
+          userId,
+          title: title || '新的咨询'
+        }
+      })
+
+      logger.info(`New chat session created: ${session.id}`)
+
+      res.status(201).json({
+        message: 'Session created successfully',
+        session: {
+          id: session.id,
+          title: session.title,
+          userId: session.userId,
+          createdAt: session.createdAt.toISOString(),
+          updatedAt: session.updatedAt.toISOString(),
+          messageCount: 0
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async getSessions(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId
+
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' })
+      }
+
+      // 获取用户的所有聊天会话
+      const sessions = await prisma.chatSessions.findMany({
+        where: { userId },
+        include: {
+          messages: {
+            orderBy: { createdAt: 'desc' },
+            take: 1
+          }
+        },
+        orderBy: { updatedAt: 'desc' }
+      })
+
+      const formattedSessions = sessions.map(session => ({
+        id: session.id,
+        title: session.title,
+        createdAt: session.createdAt.toISOString(),
+        updatedAt: session.updatedAt.toISOString(),
+        messageCount: session.messages.length,
+        lastMessage: session.messages[0]?.content || null
+      }))
+
+      res.json({
+        sessions: formattedSessions
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async deleteSession(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId
+      const { sessionId } = req.params
+
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' })
+      }
+
+      // 删除聊天会话（会自动删除关联的消息）
+      await prisma.chatSessions.delete({
+        where: {
+          id: sessionId,
+          userId // 确保用户只能删除自己的会话
+        }
+      })
+
+      logger.info(`Chat session deleted: ${sessionId}`)
+
+      res.json({
+        message: 'Session deleted successfully'
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async uploadFile(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId
+
+      // TODO: 处理文件上传（需要multer配置）
+      // const file = req.file
+
+      logger.info(`File uploaded by user: ${userId}`)
+
+      res.json({
+        message: 'File uploaded successfully',
+        file: {
+          id: 'file-' + Date.now(),
+          name: 'transcript.pdf',
+          size: 1024000,
+          type: 'application/pdf',
+          url: '/uploads/files/temp-file.pdf'
+        }
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static async getSessionMessages(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId
+      const { sessionId } = req.params
+
+      if (!userId) {
+        return res.status(401).json({ error: 'User not authenticated' })
+      }
+
+      // 获取特定会话的消息
+      const messages = await prisma.chatMessages.findMany({
+        where: {
+          sessionId,
+          userId // 确保用户只能访问自己的消息
+        },
+        orderBy: { createdAt: 'asc' }
+      })
+
+      const formattedMessages = messages.map(msg => ({
+        id: msg.id,
+        content: msg.content,
+        type: msg.type.toLowerCase(),
+        timestamp: msg.createdAt.toISOString(),
+        metadata: msg.metadata
+      }))
+
+      res.json({
+        sessionId,
+        messages: formattedMessages
+      })
+    } catch (error) {
+      next(error)
+    }
+  }
+}

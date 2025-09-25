@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                    String        @id @default(cuid())
+  email                 String        @unique
+  name                  String
+  password              String
+  avatar                String?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  language              String        @default("zh")
+  notifications         Boolean       @default(true)
+  theme                 String        @default("light")
+  refreshToken          String?
+  refreshTokenExpiresAt DateTime?
+  applications          Application[]
+  chatMessages          ChatMessage[]
+  chatSessions          ChatSession[]
+  essays                Essay[]
+  profile               UserProfile?
+
+  @@map("users")
+}
+
+model UserProfile {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  phone            String?
+  wechat           String?
+  birthDate        DateTime?
+  nationality      String?
+  currentEducation String?
+  gpa              Float?
+  major            String?
+  graduationDate   DateTime?
+  toefl            Int?
+  ielts            Float?
+  gre              Int?
+  gmat             Int?
+  experiences      Json?
+  goals            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model School {
+  id           String        @id @default(cuid())
+  name         String
+  country      String
+  city         String?
+  ranking      Int?
+  website      String?
+  logo         String?
+  description  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+  programs     Program[]
+
+  @@map("schools")
+}
+
+model Program {
+  id           String        @id @default(cuid())
+  schoolId     String
+  name         String
+  degree       String
+  field        String
+  duration     Int?
+  tuition      Float?
+  currency     String        @default("USD")
+  description  String?
+  requirements Json?
+  deadlines    Json?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  applications Application[]
+  school       School        @relation(fields: [schoolId], references: [id])
+
+  @@map("programs")
+}
+
+model Application {
+  id          String             @id @default(cuid())
+  userId      String
+  schoolId    String
+  programId   String?
+  status      ApplicationStatus  @default(DRAFT)
+  deadline    DateTime?
+  documents   Json?
+  result      ApplicationResult?
+  resultDate  DateTime?
+  resultNotes String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  program     Program?           @relation(fields: [programId], references: [id])
+  school      School             @relation(fields: [schoolId], references: [id])
+  user        User               @relation(fields: [userId], references: [id])
+  essays      Essay[]
+
+  @@map("applications")
+}
+
+model Essay {
+  id            String       @id @default(cuid())
+  userId        String
+  applicationId String?
+  title         String
+  type          EssayType
+  prompt        String?
+  content       String
+  isAIGenerated Boolean      @default(false)
+  aiPrompt      String?
+  version       Int          @default(1)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  application   Application? @relation(fields: [applicationId], references: [id])
+  user          User         @relation(fields: [userId], references: [id])
+
+  @@map("essays")
+}
+
+model ChatSession {
+  id        String        @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String       @id @default(cuid())
+  sessionId String?
+  userId    String
+  content   String
+  type      MessageType
+  metadata  Json?
+  createdAt DateTime     @default(now())
+  session   ChatSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  INTERVIEW
+  WAITLISTED
+  ACCEPTED
+  REJECTED
+  DEFERRED
+}
+
+enum ApplicationResult {
+  ACCEPTED
+  REJECTED
+  WAITLISTED
+  DEFERRED
+}
+
+enum EssayType {
+  PERSONAL_STATEMENT
+  STATEMENT_OF_PURPOSE
+  SUPPLEMENTAL_ESSAY
+  RECOMMENDATION_LETTER
+  COVER_LETTER
+  OTHER
+}
+
+enum MessageType {
+  USER
+  ASSISTANT
+  SYSTEM
+}

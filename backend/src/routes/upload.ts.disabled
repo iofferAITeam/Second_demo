@@ -1,0 +1,229 @@
+import { Router, Request } from 'express'
+import multer from 'multer'
+import { writeFile, mkdir } from 'fs/promises'
+import { existsSync } from 'fs'
+import path from 'path'
+import { prisma } from '../lib/prisma'
+import { authenticateToken } from '../middleware/auth'
+
+interface AuthRequest extends Request {
+  user?: {
+    id: string
+    email: string
+    name: string
+  }
+}
+
+const router = Router()
+
+// Configure multer for memory storage
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Allow images and documents
+    const allowedTypes = ['image/', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+    const isAllowed = allowedTypes.some(type => file.mimetype.startsWith(type))
+
+    if (isAllowed) {
+      cb(null, true)
+    } else {
+      cb(new Error('Invalid file type. Only images and documents are allowed.'))
+    }
+  }
+})
+
+// Avatar upload endpoint
+router.post('/avatar', authenticateToken, upload.single('avatar'), async (req: AuthRequest, res) => {
+  try {
+    const file = req.file
+    const userId = req.user?.id
+
+    if (!file || !userId) {
+      return res.status(400).json({ error: 'No file provided or user not authenticated' })
+    }
+
+    // Validate file type (additional check)
+    if (!file.mimetype.startsWith('image/')) {
+      return res.status(400).json({ error: 'File must be an image' })
+    }
+
+    // Create uploads directory
+    const uploadDir = path.join(process.cwd(), 'uploads', 'avatars')
+    if (!existsSync(uploadDir)) {
+      await mkdir(uploadDir, { recursive: true })
+    }
+
+    // Generate unique filename
+    const fileExtension = path.extname(file.originalname)
+    const fileName = `${userId}-${Date.now()}${fileExtension}`
+    const filePath = path.join(uploadDir, fileName)
+
+    // Save file to disk
+    await writeFile(filePath, file.buffer)
+
+    // Generate URL for frontend
+    const avatarUrl = `/uploads/avatars/${fileName}`
+
+    // Update user avatar in database
+    await prisma.user.update({
+      where: { id: userId },
+      data: { avatar: avatarUrl }
+    })
+
+    res.json({
+      success: true,
+      avatarUrl,
+      message: 'Avatar uploaded successfully'
+    })
+  } catch (error) {
+    console.error('Avatar upload error:', error)
+    res.status(500).json({ error: 'Failed to upload avatar' })
+  }
+})
+
+// Document upload endpoint
+router.post('/document', authenticateToken, upload.single('document'), async (req: AuthRequest, res) => {
+  try {
+    const file = req.file
+    const userId = req.user?.id
+    const { documentType, description } = req.body
+
+    if (!file || !userId) {
+      return res.status(400).json({ error: 'No file provided or user not authenticated' })
+    }
+
+    // Create uploads directory
+    const uploadDir = path.join(process.cwd(), 'uploads', 'documents')
+    if (!existsSync(uploadDir)) {
+      await mkdir(uploadDir, { recursive: true })
+    }
+
+    // Generate unique filename
+    const fileExtension = path.extname(file.originalname)
+    const fileName = `${userId}-${Date.now()}${fileExtension}`
+    const filePath = path.join(uploadDir, fileName)
+
+    // Save file to disk
+    await writeFile(filePath, file.buffer)
+
+    // Generate URL for frontend
+    const documentUrl = `/uploads/documents/${fileName}`
+
+    // Save document info to database (we'll need to create a Document model)
+    // For now, we'll store in the experiences JSON field as documents
+    const profile = await prisma.userProfile.findUnique({
+      where: { userId }
+    })
+
+    const currentExperiences = profile?.experiences as any || {}
+    const documents = currentExperiences.documents || []
+
+    const newDocument = {
+      id: Date.now().toString(),
+      name: file.originalname,
+      type: documentType || 'other',
+      size: file.size,
+      url: documentUrl,
+      uploadDate: new Date().toISOString(),
+      description: description || '',
+      status: 'uploaded'
+    }
+
+    documents.push(newDocument)
+
+    await prisma.userProfile.upsert({
+      where: { userId },
+      update: {
+        experiences: {
+          ...currentExperiences,
+          documents
+        }
+      },
+      create: {
+        userId,
+        experiences: {
+          documents: [newDocument]
+        }
+      }
+    })
+
+    res.json({
+      success: true,
+      document: newDocument,
+      message: 'Document uploaded successfully'
+    })
+  } catch (error) {
+    console.error('Document upload error:', error)
+    res.status(500).json({ error: 'Failed to upload document' })
+  }
+})
+
+// Get user documents
+router.get('/documents', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id
+
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' })
+    }
+
+    const profile = await prisma.userProfile.findUnique({
+      where: { userId }
+    })
+
+    const experiences = profile?.experiences as any || {}
+    const documents = experiences.documents || []
+
+    res.json({
+      success: true,
+      documents
+    })
+  } catch (error) {
+    console.error('Get documents error:', error)
+    res.status(500).json({ error: 'Failed to get documents' })
+  }
+})
+
+// Delete document
+router.delete('/document/:documentId', authenticateToken, async (req: AuthRequest, res) => {
+  try {
+    const userId = req.user?.id
+    const { documentId } = req.params
+
+    if (!userId) {
+      return res.status(401).json({ error: 'User not authenticated' })
+    }
+
+    const profile = await prisma.userProfile.findUnique({
+      where: { userId }
+    })
+
+    const currentExperiences = profile?.experiences as any || {}
+    const documents = currentExperiences.documents || []
+
+    const updatedDocuments = documents.filter((doc: any) => doc.id !== documentId)
+
+    await prisma.userProfile.update({
+      where: { userId },
+      data: {
+        experiences: {
+          ...currentExperiences,
+          documents: updatedDocuments
+        }
+      }
+    })
+
+    res.json({
+      success: true,
+      message: 'Document deleted successfully'
+    })
+  } catch (error) {
+    console.error('Delete document error:', error)
+    res.status(500).json({ error: 'Failed to delete document' })
+  }
+})
+
+export default router
