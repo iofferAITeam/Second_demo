@@ -1,220 +1,269 @@
-import { useState } from 'react'
-import { UpdateProfileRequest, User, UserProfile } from '@/types/profile'
+'use client'
 
-interface BasicInfoFormProps {
-  user: User | null
-  profile: UserProfile | null
-  formData: UpdateProfileRequest
-  isEditing: boolean
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void
+import React from 'react'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { BasicInfoData, FormSectionProps } from '@/types/profile-form'
+
+interface BasicInfoFormProps extends FormSectionProps {
+  data: BasicInfoData
+  errors?: Partial<Record<keyof BasicInfoData, string>>
 }
 
-export default function BasicInfoForm({ user, profile, formData, isEditing, onChange }: BasicInfoFormProps) {
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
-
-  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image file')
-      return
-    }
-
-    // Validate file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Image size cannot exceed 5MB')
-      return
-    }
-
-    setIsUploadingAvatar(true)
-
-    try {
-      const formData = new FormData()
-      formData.append('avatar', file)
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/upload/avatar`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-        },
-        body: formData
-      })
-
-      if (response.ok) {
-        const { avatarUrl } = await response.json()
-        // Reload the page to reflect avatar changes
-        window.location.reload()
-      } else {
-        alert('Avatar upload failed, please try again')
-      }
-    } catch (error) {
-      console.error('Avatar upload error:', error)
-      alert('Avatar upload failed, please try again')
-    } finally {
-      setIsUploadingAvatar(false)
-    }
+export default function BasicInfoForm({ data, errors, onChange }: BasicInfoFormProps) {
+  const handleInputChange = (field: keyof BasicInfoData, value: string) => {
+    onChange(field, value)
   }
 
-  if (!user || !profile) return null
+  const handleCheckboxChange = (field: keyof BasicInfoData, checked: boolean) => {
+    onChange(field, checked)
+  }
 
   return (
-    <div className="space-y-6">
-      {/* Personal Information Section */}
-      <div className="border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Personal Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-            {isEditing ? (
+    <div className="space-y-[32px]">
+      {/* Section Header */}
+      <div className="flex gap-[8px] items-center">
+        <div className="bg-[#1c5dff] h-[20px] w-[4px] rounded-[4px]" />
+        <h3 className="text-[20px] font-bold text-black font-inter">BASIC INFORMATION</h3>
+      </div>
+
+      {/* Name Section */}
+      <div className="space-y-[16px]">
+        <h4 className="text-[16px] font-semibold text-black font-inter">Name</h4>
+        <div className="flex gap-[16px]">
+          <div className="w-[200px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+              errors?.firstName ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
               <input
                 type="text"
-                name="name"
-                value={formData.name || ''}
-                onChange={onChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your full name"
+                placeholder="First Name"
+                value={data.firstName}
+                onChange={(e) => handleInputChange('firstName', e.target.value)}
+                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
               />
-            ) : (
-              <p className="text-gray-900">{user.name || 'Not provided'}</p>
+            </div>
+            {errors?.firstName && (
+              <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>
             )}
           </div>
-
-          {/* Email (read-only) */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <p className="text-gray-600">{user.email}</p>
+          <div className="w-[200px]">
+            <div className="bg-white border border-[#e8efff] rounded-[30px] px-[20px] py-[16px]">
+              <input
+                type="text"
+                placeholder="Middle Name（if has）"
+                value={data.middleName || ''}
+                onChange={(e) => handleInputChange('middleName', e.target.value)}
+                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+              />
+            </div>
           </div>
+          <div className="w-[200px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+              errors?.lastName ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
+              <input
+                type="text"
+                placeholder="Last Name"
+                value={data.lastName}
+                onChange={(e) => handleInputChange('lastName', e.target.value)}
+                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+              />
+            </div>
+            {errors?.lastName && (
+              <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>
+            )}
+          </div>
+        </div>
+      </div>
 
-          {/* Phone */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-            {isEditing ? (
+      {/* Contact Details Section */}
+      <div className="space-y-[16px]">
+        <h4 className="text-[16px] font-semibold text-black font-inter">Contact Details</h4>
+        <div className="flex gap-[16px]">
+          <div className="w-[250px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+              errors?.phone ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
               <input
                 type="tel"
-                name="phone"
-                value={formData.phone || ''}
-                onChange={onChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="+1 (555) 123-4567"
+                placeholder="Phone Number"
+                value={data.phone}
+                onChange={(e) => handleInputChange('phone', e.target.value)}
+                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
               />
-            ) : (
-              <p className="text-gray-900">{profile.phone || 'Not provided'}</p>
+            </div>
+            {errors?.phone && (
+              <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
             )}
           </div>
-
-          {/* WeChat */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">WeChat ID</label>
-            {isEditing ? (
+          <div className="w-[300px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+              errors?.email ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
               <input
-                type="text"
-                name="wechat"
-                value={formData.wechat || ''}
-                onChange={onChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Your WeChat ID"
+                type="email"
+                placeholder="Email Address"
+                value={data.email}
+                onChange={(e) => handleInputChange('email', e.target.value)}
+                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
               />
-            ) : (
-              <p className="text-gray-900">{profile.wechat || 'Not provided'}</p>
-            )}
-          </div>
-
-          {/* Birth Date */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
-            {isEditing ? (
-              <input
-                type="date"
-                name="birthDate"
-                value={
-                  formData.birthDate ||
-                  (profile.birthDate ? new Date(profile.birthDate).toISOString().split('T')[0] : '')
-                }
-                onChange={onChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            ) : (
-              <p className="text-gray-900">
-                {profile.birthDate ? new Date(profile.birthDate).toLocaleDateString() : 'Not provided'}
-              </p>
-            )}
-          </div>
-
-          {/* Nationality */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nationality</label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="nationality"
-                value={formData.nationality || ''}
-                onChange={onChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="e.g., American, Chinese, Canadian"
-              />
-            ) : (
-              <p className="text-gray-900">{profile.nationality || 'Not provided'}</p>
+            </div>
+            {errors?.email && (
+              <p className="text-red-500 text-xs mt-1">{errors.email}</p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Avatar Section */}
-      <div className="border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Profile Avatar</h3>
-        <div className="flex items-center space-x-4">
-          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center overflow-hidden">
-            {user.avatar ? (
-              <img src={`${process.env.NEXT_PUBLIC_API_URL}${user.avatar}`} alt="Avatar" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-xl text-white font-semibold">
-                {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
-              </span>
+      {/* Nationality Section */}
+      <div className="space-y-[16px]">
+        <h4 className="text-[16px] font-semibold text-black font-inter">Nationality</h4>
+        <div className="flex gap-[16px] items-center">
+          <div className="w-[250px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+              errors?.nationality ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
+              <Select value={data.nationality} onValueChange={(value: string) => handleInputChange('nationality', value)}>
+                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+                  <SelectValue placeholder="Choose Nationality" />
+                </SelectTrigger>
+                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
+                  <SelectItem value="us">United States</SelectItem>
+                  <SelectItem value="ca">Canada</SelectItem>
+                  <SelectItem value="uk">United Kingdom</SelectItem>
+                  <SelectItem value="au">Australia</SelectItem>
+                  <SelectItem value="de">Germany</SelectItem>
+                  <SelectItem value="fr">France</SelectItem>
+                  <SelectItem value="jp">Japan</SelectItem>
+                  <SelectItem value="kr">South Korea</SelectItem>
+                  <SelectItem value="cn">China</SelectItem>
+                  <SelectItem value="in">India</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {errors?.nationality && (
+              <p className="text-red-500 text-xs mt-1">{errors.nationality}</p>
             )}
           </div>
-          <div>
+          <div className="flex gap-[8px] items-center">
             <input
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarUpload}
-              className="hidden"
-              id="avatar-upload"
+              type="checkbox"
+              checked={data.visaRequired}
+              onChange={(e) => handleCheckboxChange('visaRequired', e.target.checked)}
+              className="w-4 h-4 border border-[#d2dfff] rounded-[4px] accent-[#1c5dff]"
             />
-            <button
-              type="button"
-              onClick={() => document.getElementById('avatar-upload')?.click()}
-              disabled={isUploadingAvatar}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-            >
-              {isUploadingAvatar ? 'Uploading...' : 'Change Avatar'}
-            </button>
-            <p className="text-sm text-gray-500 mt-1">
-              Upload an image (max 5MB)
-            </p>
+            <span className="text-[16px] text-black font-inter">Whether a Visa is Required</span>
           </div>
         </div>
       </div>
 
-      {/* Goals Section */}
-      <div className="border rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Academic & Career Goals</h3>
-        {isEditing ? (
-          <textarea
-            name="goals"
-            value={formData.goals || ''}
-            onChange={onChange}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Describe your academic and career goals, what you hope to achieve..."
-          />
-        ) : (
-          <p className="text-gray-900 whitespace-pre-wrap">
-            {profile.goals || 'No goals specified yet. Share your academic and career aspirations to help us provide better recommendations.'}
-          </p>
-        )}
+      {/* Personality & Interests Section */}
+      <div className="space-y-[16px]">
+        <div className="flex gap-[8px] items-center">
+          <div className="bg-[#1c5dff] h-[20px] w-[4px] rounded-[4px]" />
+          <h4 className="text-[20px] font-bold text-black font-inter">PERSONALITY & INTERESTS</h4>
+        </div>
+        
+        {/* MBTI Dropdown */}
+        <div className="space-y-[8px]">
+          <label className="text-[14px] font-medium text-black font-inter">MBTI</label>
+          <div className="w-[250px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+              errors?.mbti ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
+              <Select value={data.mbti || ''} onValueChange={(value: string) => handleInputChange('mbti', value)}>
+                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+                  <SelectValue placeholder="Select MBTI Type" />
+                </SelectTrigger>
+                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
+                  <SelectItem value="INTJ">INTJ - Architect</SelectItem>
+                  <SelectItem value="INTP">INTP - Thinker</SelectItem>
+                  <SelectItem value="ENTJ">ENTJ - Commander</SelectItem>
+                  <SelectItem value="ENTP">ENTP - Debater</SelectItem>
+                  <SelectItem value="INFJ">INFJ - Advocate</SelectItem>
+                  <SelectItem value="INFP">INFP - Mediator</SelectItem>
+                  <SelectItem value="ENFJ">ENFJ - Protagonist</SelectItem>
+                  <SelectItem value="ENFP">ENFP - Campaigner</SelectItem>
+                  <SelectItem value="ISTJ">ISTJ - Logistician</SelectItem>
+                  <SelectItem value="ISFJ">ISFJ - Protector</SelectItem>
+                  <SelectItem value="ESTJ">ESTJ - Executive</SelectItem>
+                  <SelectItem value="ESFJ">ESFJ - Consul</SelectItem>
+                  <SelectItem value="ISTP">ISTP - Virtuoso</SelectItem>
+                  <SelectItem value="ISFP">ISFP - Adventurer</SelectItem>
+                  <SelectItem value="ESTP">ESTP - Entrepreneur</SelectItem>
+                  <SelectItem value="ESFP">ESFP - Entertainer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {errors?.mbti && (
+              <p className="text-red-500 text-xs mt-1">{errors.mbti}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Extracurricular Activities */}
+        <div className="space-y-[8px]">
+          <label className="text-[14px] font-medium text-black font-inter">Extracurricular Activities</label>
+          <div className="w-[400px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+              errors?.extracurricular ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
+              <input
+                type="text"
+                placeholder="e.g., Student Council, Debate Team, Sports"
+                value={data.extracurricular || ''}
+                onChange={(e) => handleInputChange('extracurricular', e.target.value)}
+                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+              />
+            </div>
+            {errors?.extracurricular && (
+              <p className="text-red-500 text-xs mt-1">{errors.extracurricular}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Personal Strengths */}
+        <div className="space-y-[8px]">
+          <label className="text-[14px] font-medium text-black font-inter">Personal Strengths</label>
+          <div className="w-[500px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+              errors?.personalStrengths ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
+              <textarea
+                placeholder="Describe your key strengths and qualities"
+                value={data.personalStrengths || ''}
+                onChange={(e) => handleInputChange('personalStrengths', e.target.value)}
+                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none resize-none min-h-[80px]"
+                rows={3}
+              />
+            </div>
+            {errors?.personalStrengths && (
+              <p className="text-red-500 text-xs mt-1">{errors.personalStrengths}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Hobbies & Interests */}
+        <div className="space-y-[8px]">
+          <label className="text-[14px] font-medium text-black font-inter">Hobbies & Interests</label>
+          <div className="w-[500px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+              errors?.hobbies ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
+              <textarea
+                placeholder="Share your hobbies, interests, and activities you enjoy"
+                value={data.hobbies || ''}
+                onChange={(e) => handleInputChange('hobbies', e.target.value)}
+                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none resize-none min-h-[80px]"
+                rows={3}
+              />
+            </div>
+            {errors?.hobbies && (
+              <p className="text-red-500 text-xs mt-1">{errors.hobbies}</p>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )
