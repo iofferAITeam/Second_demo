@@ -9,6 +9,7 @@ interface AuthRequest extends Request {
     email: string
     name: string
   }
+  userId?: string
 }
 
 export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -20,15 +21,21 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
     }
 
     const token = authHeader.substring(7)
+    console.log('🔍 Received token:', token.substring(0, 50) + '...')
 
     const decoded = TokenService.verifyAccessToken(token)
+    console.log('🔍 Token decoded:', decoded)
     if (!decoded) {
+      console.log('❌ Token verification failed')
       return res.status(401).json({ error: 'Invalid token' })
     }
 
+    console.log('🔍 Looking up user with ID:', decoded.userId)
     const user = await AuthDatabaseService.findUserById(decoded.userId)
+    console.log('🔍 User lookup result:', user ? 'Found' : 'Not found')
 
     if (!user) {
+      console.log('❌ User not found in database')
       return res.status(404).json({ error: 'User not found' })
     }
 
@@ -37,7 +44,9 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
       email: user.email,
       name: user.name
     }
+    req.userId = user.id
 
+    console.log('✅ Auth middleware completed, userId set:', user.id)
     next()
   } catch (error) {
     logger.error('Token authentication error:', error)
