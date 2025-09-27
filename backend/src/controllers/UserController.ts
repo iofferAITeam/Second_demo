@@ -2,6 +2,10 @@ import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import { logger } from '../utils/logger'
 import { prisma } from '../lib/prisma'
+import { ProfileFormData, StructuredProfileResponse, ProfileResponse } from '../types/profile'
+import { transformFormDataToDatabase, transformDatabaseToFormData, cleanProfileUpdateData } from '../utils/profile-transformer'
+import { AvatarProcessor } from '../utils/avatar-processor'
+import path from 'path'
 
 interface AuthRequest extends Request {
   userId?: string
@@ -16,7 +20,7 @@ export class UserController {
         return res.status(401).json({ error: 'Unauthorized' })
       }
 
-      // 获取用户基本信息和Profile
+      // Get user basic information
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: {
@@ -35,22 +39,20 @@ export class UserController {
         return res.status(404).json({ error: 'User not found' })
       }
 
-      // 获取详细的Profile信息
-      let profile = await prisma.userProfile.findUnique({
+      // Get detailed profile information
+      const profile = await prisma.userProfile.findUnique({
         where: { userId }
       })
 
-      // 如果没有Profile，创建一个空的
-      if (!profile) {
-        profile = await prisma.userProfile.create({
-          data: { userId }
-        })
+      // Transform database data to frontend form structure
+      const profileData = transformDatabaseToFormData(user, profile)
+
+      const response: StructuredProfileResponse = {
+        user,
+        profileData
       }
 
-      res.json({
-        user,
-        profile
-      })
+      res.json(response)
     } catch (error) {
       next(error)
     }
@@ -59,75 +61,37 @@ export class UserController {
   static async updateProfile(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.userId
-      const {
-        name,
-        phone,
-        wechat,
-        birthDate,
-        nationality,
-        currentEducation,
-        gpa,
-        major,
-        graduationDate,
-        toefl,
-        ielts,
-        gre,
-        gmat,
-        experiences,
-        goals
-      } = req.body
+      const formData: ProfileFormData = req.body
 
       if (!userId) {
         return res.status(401).json({ error: 'Unauthorized' })
       }
 
-      // 更新用户基本信息
-      if (name) {
+      // Transform frontend form data to database format
+      const { userUpdates, profileUpdates } = transformFormDataToDatabase(formData)
+
+      // Clean up undefined values
+      const cleanedProfileUpdates = cleanProfileUpdateData(profileUpdates)
+
+      // Update user basic information if needed
+      if (userUpdates.name) {
         await prisma.user.update({
           where: { id: userId },
-          data: { name }
+          data: userUpdates
         })
       }
 
-      // 更新或创建UserProfile
+      // Update or create UserProfile
       const profile = await prisma.userProfile.upsert({
         where: { userId },
-        update: {
-          phone,
-          wechat,
-          birthDate: birthDate ? new Date(birthDate) : undefined,
-          nationality,
-          currentEducation,
-          gpa,
-          major,
-          graduationDate: graduationDate ? new Date(graduationDate) : undefined,
-          toefl,
-          ielts,
-          gre,
-          gmat,
-          experiences,
-          goals
-        },
+        update: cleanedProfileUpdates,
         create: {
           userId,
-          phone,
-          wechat,
-          birthDate: birthDate ? new Date(birthDate) : undefined,
-          nationality,
-          currentEducation,
-          gpa,
-          major,
-          graduationDate: graduationDate ? new Date(graduationDate) : undefined,
-          toefl,
-          ielts,
-          gre,
-          gmat,
-          experiences,
-          goals
+          ...cleanedProfileUpdates
         }
       })
 
-      // 获取更新后的完整信息
+      // Get updated user information
       const updatedUser = await prisma.user.findUnique({
         where: { id: userId },
         select: {
@@ -144,12 +108,15 @@ export class UserController {
 
       logger.info(`User profile updated: ${userId}`)
 
-      res.json({
+      const response: ProfileResponse = {
         message: 'Profile updated successfully',
-        user: updatedUser,
+        user: updatedUser!,
         profile
-      })
+      }
+
+      res.json(response)
     } catch (error) {
+      logger.error('Profile update error:', error)
       next(error)
     }
   }
@@ -158,16 +125,50 @@ export class UserController {
     try {
       const userId = req.userId
 
-      // TODO: 处理文件上传（需要multer配置）
-      // const avatarUrl = req.file?.path
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' })
+      }
 
-      logger.info(`Avatar uploaded for user: ${userId}`)
+      // Check if file was uploaded
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' })
+      }
+
+      // Validate the uploaded image
+      const isValidImage = await AvatarProcessor.validateImage(req.file.path)
+      if (!isValidImage) {
+        return res.status(400).json({ error: 'Invalid image file' })
+      }
+
+      // Generate optimized filename
+      const optimizedFilename = AvatarProcessor.generateOptimizedFilename(req.file.originalname, userId)
+      const outputPath = path.join('uploads/avatars', optimizedFilename)
+
+      // Process and resize the avatar
+      await AvatarProcessor.processAvatar(req.file.path, outputPath, {
+        width: 200,
+        height: 200,
+        quality: 90,
+        format: 'jpeg'
+      })
+
+      // Generate avatar URL (relative to public directory)
+      const avatarUrl = `/uploads/avatars/${optimizedFilename}`
+
+      // Update user's avatar in database
+      await prisma.user.update({
+        where: { id: userId },
+        data: { avatar: avatarUrl }
+      })
+
+      logger.info(`Avatar uploaded and processed for user: ${userId}, file: ${optimizedFilename}`)
 
       res.json({
         message: 'Avatar uploaded successfully',
-        avatarUrl: '/uploads/avatars/temp-avatar.jpg'
+        avatarUrl: avatarUrl
       })
     } catch (error) {
+      logger.error('Avatar upload error:', error)
       next(error)
     }
   }

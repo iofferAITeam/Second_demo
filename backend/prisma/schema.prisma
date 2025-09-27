@@ -33,20 +33,65 @@ model User {
 model UserProfile {
   id               String    @id @default(cuid())
   userId           String    @unique
+  
+  // Basic Information
   phone            String?
   wechat           String?
   birthDate        DateTime?
   nationality      String?
+  visaRequired     Boolean   @default(false)
+  mbti             String?
+  extracurricular  String?
+  personalStrengths String?
+  hobbies          String?
+  
+  // Academic Performance
   currentEducation String?
   gpa              Float?
+  majorGpa         Float?
   major            String?
   graduationDate   DateTime?
+  highestDegree    String?
+  highSchoolName   String?
+  universityName   String?
+  graduationYear   String?
+  majorSubjects    String[]  @default([])
+  
+  // Test Scores
+  satScore         Int?
+  actScore         Int?
   toefl            Int?
   ielts            Float?
   gre              Int?
   gmat             Int?
+  languageTestType String?
+  languageTestScore String?
+  languageTestDate String?
+  standardizedTestType String?
+  standardizedTestScore String?
+  standardizedTestDate String?
+  
+  // Research & Publications
+  researchExperience String?
+  publications      String?
+  
+  // Application Intentions
+  intendedDegree   String?
+  intendedIntakeTerm String?
+  intendedMajor    String?
+  intendedCountries String[] @default([])
+  intendedBudgets  String?
+  scholarshipRequirements String?
+  otherFinancialAidsRequired Boolean @default(false)
+  otherPreference  String?
+  careerIntentions String?
+  internshipExperience String?
+  volunteerExperience String?
+  
+  // Legacy fields (keeping for backward compatibility)
   experiences      Json?
   goals            String?
+  
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)

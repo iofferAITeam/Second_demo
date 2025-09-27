@@ -46,8 +46,13 @@ class ApiClient {
     const url = `${this.baseURL}${endpoint}`
 
     // 设置默认headers
-    const defaultHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
+    const defaultHeaders: Record<string, string> = {}
+    
+    // Only set Content-Type for non-FormData requests
+    if (!(body instanceof FormData)) {
+      defaultHeaders['Content-Type'] = 'application/json'
+    } else {
+      console.log('🔍 API Client: Sending FormData with fields:', Array.from(body.entries()).map(([key, value]) => `${key}: ${value instanceof File ? `${value.name} (${value.size} bytes)` : value}`))
     }
 
     // 如果有access token，添加到headers
@@ -296,6 +301,19 @@ class ApiClient {
   // 通用DELETE请求
   async delete<T>(endpoint: string, config?: Omit<RequestConfig, 'method' | 'body'>) {
     return this.request<T>(endpoint, { ...config, method: 'DELETE' })
+  }
+
+  // 文件上传方法
+  async uploadFile<T>(
+    endpoint: string,
+    formData: FormData,
+    config?: Omit<RequestConfig, 'method' | 'body'>
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>(endpoint, {
+      ...config,
+      method: 'POST',
+      body: formData
+    })
   }
 }
 

@@ -10,17 +10,34 @@ import Navbar from '@/components/shared/Navbar'
 
 export default function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const { user, profile, isLoading, error } = useProfile()
+  const [avatarCacheBuster, setAvatarCacheBuster] = useState(0)
+  const { user, formData, isLoading, error, saveProfile, uploadAvatar } = useProfile()
+
+  // Debug avatar URL construction
+  const avatarUrl = user?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatar}?v=${avatarCacheBuster}` : undefined
+  console.log('🖼️ Avatar URL constructed:', { 
+    originalAvatar: user?.avatar, 
+    cacheBuster: avatarCacheBuster, 
+    finalUrl: avatarUrl 
+  })
 
   const handleEdit = () => {
     setIsEditModalOpen(true)
   }
 
-  const handleAvatarUpdate = (file: File) => {
-    // TODO: Implement avatar upload functionality
-    console.log('Avatar update:', file.name)
-    // You can implement the avatar upload logic here
-    // For example: uploadAvatar(file) and update user state
+  const handleAvatarUpdate = async (file: File) => {
+    try {
+      await uploadAvatar(file)
+      console.log('Avatar uploaded successfully:', file.name)
+      // Force avatar refresh by incrementing cache buster
+      setAvatarCacheBuster(prev => {
+        const newBuster = prev + 1
+        console.log('🔄 Cache buster updated:', newBuster)
+        return newBuster
+      })
+    } catch (error) {
+      console.error('Avatar upload failed:', error)
+    }
   }
 
   const handlePhoneUpdate = (phone: string) => {
@@ -42,12 +59,15 @@ export default function ProfilePage() {
     // Navigate to upgrade page or open upgrade modal
   }
 
-  const handleSaveProfile = (data: any) => {
-    // TODO: Implement save functionality
-    console.log('Profile data saved:', data)
-    // Here you would typically send the data to your backend API
-    // For now, just close the modal
-    setIsEditModalOpen(false)
+  const handleSaveProfile = async (data: any) => {
+    try {
+      await saveProfile(data)
+      setIsEditModalOpen(false)
+      console.log('Profile data saved successfully:', data)
+    } catch (error) {
+      console.error('Failed to save profile:', error)
+      // Error handling is done in the useProfile hook
+    }
   }
 
   if (isLoading) {
@@ -77,7 +97,7 @@ export default function ProfilePage() {
     )
   }
 
-  if (!user || !profile) {
+  if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <p className="text-gray-600">Please log in to view your profile.</p>
@@ -113,8 +133,8 @@ export default function ProfilePage() {
                   user={{
                     name: user.name || 'User',
                     email: user.email,
-                    phone: profile?.phone || undefined,
-                    avatar: user.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatar}` : undefined,
+                    phone: formData?.basicInfo.phone || undefined,
+                    avatar: avatarUrl,
                     createdAt: user.createdAt.toString()
                   }}
                   subscription={{
@@ -146,18 +166,20 @@ export default function ProfilePage() {
 
       {/* Edit Profile Modal */}
       {user && (
-        <EditProfileModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          user={{
-            name: user.name || 'User',
-            email: user.email,
-            phone: profile?.phone || undefined,
-            avatar: user.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatar}` : undefined,
-            createdAt: user.createdAt.toString()
-          }}
-          onSave={handleSaveProfile}
-        />
+            <EditProfileModal
+              isOpen={isEditModalOpen}
+              onClose={() => setIsEditModalOpen(false)}
+              user={{
+                name: user.name || 'User',
+                email: user.email,
+                phone: formData?.basicInfo.phone || undefined,
+                avatar: user.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatar}?v=${avatarCacheBuster}` : undefined,
+                createdAt: user.createdAt.toString()
+              }}
+              profileData={formData}
+              onSave={handleSaveProfile}
+              onAvatarUpload={handleAvatarUpdate}
+            />
       )}
     </div>
   )
