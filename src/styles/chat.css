@@ -12,7 +12,7 @@
   background: white;
   border-radius: 24px;
   padding: 24px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border: 1px solid #e5e7eb;
   min-height: 580px;
   display: flex;
@@ -43,19 +43,19 @@
 }
 
 .chat-messages::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: url('/images/background.png') center center;
+  background: url("/images/background.png") center center;
   background-size: cover;
   z-index: 1;
 }
 
 .chat-messages::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -124,7 +124,7 @@
   line-height: 1.6;
   margin-bottom: 0;
   border: 1px solid #e5e7eb;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   position: relative;
   font-size: 16px;
   width: 100%;
@@ -181,7 +181,7 @@
   border: 1px solid #e0e0e0;
   border-radius: 24px;
   padding: 4px 4px 4px 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .chat-input {
@@ -202,7 +202,8 @@
   cursor: not-allowed;
 }
 
-.attach-btn, .send-btn {
+.attach-btn,
+.send-btn {
   width: 40px;
   height: 40px;
   border: none;
@@ -247,7 +248,7 @@
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 12px 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .file-preview .file-icon {
