@@ -7,6 +7,9 @@ const router = Router()
 // 发送消息
 router.post('/message', authenticateToken, ChatController.sendMessage)
 
+// 临时测试端点 - 不需要认证
+router.post('/test-message', ChatController.sendMessage)
+
 // 获取聊天历史
 router.get('/history', authenticateToken, ChatController.getChatHistory)
 

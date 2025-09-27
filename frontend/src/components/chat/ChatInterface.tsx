@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ChatMessages from './ChatMessages'
 import ChatInput from './ChatInput'
 import { api, ChatMessage } from '@/lib/api'
@@ -33,6 +33,7 @@ export default function ChatInterface() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [currentSessionId, setCurrentSessionId] = useState<string | undefined>()
+
 
   const convertApiMessageToMessage = (apiMessage: ChatMessage): Message => ({
     id: apiMessage.id || Math.random().toString(36).substr(2, 9),
@@ -85,13 +86,15 @@ export default function ChatInterface() {
         const aiMessage: Message = {
           id: Math.random().toString(36).substr(2, 9),
           type: 'bot',
-          content: response.message || 'No response',
+          content: response.aiResponse?.content || 'No response',
           timestamp: new Date(),
-          teamUsed: (response as any).team_used,
-          thinkingProcess: (response as any).thinking_process,
-          referenceLinks: (response as any).reference_links,
-          strategy: (response as any).strategy,
-          source: (response as any).source
+          teamUsed: response.aiResponse?.teamUsed,
+          confidence: response.aiResponse?.confidence,
+          thinkingProcess: response.aiResponse?.thinkingProcess,
+          referenceLinks: response.aiResponse?.referenceLinks,
+          strategy: response.aiResponse?.strategy,
+          source: response.aiResponse?.source,
+          fallback: response.aiResponse?.fallback
         }
         return [...withoutLoading, aiMessage]
       })
@@ -130,6 +133,23 @@ export default function ChatInterface() {
       setIsLoading(false)
     }
   }
+
+  // Check for initial message from form submission
+  useEffect(() => {
+    const initialMessage = sessionStorage.getItem('initialMessage')
+    const formData = sessionStorage.getItem('userFormData')
+
+    if (initialMessage) {
+      // Clear the sessionStorage to prevent re-sending on refresh
+      sessionStorage.removeItem('initialMessage')
+      sessionStorage.removeItem('userFormData')
+
+      // Send the initial message automatically
+      setTimeout(() => {
+        addMessage(initialMessage)
+      }, 1000) // Small delay to ensure component is fully rendered
+    }
+  }, []) // Empty dependency array to run only once on mount
 
   return (
     <div className="chat-container">

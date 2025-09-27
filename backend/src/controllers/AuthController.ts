@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import crypto from 'crypto'
 import { logger } from '../utils/logger'
 import { TokenService } from '../utils/token'
-import { AuthDatabaseService } from '../database'
+import { prisma } from '../lib/prisma'
 
 export class AuthController {
   static async register(req: Request, res: Response, next: NextFunction) {
@@ -20,7 +21,9 @@ export class AuthController {
       }
 
       // 检查用户是否已存在
-      const existingUser = await AuthDatabaseService.findUserByEmail(email)
+      const existingUser = await prisma.user.findUnique({
+        where: { email }
+      })
       if (existingUser) {
         return res.status(409).json({ error: "User already exists" })
       }
@@ -29,21 +32,26 @@ export class AuthController {
       const hashedPassword = await bcrypt.hash(password, 12)
 
       // 创建用户
-      const user = await AuthDatabaseService.createUser({
-        email,
-        name,
-        password: hashedPassword,
+      const user = await prisma.user.create({
+        data: {
+          id: crypto.randomUUID(),
+          email,
+          name,
+          password: hashedPassword,
+        }
       })
 
       // 生成 token 对
       const tokens = TokenService.generateTokenPair(user.id, user.email)
 
       // 保存 refresh token 到数据库
-      await AuthDatabaseService.updateRefreshToken(
-        user.id,
-        tokens.refreshTokenSecure,
-        tokens.refreshTokenExpiresAt
-      )
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          refreshToken: tokens.refreshTokenSecure,
+          refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
+        }
+      })
 
       logger.info(`User registered successfully: ${email}`)
 
@@ -79,7 +87,9 @@ export class AuthController {
       }
 
       // 查找用户
-      const user = await AuthDatabaseService.findUserByEmail(email)
+      const user = await prisma.user.findUnique({
+        where: { email }
+      })
       if (!user) {
         return res.status(401).json({ error: "Invalid credentials" })
       }
@@ -94,11 +104,13 @@ export class AuthController {
       const tokens = TokenService.generateTokenPair(user.id, user.email)
 
       // 保存 refresh token 到数据库
-      await AuthDatabaseService.updateRefreshToken(
-        user.id,
-        tokens.refreshTokenSecure,
-        tokens.refreshTokenExpiresAt
-      )
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          refreshToken: tokens.refreshTokenSecure,
+          refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
+        }
+      })
 
       logger.info(`User logged in successfully: ${email}`)
 
@@ -115,7 +127,7 @@ export class AuthController {
             notifications: user.notifications,
             theme: user.theme,
           },
-          profile: user.profile,
+          profile: null,
         },
         accessToken: tokens.accessToken,
         refreshToken: tokens.refreshToken
@@ -136,13 +148,16 @@ export class AuthController {
 
       const token = authHeader.substring(7)
 
-      if (!process.env.JWT_SECRET) {
-        return res.status(500).json({ error: "Server configuration error" })
+      // 使用TokenService进行验证，这样能够与自动刷新中间件保持一致
+      const decoded = TokenService.verifyAccessToken(token)
+
+      if (!decoded) {
+        return res.status(401).json({ error: "Invalid or expired token" })
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET) as { userId: string }
-
-      const user = await AuthDatabaseService.findUserById(decoded.userId)
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.userId }
+      })
 
       if (!user) {
         return res.status(404).json({ error: "User not found" })
@@ -178,7 +193,13 @@ export class AuthController {
 
         if (decoded && decoded.userId) {
           // 清除用户的 refresh token
-          await AuthDatabaseService.clearRefreshToken(decoded.userId)
+          await prisma.user.update({
+            where: { id: decoded.userId },
+            data: {
+              refreshToken: null,
+              refreshTokenExpiresAt: null,
+            }
+          })
           logger.info(`User logged out: ${decoded.email}`)
         }
       }
@@ -205,7 +226,12 @@ export class AuthController {
       }
 
       // 从数据库验证 refresh token
-      const user = await AuthDatabaseService.validateRefreshToken(decoded.userId, refreshToken)
+      const user = await prisma.user.findFirst({
+        where: {
+          id: decoded.userId,
+          refreshTokenExpiresAt: { gt: new Date() }
+        }
+      })
       if (!user) {
         return res.status(401).json({ error: 'Refresh token expired or invalid' })
       }
@@ -214,11 +240,13 @@ export class AuthController {
       const tokens = TokenService.generateTokenPair(user.id, user.email)
 
       // 更新数据库中的 refresh token
-      await AuthDatabaseService.updateRefreshToken(
-        user.id,
-        tokens.refreshTokenSecure,
-        tokens.refreshTokenExpiresAt
-      )
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          refreshToken: tokens.refreshTokenSecure,
+          refreshTokenExpiresAt: tokens.refreshTokenExpiresAt,
+        }
+      })
 
       logger.info(`Token refreshed for user: ${user.email}`)
 

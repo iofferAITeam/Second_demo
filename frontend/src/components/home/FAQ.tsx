@@ -30,7 +30,7 @@ export default function FAQ() {
       <div className="faq-content">
         <div className="faq-header">
           <div className="faq-icon">
-            <Image src="/images/icon-question.png" alt="Question" width={96} height={96} />
+            <Image src="/images/icon-question.png" alt="Question" width={80} height={80} />
           </div>
           <div className="faq-text">
             <h2>About Us: Q & A</h2>

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import { TokenService } from '../utils/token'
-import { AuthDatabaseService } from '../database'
+import { prisma } from '../lib/prisma'
 import { logger } from '../utils/logger'
 
 interface AuthRequest extends Request {
@@ -48,7 +48,16 @@ export const autoRefreshToken = async (req: AuthRequest, res: Response, next: Ne
     logger.info(`Token expiring soon for user ${decodedToken.userId}, attempting auto-refresh`)
 
     // 尝试从数据库获取用户信息和refresh token
-    const user = await AuthDatabaseService.findUserById(decodedToken.userId)
+    const user = await prisma.user.findUnique({
+      where: { id: decodedToken.userId },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        refreshToken: true,
+        refreshTokenExpiresAt: true,
+      },
+    })
 
     if (!user || !user.refreshToken || !user.refreshTokenExpiresAt) {
       logger.warn(`Auto-refresh failed: no valid refresh token for user ${decodedToken.userId}`)
@@ -58,7 +67,13 @@ export const autoRefreshToken = async (req: AuthRequest, res: Response, next: Ne
     // 检查 refresh token 是否过期
     if (user.refreshTokenExpiresAt < new Date()) {
       logger.warn(`Auto-refresh failed: refresh token expired for user ${decodedToken.userId}`)
-      await AuthDatabaseService.clearRefreshToken(user.id)
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          refreshToken: null,
+          refreshTokenExpiresAt: null,
+        },
+      })
       return next()
     }
 
@@ -66,11 +81,13 @@ export const autoRefreshToken = async (req: AuthRequest, res: Response, next: Ne
     const newTokens = TokenService.generateTokenPair(user.id, user.email)
 
     // 更新数据库中的 refresh token
-    await AuthDatabaseService.updateRefreshToken(
-      user.id,
-      newTokens.refreshTokenSecure,
-      newTokens.refreshTokenExpiresAt
-    )
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        refreshToken: newTokens.refreshTokenSecure,
+        refreshTokenExpiresAt: newTokens.refreshTokenExpiresAt,
+      },
+    })
 
     // 将新 tokens 添加到响应头中
     res.setHeader('X-New-Access-Token', newTokens.accessToken)

@@ -1,4 +1,6 @@
 import { Message } from './ChatInterface'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface ChatMessagesProps {
   messages: Message[]
@@ -20,7 +22,47 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
           )}
           <div className="message-content">
             <div className="message-bubble">
-              {message.content}
+              {message.type === 'bot' ? (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    table: ({ children }) => (
+                      <table className="markdown-table">{children}</table>
+                    ),
+                    th: ({ children }) => (
+                      <th className="markdown-th">{children}</th>
+                    ),
+                    td: ({ children }) => (
+                      <td className="markdown-td">{children}</td>
+                    ),
+                    h1: ({ children }) => (
+                      <h1 className="markdown-h1">{children}</h1>
+                    ),
+                    h2: ({ children }) => (
+                      <h2 className="markdown-h2">{children}</h2>
+                    ),
+                    h3: ({ children }) => (
+                      <h3 className="markdown-h3">{children}</h3>
+                    ),
+                    ul: ({ children }) => (
+                      <ul className="markdown-ul">{children}</ul>
+                    ),
+                    ol: ({ children }) => (
+                      <ol className="markdown-ol">{children}</ol>
+                    ),
+                    li: ({ children }) => (
+                      <li className="markdown-li">{children}</li>
+                    ),
+                    strong: ({ children }) => (
+                      <strong className="markdown-strong">{children}</strong>
+                    )
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
+              ) : (
+                message.content
+              )}
             </div>
 
 

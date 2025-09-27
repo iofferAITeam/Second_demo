@@ -1,0 +1,561 @@
+/* Recommendation Case Page Styles */
+
+/* Main layout */
+.recommendation-case-page {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.recommendation-case-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.recommendation-case-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.recommendation-case-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.recommendation-case-close {
+  padding: 0.5rem;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.recommendation-case-close:hover {
+  background-color: #f3f4f6;
+}
+
+.recommendation-case-content {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.recommendation-case-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Navigation buttons */
+.recommendation-case-nav {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 5rem;
+}
+
+.recommendation-case-nav-button {
+  padding: 0.75rem;
+  border-radius: 50%;
+  background: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+}
+
+.recommendation-case-nav-button:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.recommendation-case-nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* User Profile Component */
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.user-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+}
+
+.user-avatar-fallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.user-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Offer Results Component */
+.offer-results {
+  margin-bottom: 1rem;
+}
+
+.offer-results-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.offer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.offer-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.offer-icon {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.offer-text {
+  color: #1f2937;
+  line-height: 1.6;
+  flex: 1;
+}
+
+/* Background Tags Component */
+.background-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 1rem 0;
+}
+
+.background-tag {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.background-tag-label {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.background-tag-data {
+  background-color: #1f2937;
+  color: white;
+}
+
+/* Personal Tags Component */
+.personal-tags {
+  padding: 1rem 0;
+}
+
+.personal-tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.personal-tag {
+  padding: 0.5rem 1rem;
+  background-color: #dbeafe;
+  color: #2563eb;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Case Analysis Component */
+.case-analysis {
+  padding: 2rem 0;
+}
+
+.case-analysis-content {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.case-analysis-illustration {
+  flex-shrink: 0;
+}
+
+.case-illustration-container {
+  width: 8rem;
+  height: 8rem;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.case-illustration-decoration {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.case-illustration-decoration:nth-child(2) {
+  top: -0.5rem;
+  right: -0.5rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: #60a5fa;
+  opacity: 0.6;
+}
+
+.case-illustration-decoration:nth-child(3) {
+  bottom: -0.25rem;
+  left: -0.75rem;
+  width: 1rem;
+  height: 1rem;
+  background-color: #93c5fd;
+  opacity: 0.4;
+}
+
+.case-illustration-decoration:nth-child(4) {
+  top: 1.5rem;
+  right: -1rem;
+  width: 0.75rem;
+  height: 0.75rem;
+  background-color: #3b82f6;
+  opacity: 0.5;
+}
+
+.case-analysis-text {
+  flex: 1;
+}
+
+.case-analysis-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.case-analysis-content-text {
+  color: #374151;
+  line-height: 1.6;
+}
+
+/* School Selection Plan Component */
+.school-selection-plan {
+  padding: 1.5rem 0;
+}
+
+.school-plan-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.school-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.school-stat {
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.school-stat-primary {
+  background-color: #2563eb;
+  color: white;
+}
+
+.school-stat-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.target-schools-section {
+  margin-bottom: 1.5rem;
+}
+
+.target-schools-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.target-icon-container {
+  width: 2rem;
+  height: 2rem;
+  background-color: #fce7f3;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.target-schools-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.target-schools-description {
+  color: #374151;
+  line-height: 1.6;
+  margin-left: 2.75rem;
+}
+
+/* School Card Component */
+.school-card {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.school-card-content {
+  padding: 1.5rem;
+}
+
+.school-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.school-info {
+  flex: 1;
+}
+
+.school-name-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.school-warning-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  background-color: #dc2626;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 0.75rem;
+}
+
+.school-name {
+  font-weight: 500;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.school-project {
+  color: #6b7280;
+  font-size: 0.875rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 1rem;
+}
+
+.school-details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 2rem;
+  font-size: 0.875rem;
+}
+
+.school-detail {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.school-detail-icon {
+  color: #9ca3af;
+}
+
+.school-detail-text {
+  color: #6b7280;
+}
+
+.school-detail-highlight {
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.school-tag {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.school-share {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.school-share-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #2563eb;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.school-share-button:hover {
+  color: #1d4ed8;
+}
+
+.school-metrics {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  padding: 1.5rem;
+}
+
+.metrics-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.metric-item {
+  text-align: center;
+}
+
+.metric-circle {
+  width: 4rem;
+  height: 4rem;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  margin-bottom: 0.5rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.metric-label {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .recommendation-case-container {
+    padding: 1rem;
+  }
+
+  .recommendation-case-content {
+    flex-direction: column;
+  }
+
+  .recommendation-case-nav {
+    order: -1;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0;
+    margin-bottom: 2rem;
+  }
+
+  .case-analysis-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .case-analysis-illustration {
+    align-self: center;
+  }
+
+  .target-schools-description {
+    margin-left: 0;
+  }
+
+  .school-stats {
+    justify-content: center;
+  }
+
+  .school-details {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .metrics-container {
+    justify-content: space-around;
+  }
+}
+
+@media (max-width: 480px) {
+  .recommendation-case-title {
+    font-size: 1.25rem;
+  }
+
+  .background-tags,
+  .personal-tags-list {
+    justify-content: center;
+  }
+
+  .school-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .school-tag {
+    align-self: flex-start;
+  }
+}

@@ -31,7 +31,7 @@ export function UserMenu({ onAuthModalOpen }: UserMenuProps) {
     <div className="relative">
       <button
         onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+        className="flex items-center space-x-6 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
       >
         <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
           {user?.name.charAt(0).toUpperCase()}
@@ -43,7 +43,7 @@ export function UserMenu({ onAuthModalOpen }: UserMenuProps) {
       </button>
 
       {isDropdownOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200" style={{right: '20px'}}>
           <div className="px-4 py-2 text-sm text-gray-900 border-b border-gray-200">
             <div className="font-medium">{user?.name}</div>
             <div className="text-gray-500">{user?.email}</div>

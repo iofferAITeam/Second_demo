@@ -1,6 +1,6 @@
-import { getToken } from './auth'
+import { getToken, getUserIdFromToken } from './auth'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8010'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
 
 export interface ApiResponse<T = any> {
   success?: boolean
@@ -79,7 +79,7 @@ class ApiClient {
     if (!response.ok) {
       if (response.status === 401) {
         // Token expired, redirect to login
-        window.location.href = '/login'
+        window.location.href = '/auth'
         throw new Error('Unauthorized')
       }
 
@@ -91,45 +91,49 @@ class ApiClient {
   }
 
   // Chat API
-  async sendMessage(message: string, sessionId?: string, user_id: string = 'test_user'): Promise<ChatResponse> {
-    return this.request<ChatResponse>('/chat/message', {
+  async sendMessage(message: string, sessionId?: string): Promise<ChatResponse> {
+    // 使用正确的认证端点
+    return this.request<ChatResponse>('/api/chat/message', {
       method: 'POST',
-      body: JSON.stringify({ message, sessionId, user_id }),
+      body: JSON.stringify({
+        message,
+        sessionId
+      }),
     })
   }
 
   async getChatHistory(limit = 50, offset = 0): Promise<MessagesResponse> {
-    return this.request<MessagesResponse>(`/chat/history?limit=${limit}&offset=${offset}`)
+    return this.request<MessagesResponse>(`/api/chat/history?limit=${limit}&offset=${offset}`)
   }
 
   async createSession(title?: string): Promise<SessionResponse> {
-    return this.request<SessionResponse>('/chat/session', {
+    return this.request<SessionResponse>('/api/chat/session', {
       method: 'POST',
       body: JSON.stringify({ title }),
     })
   }
 
   async getSessions(): Promise<SessionsResponse> {
-    return this.request<SessionsResponse>('/chat/sessions')
+    return this.request<SessionsResponse>('/api/chat/sessions')
   }
 
   async deleteSession(sessionId: string): Promise<ApiResponse> {
-    return this.request<ApiResponse>(`/chat/session/${sessionId}`, {
+    return this.request<ApiResponse>(`/api/chat/session/${sessionId}`, {
       method: 'DELETE',
     })
   }
 
   async getSessionMessages(sessionId: string): Promise<SessionMessagesResponse> {
-    return this.request<SessionMessagesResponse>(`/chat/session/${sessionId}/messages`)
+    return this.request<SessionMessagesResponse>(`/api/chat/session/${sessionId}/messages`)
   }
 
   // User API
   async getProfile() {
-    return this.request('/user/profile')
+    return this.request('/api/user/profile')
   }
 
   async updateProfile(data: any) {
-    return this.request('/user/profile', {
+    return this.request('/api/user/profile', {
       method: 'PUT',
       body: JSON.stringify(data),
     })
@@ -141,7 +145,7 @@ class ApiClient {
     formData.append(type, file)
 
     const token = getToken()
-    const response = await fetch(`${API_BASE_URL}/upload/${type}`, {
+    const response = await fetch(`${API_BASE_URL}/api/upload/${type}`, {
       method: 'POST',
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),

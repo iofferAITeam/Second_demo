@@ -2,39 +2,53 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, memo } from 'react'
+import { Dropdown, Avatar, Space } from 'antd'
+import { UserOutlined, SettingOutlined, LogoutOutlined, DownOutlined } from '@ant-design/icons'
+import type { MenuProps } from 'antd'
 import { useAuth } from '@/hooks/useAuth'
 
-export default function Navbar() {
+function Navbar() {
   const { user, isAuthenticated, signOut } = useAuth()
-  const [showUserMenu, setShowUserMenu] = useState(false)
-  const menuRef = useRef<HTMLDivElement>(null)
 
-  // 点击外部关闭菜单
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setShowUserMenu(false)
-      }
-    }
 
-    if (showUserMenu) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showUserMenu])
+  // 用户菜单配置
+  const menuItems: MenuProps['items'] = [
+    {
+      key: 'profile',
+      label: (
+        <Link href="/profile">
+          Profile
+        </Link>
+      ),
+      icon: <UserOutlined />,
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'logout',
+      label: (
+        <span className="text-red-500">
+          Sign Out
+        </span>
+      ),
+      icon: <LogoutOutlined />,
+      onClick: signOut,
+    },
+  ]
 
   return (
     <header className="header">
       <nav className="nav">
         <div className="logo">
-          <Image src="/images/logo.png" alt="iOffer" width={120} height={32} />
+          <Link href="/home">
+            <Image src="/images/logo.png" alt="iOffer" width={120} height={32} />
+          </Link>
         </div>
 
         <ul className="nav-links">
+          <li><Link href="/home">Home</Link></li>
           <li><Link href="/chat" className="active">Chat</Link></li>
           <li><a href="#">Features</a></li>
           <li><a href="#">FAQ</a></li>
@@ -42,55 +56,58 @@ export default function Navbar() {
         </ul>
 
         <div className="nav-right">
-          <div className="language-selector">
-            <span>🌐 EN</span>
-          </div>
 
-          {isAuthenticated && user ? (
-            <div className="relative" ref={menuRef}>
-              <button
-                onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center space-x-2 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition-colors"
-              >
-                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                  <span className="text-blue-500 text-sm font-semibold">
-                    {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
+          {isAuthenticated ? (
+            <Dropdown
+              menu={{ items: menuItems }}
+              placement="bottomRight"
+              arrow={{ pointAtCenter: false }}
+              trigger={['click']}
+              overlayStyle={{
+                minWidth: '160px',
+              }}
+              overlayClassName="user-dropdown"
+              onOpenChange={(open: any) => {
+                if (open) {
+                  // 延迟执行，等待下拉菜单渲染
+                  setTimeout(() => {
+                    const dropdown = document.querySelector('.ant-dropdown:not([style*="display: none"])');
+                    if (dropdown) {
+                      const dropdownElement = dropdown as HTMLElement;
+                      dropdownElement.style.position = 'fixed';
+                      dropdownElement.style.top = '70px';
+                      dropdownElement.style.right = '20px';
+                      dropdownElement.style.left = 'auto';
+                      dropdownElement.style.transform = 'none';
+                      dropdownElement.style.zIndex = '9999';
+                    }
+                  }, 10);
+                }
+              }}
+            >
+              <div className="flex items-center cursor-pointer hover:opacity-80 transition-opacity" style={{gap: '15px'}}>
+                <Avatar
+                  size={40}
+                  style={{
+                    backgroundColor: '#1677ff',
+                    color: 'white',
+                    fontWeight: 'bold',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  icon={<UserOutlined />}
+                >
+                  {user?.name ? user.name.charAt(0).toUpperCase() : user?.email?.charAt(0).toUpperCase()}
+                </Avatar>
+                <Space className="hidden md:flex" size="large">
+                  <span className="text-gray-700 font-medium">
+                    {user?.name || user?.email}
                   </span>
-                </div>
-                <span className="hidden md:block">{user.name || user.email}</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
-                  <Link
-                    href="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    href="/dashboard"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    Dashboard
-                  </Link>
-                  <button
-                    onClick={() => {
-                      signOut()
-                      setShowUserMenu(false)
-                    }}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              )}
-            </div>
+                  <DownOutlined className="text-gray-500 text-xs" />
+                </Space>
+              </div>
+            </Dropdown>
           ) : (
             <Link href="/auth" className="signup-button">Sign up / Log in</Link>
           )}
@@ -99,3 +116,5 @@ export default function Navbar() {
     </header>
   )
 }
+
+export default memo(Navbar)

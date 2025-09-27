@@ -71,6 +71,11 @@ export class TokenService {
     return now
   }
 
+  // 哈希 token（用于安全存储）
+  static hashToken(token: string): string {
+    return crypto.createHash('sha256').update(token).digest('hex')
+  }
+
   // 生成 token 对
   static generateTokenPair(userId: string, email: string) {
     const accessToken = this.generateAccessToken(userId, email)

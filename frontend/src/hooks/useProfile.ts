@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { ProfileData, UpdateProfileRequest, ProfileResponse, ProfileCompletion } from '@/types/profile'
 import { useAuth } from '@/hooks/useAuth'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
 
 export function useProfile() {
   const [profileData, setProfileData] = useState<ProfileData | null>(null)
@@ -19,7 +19,7 @@ export function useProfile() {
 
     try {
       setIsLoading(true)
-      const token = localStorage.getItem('accessToken')
+      const token = localStorage.getItem('access_token')
 
       const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         headers: {
@@ -62,7 +62,7 @@ export function useProfile() {
     try {
       setIsLoading(true)
       setError(null)
-      const token = localStorage.getItem('accessToken')
+      const token = localStorage.getItem('access_token')
 
       const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         method: 'PUT',

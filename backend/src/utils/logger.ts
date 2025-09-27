@@ -11,6 +11,29 @@ const logFormat = winston.format.combine(
   winston.format.json()
 )
 
+// 安全的JSON.stringify函数，处理循环引用
+function safeStringify(obj: any): string {
+  try {
+    return JSON.stringify(obj, (key, value) => {
+      // 跳过可能引起循环引用的属性
+      if (key === 'config' || key === 'request' || key === 'response' || key === 'agent' || key === 'sockets') {
+        return '[Circular]'
+      }
+      // 对于错误对象，只保留有用的信息
+      if (value instanceof Error) {
+        return {
+          name: value.name,
+          message: value.message,
+          stack: value.stack
+        }
+      }
+      return value
+    })
+  } catch (error) {
+    return '[Unable to stringify object]'
+  }
+}
+
 // 控制台输出格式
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
@@ -18,7 +41,7 @@ const consoleFormat = winston.format.combine(
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
     let msg = `${timestamp} [${level}]: ${message}`
     if (Object.keys(meta).length > 0) {
-      msg += ` ${JSON.stringify(meta)}`
+      msg += ` ${safeStringify(meta)}`
     }
     return msg
   })

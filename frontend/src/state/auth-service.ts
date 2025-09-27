@@ -50,8 +50,13 @@ class AuthService {
     return { ...this.state }
   }
 
-  // 初始化：检查本地token并验证
+  // 初始化：检查本地token并验证（添加缓存）
   private async initialize() {
+    // 如果已经初始化过，直接返回
+    if (this.state.user !== null || this.state.isAuthenticated) {
+      return
+    }
+
     // 首先尝试迁移旧token（向后兼容）
     const legacyMigrated = this.migrateLegacyToken()
     if (legacyMigrated) {

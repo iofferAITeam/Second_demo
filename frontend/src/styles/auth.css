@@ -45,14 +45,27 @@
 /* 眼睛图标 */
 .password-eye-icon {
   position: absolute;
-  right: 20px;
+  right: 20px; /* 距离右边的距离 - 可调整 15px(更靠右) 25px(更靠左) */
   top: 50%;
   transform: translateY(-50%);
-  font-size: 14px;
-  color: #000;
+  font-size: 16px; /* 图标大小 - 可调整 12px(小) 14px(中) 16px(大) 18px(更大) */
+  color: #6b7280; /* 图标颜色 - 灰色，可改为 #000(黑色) #3b82f6(蓝色) */
   cursor: pointer;
-  font-weight: normal;
-  font-family: monospace;
+  /* 额外样式选项 */
+  opacity: 0.7; /* 透明度 - 可调整 0.5(半透明) 0.7(稍透明) 1.0(完全不透明) */
+  transition: all 0.2s ease; /* 动画效果 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+/* 鼠标悬停效果 */
+.password-eye-icon:hover {
+  opacity: 1;
+  color: #3b82f6; /* 悬停时变蓝色 */
+  transform: translateY(-50%) scale(1.1); /* 悬停时稍微放大 */
 }
 
 /* 密码提示文字 */
@@ -228,6 +241,114 @@
 }
 
 .login-header-right {
-  text-align: right;
-  padding-right: 20px;
+  text-align: right; /* 右对齐 - 可改为 left(左对齐) 或 center(居中) */
+  padding-right: -20px; /* 右边距 - 增大数值向左移动，减小向右移动 */
+  /* 其他位置选项: */
+  /* text-align: center; 居中对齐 */
+  /* text-align: left; padding-left: 20px; 左对齐 */
+}
+
+/* LOG IN 切换按钮样式 */
+.login-toggle-btn {
+  color: #2b70df; /* 文字颜色 - 蓝色 */
+  background: none;
+  border: none;
+  font-size: 16px; /* 字号大小 - 可调整 12px(小) 14px(中) 16px(大) 18px(更大) */
+  font-weight: 500;
+  /* 位置调整 */
+  padding: 8px 0;
+  /* 如果要调整位置，可以修改父容器的 text-align 或添加 margin */
+  /* margin-right: 10px; 向左移动 */
+  /* margin-left: 10px; 向右移动 */
+}
+
+.login-toggle-btn:hover {
+  color: #2563eb; /* 鼠标悬停颜色 - 深蓝色 */
+}
+
+/* Email 标签栏样式 */
+.email-tab-container {
+  border-bottom: 1px solid #e5e7eb; /* 分割线颜色 - 浅灰色 */
+}
+
+.email-tab-active {
+  color: #040b17 !important; /* Email 文字颜色 - 蓝色 */
+  border-bottom: 2px solid #d2d6dc !important; /* 底部分割线颜色 - 蓝色 */
+}
+
+/* 表单位置调整 */
+.auth-form-wrapper {
+  margin-left: 20px;
+  padding-left: 60px;
+}
+
+/* 响应式调整 */
+@media (max-width: 1024px) {
+  .auth-form-wrapper {
+    margin-left: 0;
+    padding-left: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-form-wrapper {
+    margin-left: 0;
+    padding-left: 0;
+  }
+}
+
+/* 页面背景和布局样式 */
+.auth-page-background {
+  background-image: url('/images/background.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.auth-background-overlay {
+  background-color: rgba(249, 249, 251, 0.77);
+}
+
+.auth-left-content {
+  padding-top: 50px;
+}
+
+.auth-illustration-container {
+  margin-left: 100px;
+  margin-top: 20px;
+}
+
+.auth-text-content {
+  margin-left: 100px;
+  margin-top: 40px;
+}
+
+.auth-form-container-wrapper {
+  margin-top: 200px;
+  max-width: 400px; /* 表单最大宽度 - 可调整 300px(窄) 350px(中) 400px(宽) 450px(更宽) */
+  width: 100%;
+}
+
+/* 响应式调整 */
+@media (max-width: 1024px) {
+  .auth-illustration-container,
+  .auth-text-content {
+    margin-left: 50px;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-left-content {
+    padding-top: 20px;
+  }
+
+  .auth-illustration-container,
+  .auth-text-content {
+    margin-left: 0;
+    margin-top: 20px;
+  }
+
+  .auth-form-container-wrapper {
+    margin-top: 100px;
+  }
 }

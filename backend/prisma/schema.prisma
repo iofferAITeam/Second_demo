@@ -8,91 +8,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                    String        @id @default(cuid())
-  email                 String        @unique
-  name                  String
-  password              String
-  avatar                String?
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
-  language              String        @default("zh")
-  notifications         Boolean       @default(true)
-  theme                 String        @default("light")
-  refreshToken          String?
-  refreshTokenExpiresAt DateTime?
-  applications          Application[]
-  chatMessages          ChatMessage[]
-  chatSessions          ChatSession[]
-  essays                Essay[]
-  profile               UserProfile?
-
-  @@map("users")
-}
-
-model UserProfile {
-  id               String    @id @default(cuid())
-  userId           String    @unique
-  phone            String?
-  wechat           String?
-  birthDate        DateTime?
-  nationality      String?
-  currentEducation String?
-  gpa              Float?
-  major            String?
-  graduationDate   DateTime?
-  toefl            Int?
-  ielts            Float?
-  gre              Int?
-  gmat             Int?
-  experiences      Json?
-  goals            String?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("user_profiles")
-}
-
-model School {
-  id           String        @id @default(cuid())
-  name         String
-  country      String
-  city         String?
-  ranking      Int?
-  website      String?
-  logo         String?
-  description  String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  applications Application[]
-  programs     Program[]
-
-  @@map("schools")
-}
-
-model Program {
-  id           String        @id @default(cuid())
-  schoolId     String
-  name         String
-  degree       String
-  field        String
-  duration     Int?
-  tuition      Float?
-  currency     String        @default("USD")
-  description  String?
-  requirements Json?
-  deadlines    Json?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  applications Application[]
-  school       School        @relation(fields: [schoolId], references: [id])
-
-  @@map("programs")
-}
-
-model Application {
-  id          String             @id @default(cuid())
+model applications {
+  id          String             @id
   userId      String
   schoolId    String
   programId   String?
@@ -103,58 +20,203 @@ model Application {
   resultDate  DateTime?
   resultNotes String?
   createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  program     Program?           @relation(fields: [programId], references: [id])
-  school      School             @relation(fields: [schoolId], references: [id])
-  user        User               @relation(fields: [userId], references: [id])
-  essays      Essay[]
-
-  @@map("applications")
+  updatedAt   DateTime
+  programs    programs?          @relation(fields: [programId], references: [id])
+  schools     schools            @relation(fields: [schoolId], references: [id])
+  users       users              @relation(fields: [userId], references: [id])
+  essays      essays[]
 }
 
-model Essay {
-  id            String       @id @default(cuid())
+model chat_messages {
+  id            String         @id
+  sessionId     String?
+  userId        String
+  content       String
+  type          MessageType
+  metadata      Json?
+  createdAt     DateTime       @default(now())
+  chat_sessions chat_sessions? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  users         users          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model chat_sessions {
+  id            String          @id
+  userId        String
+  title         String?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime
+  chat_messages chat_messages[]
+  users         users           @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model essays {
+  id            String        @id
   userId        String
   applicationId String?
   title         String
   type          EssayType
   prompt        String?
   content       String
-  isAIGenerated Boolean      @default(false)
+  isAIGenerated Boolean       @default(false)
   aiPrompt      String?
-  version       Int          @default(1)
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  application   Application? @relation(fields: [applicationId], references: [id])
-  user          User         @relation(fields: [userId], references: [id])
-
-  @@map("essays")
+  version       Int           @default(1)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime
+  applications  applications? @relation(fields: [applicationId], references: [id])
+  users         users         @relation(fields: [userId], references: [id])
 }
 
-model ChatSession {
-  id        String        @id @default(cuid())
-  userId    String
-  title     String?
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  messages  ChatMessage[]
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("chat_sessions")
+model programs {
+  id           String         @id
+  schoolId     String
+  name         String
+  degree       String
+  field        String
+  duration     Int?
+  tuition      Float?
+  currency     String         @default("USD")
+  description  String?
+  requirements Json?
+  deadlines    Json?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  applications applications[]
+  schools      schools        @relation(fields: [schoolId], references: [id])
 }
 
-model ChatMessage {
-  id        String       @id @default(cuid())
-  sessionId String?
-  userId    String
-  content   String
-  type      MessageType
-  metadata  Json?
-  createdAt DateTime     @default(now())
-  session   ChatSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+model schools {
+  id           String         @id
+  name         String
+  country      String
+  city         String?
+  ranking      Int?
+  website      String?
+  logo         String?
+  description  String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime
+  applications applications[]
+  programs     programs[]
+}
 
-  @@map("chat_messages")
+model user_profiles {
+  id               String    @id
+  userId           String    @unique
+
+  // 基础信息
+  phone            String?
+  wechat           String?
+  birthDate        DateTime?
+  nationality      String?
+
+  // 学术背景
+  currentEducation String?
+  gpa              Float?
+  lastTwoYearsGpa  Float?
+  major            String?
+  graduationDate   DateTime?
+  undergraduateUniversity String?
+  universityRank   Int?
+  universityType   String?  // 'overseas', '985_211', 'regular', 'unknown'
+
+  // 标准化考试成绩
+  toefl            Int?
+  ielts            Float?
+  gre              Int?
+  gmat             Int?
+
+  // 语言详细成绩 (JSON)
+  toeflDetails     Json?    // {reading: 28, listening: 29, speaking: 23, writing: 25}
+  ieltsDetails     Json?    // {reading: 8.0, listening: 7.5, speaking: 7.0, writing: 7.5}
+  greDetails       Json?    // {verbal: 160, quantitative: 165, analytical: 4.0}
+
+  // 经历背景 (JSON Arrays)
+  workExperiences  Json?    // Array of work experience objects
+  internshipExperiences Json? // Array of internship objects
+  researchProjects Json?    // Array of research project objects
+  extracurricularActivities Json? // Array of activity objects
+  awards           Json?    // Array of award objects
+  experiences      Json?    // 保持向后兼容
+
+  // 推荐信信息 (JSON)
+  recommendationLetters Json? // Array of recommendation letter objects
+
+  // 技能相关 (JSON Arrays)
+  programmingSkills Json?   // Array of programming skills
+  languageSkills   Json?    // Array of language proficiency objects
+
+  // 申请相关
+  targetDegreeType String?  // 'undergraduate', 'masters', 'phd'
+  targetMajors     Json?    // Array of target majors
+  targetCountries  Json?    // Array of target countries
+  applicationYear  String?
+  applicationTerm  String?  // 'fall', 'spring', 'summer'
+
+  // 个人发展
+  goals            String?
+  careerGoals      String?
+  personalStatement String?
+  researchInterests Json?   // Array of research interest areas
+
+  // 财务与生活偏好
+  budgetRange      String?
+  scholarshipNeeds Boolean? @default(false)
+  preferredCityType String? // 'urban', 'suburban', 'rural', 'any'
+  climatePreference String?
+  campusSize       String?  // 'small', 'medium', 'large', 'any'
+
+  // 推荐模型特征标签 (自动计算)
+  gpaTag           Float?   // GPA等级标签
+  paperTag         Float?   // 论文标签
+  toeflTag         Float?   // 语言成绩标签
+  greTag           Float?   // GRE标签
+  researchTag      Float?   // 科研经历标签
+  collegeTypeTag   Float?   // 院校类型标签
+  recommendationTag Float?  // 推荐信质量标签
+  networkingTag    Float?   // 套磁标签
+
+  // 计算的特征值
+  hasResearchExperience Boolean? @default(false)
+  publicationCount Int?     @default(0)
+  totalWorkMonths  Int?     @default(0)
+  leadershipScore  Float?   @default(0.0)
+  averageGPA       Float?   // 标准化后的GPA (4.0制)
+
+  // 系统字段
+  lastSyncAt       DateTime?
+  syncStatus       String?  @default("pending") // 'synced', 'pending', 'error'
+  syncErrors       Json?    // 同步错误记录
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime
+  users            users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model users {
+  id                    String          @id
+  email                 String          @unique
+  name                  String
+  password              String
+  avatar                String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime
+  language              String          @default("zh")
+  notifications         Boolean         @default(true)
+  theme                 String          @default("light")
+  refreshToken          String?
+  refreshTokenExpiresAt DateTime?
+  applications          applications[]
+  chat_messages         chat_messages[]
+  chat_sessions         chat_sessions[]
+  essays                essays[]
+  user_profiles         user_profiles?
+  application_history   user_application_history[]
+}
+
+enum ApplicationResult {
+  ACCEPTED
+  REJECTED
+  WAITLISTED
+  DEFERRED
 }
 
 enum ApplicationStatus {
@@ -165,13 +227,6 @@ enum ApplicationStatus {
   WAITLISTED
   ACCEPTED
   REJECTED
-  DEFERRED
-}
-
-enum ApplicationResult {
-  ACCEPTED
-  REJECTED
-  WAITLISTED
   DEFERRED
 }
 
@@ -188,4 +243,24 @@ enum MessageType {
   USER
   ASSISTANT
   SYSTEM
+}
+
+// 用户申请历史追踪
+model user_application_history {
+  id               String    @id @default(uuid())
+  userId           String
+  schoolName       String
+  programName      String
+  applicationYear  String
+  result           String    // 'accepted', 'rejected', 'waitlisted', 'pending'
+  resultDate       DateTime?
+  profileSnapshot  Json      // 申请时的用户资料快照
+  predictionScore  Float?    // 当时的模型预测分数
+  actualFeatures   Json?     // 实际使用的模型特征
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
+  users            users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([applicationYear])
 }

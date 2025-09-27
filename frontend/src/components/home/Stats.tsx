@@ -4,9 +4,9 @@ export default function Stats() {
   return (
     <section className="stats-section">
       <div className="stats-content">
-        <div className="stats-header">
-          <div className="stats-icon">
-            <Image src="/images/icon-chart.png" alt="Stats" width={100} height={100} />
+        <div className="stats-header" style={{gap: '0px'}}>
+          <div className="stats-icon" style={{transform: 'translateX(220px)'}}>
+            <Image src="/images/icon-chart.png" alt="Stats" width={80} height={80} />
           </div>
           <div className="stats-text">
             <h2>Why Students Choose Us</h2>

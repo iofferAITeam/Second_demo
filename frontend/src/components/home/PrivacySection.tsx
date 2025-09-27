@@ -4,8 +4,8 @@ export default function PrivacySection() {
   return (
     <section className="privacy-section">
       <div className="privacy-container">
-        <div className="privacy-icon" style={{textAlign: 'center', marginBottom: 0}}>
-          <Image src="/images/icon-success.png" alt="Success" width={60} height={60} />
+        <div className="privacy-icon" style={{transform: 'translateX(280px) translateY(-30px)'}}>
+          <Image src="/images/icon-success.png" alt="Success" width={80} height={80} />
         </div>
         <div className="privacy-content">
           <h3>Don't Worry!</h3>

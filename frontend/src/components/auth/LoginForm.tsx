@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import Navbar from '@/components/shared/Navbar'
 import '@/styles/auth.css'
 
@@ -24,9 +25,16 @@ export default function LoginForm() {
   const [agreedToTerms, setAgreedToTerms] = useState(false)
   const [isCodeSent, setIsCodeSent] = useState(false)
   const [countdown, setCountdown] = useState(0)
+  const [showPassword, setShowPassword] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   // 获取重定向URL参数，确保searchParams不为null
-  const redirectUrl = searchParams?.get('redirect') || '/dashboard'
+  const redirectUrl = searchParams?.get('redirect') || '/chat'
+
+  // 修复hydration错误 - 确保组件已挂载
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // 修复倒计时逻辑 - 使用useEffect管理定时器
   useEffect(() => {
@@ -104,7 +112,7 @@ export default function LoginForm() {
           email: formData.email,
           password: formData.password,
         })
-        alert('Login successful!')
+        // 登录成功，直接跳转，不显示弹出提示
         router.push(redirectUrl)
       } else {
         // 注册逻辑
@@ -123,7 +131,7 @@ export default function LoginForm() {
           // 只在 inputType 为 phone 时传递 verificationCode，避免类型错误
           ...(inputType === 'phone' && { verificationCode: formData.verificationCode })
         })
-        alert('Registration successful!')
+        // 注册成功，直接跳转，不显示弹出提示
         router.push(redirectUrl)
       }
     } catch (error) {
@@ -189,16 +197,9 @@ export default function LoginForm() {
   }, [countdown])
 
   return (
-    <div className="min-h-screen relative" style={{
-      backgroundImage: 'url(/images/background.png)',
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-    }}>
+    <div className="min-h-screen relative auth-page-background">
       {/* 背景图片颜色覆盖层 */}
-      <div className="absolute inset-0" style={{
-        backgroundColor: 'rgba(249, 249, 251, 0.77)'
-      }}></div>
+      <div className="absolute inset-0 auth-background-overlay"></div>
       
       {/* 顶部导航 */}
       <div className="relative z-10">
@@ -207,7 +208,7 @@ export default function LoginForm() {
 
       <div className="flex min-h-[calc(100vh-100px)] w-full relative z-30 lg:flex-row flex-col">
         {/* 左侧内容区 - 向右移动，减少左侧边距，增加右侧边距 */}
-        <div className="lg:w-3/5 w-full px-4 lg:px-12 lg:pr-16 pb-8 relative flex flex-col justify-center" style={{ paddingTop: '50px' }}>
+        <div className="lg:w-3/5 w-full px-4 lg:px-12 lg:pr-16 pb-8 relative flex flex-col justify-center auth-left-content">
           {/* 背景装饰圆圈 */}
           <div className="absolute top-20 left-16 w-24 h-24 bg-white/10 rounded-full hidden lg:block"></div>
           <div className="absolute top-1/4 right-20 w-16 h-16 bg-white/15 rounded-full hidden lg:block"></div>
@@ -215,7 +216,7 @@ export default function LoginForm() {
           <div className="absolute bottom-1/3 left-20 w-12 h-12 bg-white/15 rounded-full hidden lg:block"></div>
 
           {/* AI认证插图 - 调整边距和定位 */}
-          <div className="flex justify-center mb-4 max-w-xl lg:max-w-2xl mx-auto" style={{ marginLeft: '100px', marginTop: '20px' }}>
+          <div className="flex justify-center mb-4 max-w-xl lg:max-w-2xl mx-auto auth-illustration-container">
             <div className="w-[200px] h-[180px] lg:w-[320px] lg:h-[280px]">
               <img
                 src="/images/icon-auth.png"
@@ -227,7 +228,7 @@ export default function LoginForm() {
           </div>
 
           {/* 文字内容 - 调整对齐方式和边距 */}
-          <div className="text-center space-y-3 max-w-xl lg:max-w-2xl mx-auto mt-8" style={{ marginLeft: '100px', marginTop: '40px' }}>
+          <div className="text-center space-y-3 max-w-xl lg:max-w-2xl mx-auto mt-8 auth-text-content">
             <h1 className="text-xl lg:text-2xl font-bold text-black leading-tight">
               AI-Powered All-in-One Application Service
             </h1>
@@ -238,12 +239,12 @@ export default function LoginForm() {
           </div>
         </div>
 
-        {/* 右侧表单区 - 向左移动，增加左侧边距 */}
-        <div className="lg:w-2/5 w-full py-8 lg:py-0" style={{ paddingLeft: '0px' }}>
-          <div className="w-full max-w-[350px]" style={{ marginLeft: '0px', marginTop: '200px' }}>
+        {/* 右侧表单区 - 向右移动，增加左侧边距 */}
+        <div className="lg:w-2/5 w-full py-8 lg:py-0 auth-form-wrapper">
+          <div className="auth-form-container-wrapper">
             {/* 外部标题 */}
             <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4 text-right">
-              {isLogin ? 'LOG IN' : 'SIGN UP NOW'}
+              {isLogin ? 'Log in' : 'SIGN UP NOW'}
             </h2>
             <div className="bg-white shadow-2xl rounded-lg relative">
               {/* 问号图标 - 左上角 */}
@@ -258,40 +259,28 @@ export default function LoginForm() {
                 <div className="login-header-right">
                   <button
                     onClick={toggleMode}
-                    className="text-blue-500 hover:text-blue-600 text-sm cursor-pointer font-medium transition-colors"
+                    className="login-toggle-btn text-sm cursor-pointer font-medium transition-colors"
                   >
-                    {isLogin ? 'Need an account? Sign up' : 'LOG IN >'}
+                    {isLogin ? 'Need an account? Sign up >' : 'Log in >'}
                   </button>
                 </div>
               </div>
 
-              {/* 邮箱/手机号切换 */}
-              {!isLogin && (
-                <div className="flex border-b border-gray-200 mb-6 px-8">
-                  <button
-                    type="button"
-                    onClick={() => setInputType('email')}
-                    className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-                      inputType === 'email'
-                        ? 'text-blue-600 border-b-2 border-blue-600'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Email
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setInputType('phone')}
-                    className={`flex-1 pb-3 text-sm font-medium transition-colors ${
-                      inputType === 'phone'
-                        ? 'text-blue-600 border-b-2 border-blue-600'
-                        : 'text-gray-500 hover:text-gray-700'
-                    }`}
-                  >
-                    Phone Number
-                  </button>
+              {/* 邮箱/手机号切换 - 登录和注册都显示 */}
+              <div className="flex email-tab-container mb-6 px-8">
+                <button
+                  type="button"
+                  onClick={() => setInputType('email')}
+                  className={`flex-1 pb-3 text-sm font-medium transition-colors ${
+                    inputType === 'email'
+                      ? 'email-tab-active'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
+                >
+                  Email
+                </button>
+{/* 暂时注释掉手机号注册入口 */}
                 </div>
-              )}
 
               <div className="auth-form-container">
                 <form onSubmit={handleSubmit}>
@@ -311,7 +300,7 @@ export default function LoginForm() {
                     </div>
                   )}
 
-                  {/* 手机号字段 */}
+                  {/* 手机号字段 - 暂时注释掉
                   {!isLogin && inputType === 'phone' && (
                     <>
                       <div className="auth-form-group">
@@ -350,6 +339,7 @@ export default function LoginForm() {
                       </div>
                     </>
                   )}
+                  */}
 
                   {/* 登录时的邮箱字段 */}
                   {isLogin && (
@@ -371,7 +361,7 @@ export default function LoginForm() {
                     <div className="password-input-container">
                       <input
                         name="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"}
                         placeholder="请输入密码"
                         value={formData.password}
                         onChange={handleChange}
@@ -379,7 +369,12 @@ export default function LoginForm() {
                         minLength={8}
                         className="auth-form-input password-input"
                       />
-                      <div className="password-eye-icon">◉</div>
+                      <div
+                        className="password-eye-icon"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                      </div>
                     </div>
                     {!isLogin && (
                       <div className="password-hint">
@@ -415,10 +410,10 @@ export default function LoginForm() {
                   {/* 提交按钮 */}
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={mounted ? isLoading : false}
                     className="auth-submit-btn"
                   >
-                    {isLoading ? '请稍候...' : (isLogin ? '立即登录' : '立即注册')}
+                    {mounted && isLoading ? '请稍候...' : (isLogin ? '立即登录' : '立即注册')}
                   </button>
 
                   {/* 错误提示 */}
@@ -430,7 +425,7 @@ export default function LoginForm() {
                 </form>
               </div>
 
-              {/* 社交媒体登录 */}
+              {/* 社交媒体登录 - 暂时注释掉
               <div className="social-login-container">
                 <div className="social-login-text">Sign up with social media</div>
                 <div className="social-login-buttons">
@@ -456,6 +451,7 @@ export default function LoginForm() {
                   </button>
                 </div>
               </div>
+              */}
             </div>
           </div>
         </div>

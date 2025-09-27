@@ -431,3 +431,8 @@ body {
   border-radius: 8px;
   margin-top: 8px;
 }
+
+/* User Dropdown Styles - 清理重置 */
+.nav-right {
+  position: relative;
+}

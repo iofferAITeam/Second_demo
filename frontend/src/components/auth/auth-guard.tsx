@@ -14,7 +14,7 @@ interface AuthGuardProps {
 export function AuthGuard({
   children,
   requireAuth = true,
-  redirectTo = '/login',
+  redirectTo = '/auth',
   fallback
 }: AuthGuardProps) {
   const { isAuthenticated, isLoading } = useAuth()
@@ -34,7 +34,7 @@ export function AuthGuard({
     }
 
     if (!requireAuth && isAuthenticated) {
-      router.push('/dashboard')
+      router.push('/chat')
       setShouldRender(false)
       return
     }
@@ -62,7 +62,7 @@ export function AuthGuard({
 // 专用的需要认证的路由守卫
 export function ProtectedRoute({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   return (
-    <AuthGuard requireAuth={true} redirectTo="/" fallback={fallback}>
+    <AuthGuard requireAuth={true} redirectTo="/auth" fallback={fallback}>
       {children}
     </AuthGuard>
   )
@@ -71,7 +71,7 @@ export function ProtectedRoute({ children, fallback }: { children: React.ReactNo
 // 专用的不需要认证的路由守卫（如登录页面）
 export function PublicRoute({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   return (
-    <AuthGuard requireAuth={false} redirectTo="/dashboard" fallback={fallback}>
+    <AuthGuard requireAuth={false} redirectTo="/chat" fallback={fallback}>
       {children}
     </AuthGuard>
   )

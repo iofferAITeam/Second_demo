@@ -41,7 +41,6 @@ export default function ChatInput({ onSendMessage, disabled = false }: ChatInput
   return (
     <div className="chat-input-container">
       <div className="chat-actions">
-        <button className="action-link">Modify my profile</button>
         <button className="discover-more">
           Discover More with iOffer ⌄
         </button>
