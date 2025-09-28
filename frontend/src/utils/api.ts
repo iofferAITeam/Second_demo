@@ -1,6 +1,6 @@
 // 前端API客户端 - 用于调用后端API
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8010/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
 
 // 通用请求函数
 async function apiRequest(endpoint: string, options: RequestInit = {}) {

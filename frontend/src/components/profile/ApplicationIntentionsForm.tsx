@@ -1,8 +1,9 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { ApplicationIntentionsData, FormSectionProps } from '@/types/profile-form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import CustomDropdown from '@/components/ui/custom-dropdown'
 import { Plus } from 'lucide-react'
 
 interface ApplicationIntentionsFormProps extends FormSectionProps {
@@ -11,43 +12,26 @@ interface ApplicationIntentionsFormProps extends FormSectionProps {
 }
 
 export default function ApplicationIntentionsForm({ data, errors, onChange }: ApplicationIntentionsFormProps) {
-  const [intendedMajors, setIntendedMajors] = useState<string[]>(data.intendedMajor ? [data.intendedMajor] : [])
-  const [intendedCountries, setIntendedCountries] = useState<string[]>(data.intendedCountries || [])
-
-  const handleInputChange = (field: keyof ApplicationIntentionsData, value: string | boolean) => {
+  const handleInputChange = (field: keyof ApplicationIntentionsData, value: string | boolean | string[]) => {
     onChange(field, value)
   }
 
-  const addIntendedMajor = () => {
-    const newMajors = [...intendedMajors, '']
-    setIntendedMajors(newMajors)
-  }
-
-  const removeIntendedMajor = (index: number) => {
-    const newMajors = intendedMajors.filter((_, i) => i !== index)
-    setIntendedMajors(newMajors)
-  }
-
-  const updateIntendedMajor = (index: number, value: string) => {
-    const newMajors = [...intendedMajors]
-    newMajors[index] = value
-    setIntendedMajors(newMajors)
-  }
-
   const addIntendedCountry = () => {
-    const newCountries = [...intendedCountries, '']
-    setIntendedCountries(newCountries)
+    const currentCountries = data.intendedCountries || []
+    handleInputChange('intendedCountries', [...currentCountries, ''])
   }
 
   const removeIntendedCountry = (index: number) => {
-    const newCountries = intendedCountries.filter((_, i) => i !== index)
-    setIntendedCountries(newCountries)
+    const currentCountries = data.intendedCountries || []
+    const newCountries = currentCountries.filter((_, i) => i !== index)
+    handleInputChange('intendedCountries', newCountries)
   }
 
   const updateIntendedCountry = (index: number, value: string) => {
-    const newCountries = [...intendedCountries]
+    const currentCountries = data.intendedCountries || []
+    const newCountries = [...currentCountries]
     newCountries[index] = value
-    setIntendedCountries(newCountries)
+    handleInputChange('intendedCountries', newCountries)
   }
 
   return (
@@ -66,12 +50,12 @@ export default function ApplicationIntentionsForm({ data, errors, onChange }: Ap
             errors?.intendedDegree ? 'border-red-500' : 'border-[#e8efff]'
           }`}>
             <Select value={data.intendedDegree || ''} onValueChange={(value: string) => handleInputChange('intendedDegree', value)}>
-              <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+              <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-black [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
                 <SelectValue placeholder="Please Choose" />
               </SelectTrigger>
               <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
-                <SelectItem value="bachelor">Bachelor's Degree</SelectItem>
-                <SelectItem value="master">Master's Degree</SelectItem>
+                <SelectItem value="bachelor">Bachelor&apos;s Degree</SelectItem>
+                <SelectItem value="master">Master&apos;s Degree</SelectItem>
                 <SelectItem value="phd">PhD/Doctorate</SelectItem>
                 <SelectItem value="certificate">Certificate</SelectItem>
                 <SelectItem value="diploma">Diploma</SelectItem>
@@ -90,7 +74,7 @@ export default function ApplicationIntentionsForm({ data, errors, onChange }: Ap
             errors?.intendedIntakeTerm ? 'border-red-500' : 'border-[#e8efff]'
           }`}>
             <Select value={data.intendedIntakeTerm || ''} onValueChange={(value: string) => handleInputChange('intendedIntakeTerm', value)}>
-              <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+              <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-black [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
                 <SelectValue placeholder="Please Choose" />
               </SelectTrigger>
               <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
@@ -117,7 +101,7 @@ export default function ApplicationIntentionsForm({ data, errors, onChange }: Ap
             errors?.intendedMajor ? 'border-red-500' : 'border-[#e8efff]'
           }`}>
             <Select value={data.intendedMajor || ''} onValueChange={(value: string) => handleInputChange('intendedMajor', value)}>
-              <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+              <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-black [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
                 <SelectValue placeholder="Please Choose" />
               </SelectTrigger>
               <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
@@ -133,15 +117,6 @@ export default function ApplicationIntentionsForm({ data, errors, onChange }: Ap
               </SelectContent>
             </Select>
           </div>
-          <div className="flex gap-[8px] items-center">
-            <Plus className="h-4 w-4 text-[#1c5dff]" />
-            <button 
-              onClick={addIntendedMajor}
-              className="text-[#1c5dff] text-[16px] font-normal font-inter"
-            >
-              Add More
-            </button>
-          </div>
         </div>
         {errors?.intendedMajor && (
           <p className="text-red-500 text-xs mt-1">{errors.intendedMajor}</p>
@@ -149,45 +124,44 @@ export default function ApplicationIntentionsForm({ data, errors, onChange }: Ap
       </div>
 
       {/* Intended Countries Section */}
-      <div className="flex gap-[16px]">
-        <div className="space-y-[20px]">
-          <h4 className="text-[16px] font-semibold text-black font-inter">Intended Countries</h4>
-          <div className="flex gap-[16px] items-center">
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] h-[56px] flex items-center w-[298px] ${
-              errors?.intendedCountries ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <Select value={intendedCountries[0] || ''} onValueChange={(value: string) => updateIntendedCountry(0, value)}>
-                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
-                  <SelectValue placeholder="Please Choose" />
-                </SelectTrigger>
-                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
-                  <SelectItem value="us">United States</SelectItem>
-                  <SelectItem value="ca">Canada</SelectItem>
-                  <SelectItem value="uk">United Kingdom</SelectItem>
-                  <SelectItem value="au">Australia</SelectItem>
-                  <SelectItem value="de">Germany</SelectItem>
-                  <SelectItem value="fr">France</SelectItem>
-                  <SelectItem value="jp">Japan</SelectItem>
-                  <SelectItem value="kr">South Korea</SelectItem>
-                  <SelectItem value="cn">China</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+      <div className="space-y-[20px]">
+        <h4 className="text-[16px] font-semibold text-black font-inter">Intended Countries</h4>
+        <div className="space-y-[12px]">
+          {(data.intendedCountries || []).map((country, index) => (
+            <div key={index} className="flex gap-[8px] items-center">
+              <div className="w-[298px]">
+                <CustomDropdown
+                  value={country}
+                  onChange={(value: string) => updateIntendedCountry(index, value)}
+                  placeholder="Please Choose"
+                  error={!!errors?.intendedCountries}
+                />
+              </div>
+              {index > 0 && (
+                <button
+                  type="button"
+                  onClick={() => removeIntendedCountry(index)}
+                  className="text-red-500 hover:text-red-700 text-[14px] font-medium px-[12px] py-[8px] rounded-[6px] hover:bg-red-50 transition-colors"
+                >
+                  Remove
+                </button>
+              )}
             </div>
-            <div className="flex gap-[8px] items-center">
-              <Plus className="h-4 w-4 text-[#1c5dff]" />
-              <button 
-                onClick={addIntendedCountry}
-                className="text-[#1c5dff] text-[16px] font-normal font-inter"
-              >
-                Add More
-              </button>
-            </div>
+          ))}
+          <div className="flex gap-[8px] items-center">
+            <Plus className="h-4 w-4 text-[#1c5dff]" />
+            <button 
+              type="button"
+              onClick={addIntendedCountry}
+              className="text-[#1c5dff] text-[16px] font-inter bg-transparent border-none cursor-pointer hover:underline"
+            >
+              Add More
+            </button>
           </div>
-          {errors?.intendedCountries && (
-            <p className="text-red-500 text-xs mt-1">{errors.intendedCountries}</p>
-          )}
         </div>
+        {errors?.intendedCountries && (
+          <p className="text-red-500 text-xs mt-1">{errors.intendedCountries}</p>
+        )}
       </div>
 
       {/* Intended Budgets and Scholarship Section */}
@@ -225,7 +199,7 @@ export default function ApplicationIntentionsForm({ data, errors, onChange }: Ap
               errors?.scholarshipRequirements ? 'border-red-500' : 'border-[#e8efff]'
             }`}>
               <Select value={data.scholarshipRequirements || ''} onValueChange={(value: string) => handleInputChange('scholarshipRequirements', value)}>
-                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-black [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
                   <SelectValue placeholder="Scholarship Requirements" />
                 </SelectTrigger>
                 <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">

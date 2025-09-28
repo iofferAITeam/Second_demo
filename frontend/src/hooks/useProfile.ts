@@ -13,10 +13,7 @@ export function useProfile() {
 
   // 自动加载用户Profile数据
   const loadProfile = async () => {
-    console.log('🔄 loadProfile called:', { isAuthenticated, user: user?.email })
-    
     if (!isAuthenticated) {
-      console.log('❌ Not authenticated, skipping profile load')
       setIsLoading(false)
       return
     }
@@ -24,8 +21,6 @@ export function useProfile() {
     try {
       setIsLoading(true)
       const token = localStorage.getItem('access_token')
-      console.log('🔑 Token for API call:', token ? 'exists' : 'null')
-      console.log('🔑 Full token:', token ? token.substring(0, 50) + '...' : 'null')
 
       const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         headers: {
@@ -33,19 +28,12 @@ export function useProfile() {
           'Content-Type': 'application/json'
         }
       })
-      
-      console.log('📡 API Response status:', response.status, response.statusText)
 
       if (!response.ok) {
         throw new Error('Failed to load profile')
       }
 
       const data: StructuredProfileData = await response.json()
-      console.log('📥 Received profile data:', { 
-        userId: data.user?.id, 
-        avatarUrl: data.user?.avatar,
-        hasProfileData: !!data.profileData 
-      })
       setProfileData(data)
       setError(null)
     } catch (err) {
@@ -151,10 +139,8 @@ export function useProfile() {
       }
 
       const result = await response.json()
-      console.log('✅ Avatar upload successful:', { avatarUrl: result.avatarUrl })
 
       // Refresh profile data to get updated avatar
-      console.log('🔄 Refreshing profile data after avatar upload...')
       await loadProfile()
 
       return result.avatarUrl || ''

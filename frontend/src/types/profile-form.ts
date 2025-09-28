@@ -13,6 +13,24 @@ export interface BasicInfoData {
   hobbies?: string
 }
 
+export interface MajorSubjectData {
+  subject: string
+  gpa?: string
+  majorGpa?: string
+}
+
+export interface LanguageTestData {
+  testType: string
+  score: string
+  date: string
+}
+
+export interface StandardizedTestData {
+  testType: string
+  score: string
+  date: string
+}
+
 export interface AcademicPerformanceData {
   gpa?: string
   majorGpa?: string
@@ -23,16 +41,18 @@ export interface AcademicPerformanceData {
   greScore?: string
   gmatScore?: string
   highestDegree?: string
-  highSchoolName?: string
-  universityName?: string
+  graduatedInstitution?: string
   graduationYear?: string
-  majorSubjects?: string[]
+  majorSubjects?: string[] // Backend compatible - will store JSON strings
+  majorSubjectsData?: MajorSubjectData[] // Frontend only - for UI state
   languageTestType?: string
   languageTestScore?: string
   languageTestDate?: string
+  languageTestsData?: LanguageTestData[] // Frontend only - for UI state
   standardizedTestType?: string
   standardizedTestScore?: string
   standardizedTestDate?: string
+  standardizedTestsData?: StandardizedTestData[] // Frontend only - for UI state
   researchExperience?: string
   publications?: string
 }

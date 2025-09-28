@@ -2,6 +2,8 @@
 
 import React from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import CustomDropdown from '@/components/ui/custom-dropdown'
+import MBTIDropdown from '@/components/ui/mbti-dropdown'
 import { BasicInfoData, FormSectionProps } from '@/types/profile-form'
 
 interface BasicInfoFormProps extends FormSectionProps {
@@ -120,28 +122,12 @@ export default function BasicInfoForm({ data, errors, onChange }: BasicInfoFormP
         <h4 className="text-[16px] font-semibold text-black font-inter">Nationality</h4>
         <div className="flex gap-[16px] items-center">
           <div className="w-[250px]">
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-              errors?.nationality ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <Select value={data.nationality} onValueChange={(value: string) => handleInputChange('nationality', value)}>
-                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
-                  <SelectValue placeholder="Choose Nationality" />
-                </SelectTrigger>
-                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
-                  <SelectItem value="us">United States</SelectItem>
-                  <SelectItem value="ca">Canada</SelectItem>
-                  <SelectItem value="uk">United Kingdom</SelectItem>
-                  <SelectItem value="au">Australia</SelectItem>
-                  <SelectItem value="de">Germany</SelectItem>
-                  <SelectItem value="fr">France</SelectItem>
-                  <SelectItem value="jp">Japan</SelectItem>
-                  <SelectItem value="kr">South Korea</SelectItem>
-                  <SelectItem value="cn">China</SelectItem>
-                  <SelectItem value="in">India</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <CustomDropdown
+              value={data.nationality}
+              placeholder="Choose Nationality"
+              onChange={(value: string) => handleInputChange('nationality', value)}
+              error={!!errors?.nationality}
+            />
             {errors?.nationality && (
               <p className="text-red-500 text-xs mt-1">{errors.nationality}</p>
             )}
@@ -168,34 +154,13 @@ export default function BasicInfoForm({ data, errors, onChange }: BasicInfoFormP
         {/* MBTI Dropdown */}
         <div className="space-y-[8px]">
           <label className="text-[14px] font-medium text-black font-inter">MBTI</label>
-          <div className="w-[250px]">
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-              errors?.mbti ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <Select value={data.mbti || ''} onValueChange={(value: string) => handleInputChange('mbti', value)}>
-                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
-                  <SelectValue placeholder="Select MBTI Type" />
-                </SelectTrigger>
-                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
-                  <SelectItem value="INTJ">INTJ - Architect</SelectItem>
-                  <SelectItem value="INTP">INTP - Thinker</SelectItem>
-                  <SelectItem value="ENTJ">ENTJ - Commander</SelectItem>
-                  <SelectItem value="ENTP">ENTP - Debater</SelectItem>
-                  <SelectItem value="INFJ">INFJ - Advocate</SelectItem>
-                  <SelectItem value="INFP">INFP - Mediator</SelectItem>
-                  <SelectItem value="ENFJ">ENFJ - Protagonist</SelectItem>
-                  <SelectItem value="ENFP">ENFP - Campaigner</SelectItem>
-                  <SelectItem value="ISTJ">ISTJ - Logistician</SelectItem>
-                  <SelectItem value="ISFJ">ISFJ - Protector</SelectItem>
-                  <SelectItem value="ESTJ">ESTJ - Executive</SelectItem>
-                  <SelectItem value="ESFJ">ESFJ - Consul</SelectItem>
-                  <SelectItem value="ISTP">ISTP - Virtuoso</SelectItem>
-                  <SelectItem value="ISFP">ISFP - Adventurer</SelectItem>
-                  <SelectItem value="ESTP">ESTP - Entrepreneur</SelectItem>
-                  <SelectItem value="ESFP">ESFP - Entertainer</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="w-[296px]">
+            <MBTIDropdown
+              value={data.mbti}
+              placeholder="Please Choose"
+              onChange={(value: string) => handleInputChange('mbti', value)}
+              error={!!errors?.mbti}
+            />
             {errors?.mbti && (
               <p className="text-red-500 text-xs mt-1">{errors.mbti}</p>
             )}

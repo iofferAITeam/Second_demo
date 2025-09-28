@@ -13,13 +13,8 @@ export default function ProfilePage() {
   const [avatarCacheBuster, setAvatarCacheBuster] = useState(0)
   const { user, formData, isLoading, error, saveProfile, uploadAvatar } = useProfile()
 
-  // Debug avatar URL construction
-  const avatarUrl = user?.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatar}?v=${avatarCacheBuster}` : undefined
-  console.log('🖼️ Avatar URL constructed:', { 
-    originalAvatar: user?.avatar, 
-    cacheBuster: avatarCacheBuster, 
-    finalUrl: avatarUrl 
-  })
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
+  const avatarUrl = user?.avatar ? `${API_BASE_URL}${user.avatar}?v=${avatarCacheBuster}&t=${Date.now()}&bust=${Math.random()}` : undefined
 
   const handleEdit = () => {
     setIsEditModalOpen(true)
@@ -28,13 +23,11 @@ export default function ProfilePage() {
   const handleAvatarUpdate = async (file: File) => {
     try {
       await uploadAvatar(file)
-      console.log('Avatar uploaded successfully:', file.name)
-      // Force avatar refresh by incrementing cache buster
-      setAvatarCacheBuster(prev => {
-        const newBuster = prev + 1
-        console.log('🔄 Cache buster updated:', newBuster)
-        return newBuster
-      })
+      // Force avatar refresh by incrementing cache buster after a short delay
+      // to ensure the profile data has been updated
+      setTimeout(() => {
+        setAvatarCacheBuster(prev => prev + 1)
+      }, 100)
     } catch (error) {
       console.error('Avatar upload failed:', error)
     }
@@ -173,7 +166,7 @@ export default function ProfilePage() {
                 name: user.name || 'User',
                 email: user.email,
                 phone: formData?.basicInfo.phone || undefined,
-                avatar: user.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatar}?v=${avatarCacheBuster}` : undefined,
+                avatar: avatarUrl,
                 createdAt: user.createdAt.toString()
               }}
               profileData={formData}
