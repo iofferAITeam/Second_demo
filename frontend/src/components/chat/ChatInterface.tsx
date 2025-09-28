@@ -86,15 +86,15 @@ export default function ChatInterface() {
         const aiMessage: Message = {
           id: Math.random().toString(36).substr(2, 9),
           type: 'bot',
-          content: response.aiResponse?.content || 'No response',
+          content: response.message || 'No response',
           timestamp: new Date(),
-          teamUsed: response.aiResponse?.teamUsed,
-          confidence: response.aiResponse?.confidence,
-          thinkingProcess: response.aiResponse?.thinkingProcess,
-          referenceLinks: response.aiResponse?.referenceLinks,
-          strategy: response.aiResponse?.strategy,
-          source: response.aiResponse?.source,
-          fallback: response.aiResponse?.fallback
+          teamUsed: response.team_used,
+          confidence: response.confidence,
+          thinkingProcess: response.thinking_process,
+          referenceLinks: response.reference_links,
+          strategy: response.strategy,
+          source: response.source,
+          fallback: response.fallback
         }
         return [...withoutLoading, aiMessage]
       })

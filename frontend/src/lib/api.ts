@@ -25,8 +25,16 @@ export interface ChatMessage {
 
 export interface ChatResponse {
   message: string
-  userMessage: ChatMessage
-  aiResponse: ChatMessage
+  thinking_process?: string
+  reference_links?: string[]
+  strategy?: string
+  source?: string
+  rag_similarity?: number
+  team_used: string
+  timestamp: string
+  status?: string
+  confidence?: number
+  fallback?: boolean
 }
 
 export interface ChatSession {
@@ -92,8 +100,8 @@ class ApiClient {
 
   // Chat API
   async sendMessage(message: string, sessionId?: string): Promise<ChatResponse> {
-    // 使用正确的认证端点
-    return this.request<ChatResponse>('/api/chat/message', {
+    // 使用正确的聊天端点（不需要 /api 前缀）
+    return this.request<ChatResponse>('/chat/message', {
       method: 'POST',
       body: JSON.stringify({
         message,

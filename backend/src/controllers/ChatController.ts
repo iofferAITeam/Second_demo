@@ -87,7 +87,7 @@ export class ChatController {
       if (userId) {
         try {
           // 使用STUDENT_INFO团队提取用户资料信息
-          const extractionResponse = await axios.post('http://127.0.0.1:8010/chat/message', {
+          const extractionResponse = await axios.post(`${process.env.AI_SERVICE_URL}/chat/message`, {
             message: `请从以下消息中提取学生个人资料信息: ${message}`,
             user_id: userId,
             team_type: "STUDENT_INFO"
@@ -225,7 +225,7 @@ export class ChatController {
         }
 
         // 先尝试调用新的AI服务
-        const aiServiceResponse = await axios.post('http://127.0.0.1:8010/chat/message', aiRequest, {
+        const aiServiceResponse = await axios.post(`${process.env.AI_SERVICE_URL}/chat/message`, aiRequest, {
           timeout: 120000, // 2分钟超时，给AI团队足够时间生成推荐
           headers: {
             'Content-Type': 'application/json'
