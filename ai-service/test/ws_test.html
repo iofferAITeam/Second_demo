@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>iOffer AI WebSocket Tester</title>
+    <style>
+      body { font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Arial, sans-serif; margin: 24px; }
+      .row { margin: 8px 0; }
+      label { display: inline-block; min-width: 110px; }
+      #log { border: 1px solid #ddd; border-radius: 8px; padding: 10px; height: 420px; overflow: auto; background: #fafafa; }
+      .msg { margin: 6px 0; padding: 8px 10px; border-radius: 8px; white-space: pre-wrap; }
+      .me { background: #007bff; color: #fff; align-self: flex-end; }
+      .status { background: #f0f8ff; color: #035; }
+      .result { background: #f5fff0; color: #053; }
+      .error { background: #fff5f5; color: #800; }
+      .sys { background: #eee; color: #333; font-style: italic; }
+      .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+      input[type=text] { width: 360px; padding: 6px 8px; }
+      textarea { width: 100%; height: 80px; padding: 8px; }
+      button { padding: 6px 12px; cursor: pointer; }
+      code { background: #eee; padding: 1px 4px; border-radius: 4px; }
+    </style>
+  </head>
+  <body>
+    <h2>iOffer AI WebSocket Tester</h2>
+    <div class="row controls">
+      <label for="wsUrl">Server</label>
+      <input id="wsUrl" type="text" value="ws://127.0.0.1:8000/ws" />
+      <label for="userId">User ID</label>
+      <input id="userId" type="text" value="hanyu_liu_003" />
+      <button id="connectBtn">Connect</button>
+      <button id="disconnectBtn" disabled>Disconnect</button>
+      <span id="status">Disconnected</span>
+    </div>
+
+    <div class="row">
+      <label for="message">Message</label>
+      <textarea id="message" placeholder="Type your message (English)"></textarea>
+      <div class="controls">
+        <button id="sendBtn" disabled>Send</button>
+        <button id="clearBtn">Clear Log</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="log"></div>
+    </div>
+
+    <script>
+      const wsUrl = document.getElementById('wsUrl');
+      const userId = document.getElementById('userId');
+      const connectBtn = document.getElementById('connectBtn');
+      const disconnectBtn = document.getElementById('disconnectBtn');
+      const statusEl = document.getElementById('status');
+      const messageEl = document.getElementById('message');
+      const sendBtn = document.getElementById('sendBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const log = document.getElementById('log');
+
+      let ws = null;
+
+      function add(type, text) {
+        const div = document.createElement('div');
+        div.className = `msg ${type}`;
+        div.textContent = text;
+        log.appendChild(div);
+        log.scrollTop = log.scrollHeight;
+      }
+
+      function addJson(type, obj) {
+        add(type, JSON.stringify(obj, null, 2));
+      }
+
+      function setConnected(c) {
+        connectBtn.disabled = c;
+        disconnectBtn.disabled = !c;
+        sendBtn.disabled = !c;
+        statusEl.textContent = c ? 'Connected' : 'Disconnected';
+      }
+
+      connectBtn.onclick = () => {
+        if (ws) return;
+        const url = `${wsUrl.value.replace(/\/$/, '')}/${encodeURIComponent(userId.value)}`;
+        ws = new WebSocket(url);
+        add('sys', `Connecting to ${url} ...`);
+
+        ws.onopen = () => {
+          setConnected(true);
+          add('sys', 'Connected');
+        };
+
+        ws.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (data?.type === 'status') {
+              const s = data.data?.status || 'thinking';
+              const msg = data.data?.message || '';
+              addJson(s === 'error' ? 'error' : 'status', data);
+            } else if (data?.type === 'result') {
+              addJson('result', data);
+            } else if (data?.type === 'system' || data?.type === 'bot_response') {
+              addJson('sys', data);
+            } else {
+              add('sys', e.data);
+            }
+          } catch (err) {
+            add('sys', e.data);
+          }
+        };
+
+        ws.onclose = () => {
+          add('sys', 'Disconnected');
+          setConnected(false);
+          ws = null;
+        };
+
+        ws.onerror = (err) => {
+          add('error', `WebSocket error`);
+        };
+      };
+
+      disconnectBtn.onclick = () => {
+        if (ws) ws.close();
+      };
+
+      sendBtn.onclick = () => {
+        const text = messageEl.value.trim();
+        if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+        // API expects: { type: 'user_message', data: { message: '...' } }
+        const payload = { type: 'user_message', data: { message: text } };
+        ws.send(JSON.stringify(payload));
+        add('me', text);
+        messageEl.value = '';
+      };
+
+      clearBtn.onclick = () => { log.innerHTML = ''; };
+    </script>
+  </body>
+  </html>
+

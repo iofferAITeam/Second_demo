@@ -1,0 +1,97 @@
+# env files
+.env
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# chainlit
+.chainlit/
+
+# DS_Store
+.DS_Store
+
+# Generated data files (large embeddings, FAISS index, etc.)
+data/
+!data/                 # re-allow the directory itself
+!data/qa_pairs.csv     # re-allow this specific file
+
+# Log files
+*.log
+logs/
+debug_output.log
+debug_output_*.log
+
+# Cache and temporary files
+.cache/
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# IDE and editor files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Python specific
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+.tox/
+.nox/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Environment variables
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Model files (large ML models)
+*.joblib
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+
+# Uploads and temporary files
+uploads/
+temp/
+tmp/
