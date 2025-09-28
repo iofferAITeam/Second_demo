@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ioffer-postgres
+    environment:
+      POSTGRES_DB: ioffer_db
+      POSTGRES_USER: ioffer_user
+      POSTGRES_PASSWORD: ioffer_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ioffer_user -d ioffer_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: ioffer-ai-service
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-AIzaSyCBn8BSghEjntAaO3BHaR6kPvUKwA5jEoE}
+      - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY:-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}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-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}
+      - DATABASE_URL=postgresql://ioffer_user:ioffer_password@postgres:5432/ioffer_db
+      - SQL_DATABASE_URI=postgresql://ioffer_user:ioffer_password@postgres:5432/ioffer_db
+    ports:
+      - "8010:8010"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    volumes:
+      - ./ai-service/data:/app/data
+      - ./ai-service/uploads:/app/uploads
+
+volumes:
+  postgres_data:
+    driver: local

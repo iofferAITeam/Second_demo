@@ -1,0 +1,188 @@
+/* Recommendation Case Styles */
+.recommendation-case {
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+.recommendation-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.recommendation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.recommendation-content {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.recommendation-main {
+  flex: 1;
+  space-y: 2rem;
+}
+
+.recommendation-nav {
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-top: 5rem;
+}
+
+.recommendation-nav button {
+  padding: 0.75rem;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.recommendation-nav button:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.recommendation-nav button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Component specific styles */
+.offer-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.background-tag {
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-right: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.background-tag.label {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.background-tag.data {
+  background-color: #1e293b;
+  color: white;
+}
+
+.personal-tag {
+  padding: 0.5rem 1rem;
+  background-color: #dbeafe;
+  color: #2563eb;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-right: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.case-analysis {
+  display: flex;
+  gap: 1.5rem;
+  padding: 2rem 0;
+}
+
+.case-illustration {
+  width: 8rem;
+  height: 8rem;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.school-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.school-stat {
+  padding: 0.75rem 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.school-stat.primary {
+  background-color: #2563eb;
+  color: white;
+}
+
+.school-stat.secondary {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.school-card {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.school-metrics {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: white;
+  padding: 1.5rem;
+}
+
+.metric-circle {
+  width: 4rem;
+  height: 4rem;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .recommendation-content {
+    flex-direction: column;
+  }
+
+  .recommendation-nav {
+    order: -1;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0;
+    margin-bottom: 2rem;
+  }
+
+  .case-analysis {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .case-illustration {
+    align-self: center;
+  }
+
+  .school-stats {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

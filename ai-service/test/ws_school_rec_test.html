@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>School Recommendation WS Test</title>
+    <style>
+      body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;margin:24px}
+      .row{margin:8px 0}
+      label{display:inline-block;min-width:110px}
+      #log{border:1px solid #ddd;border-radius:8px;padding:10px;height:420px;overflow:auto;background:#fafafa}
+      .msg{margin:6px 0;padding:8px 10px;border-radius:8px;white-space:pre-wrap}
+      .me{background:#007bff;color:#fff}
+      .status{background:#f0f8ff;color:#035}
+      .result{background:#f5fff0;color:#053}
+      .error{background:#fff5f5;color:#800}
+      .sys{background:#eee;color:#333;font-style:italic}
+      .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+      input[type=text]{width:360px;padding:6px 8px}
+      textarea{width:100%;height:80px;padding:8px}
+      button{padding:6px 12px;cursor:pointer}
+      table{border-collapse:collapse;width:100%;margin-top:6px}
+      th,td{border:1px solid #ddd;padding:6px;text-align:left}
+      th{background:#f6f6f6}
+    </style>
+  </head>
+  <body>
+    <h2>School Recommendation WebSocket Test</h2>
+    <div class="row controls">
+      <label for="wsUrl">Server</label>
+      <input id="wsUrl" type="text" value="ws://127.0.0.1:8010/ws" />
+      <label for="userId">User ID</label>
+      <input id="userId" type="text" value="hanyu_liu_003" />
+      <button id="connectBtn">Connect</button>
+      <button id="disconnectBtn" disabled>Disconnect</button>
+      <span id="status">Disconnected</span>
+    </div>
+
+    <div class="row controls">
+      <label for="field">Field</label>
+      <select id="field">
+        <option>Business</option>
+        <option>Computer Science</option>
+        <option>Data Science</option>
+        <option>Information Systems</option>
+        <option>Finance</option>
+      </select>
+      <button id="sendRec">Send Recommendation Test</button>
+    </div>
+
+    <div class="row">
+      <label for="message">Message</label>
+      <textarea id="message" placeholder="Type or auto-filled test message"></textarea>
+      <div class="controls">
+        <button id="sendBtn" disabled>Send</button>
+        <button id="clearBtn">Clear Log</button>
+      </div>
+    </div>
+
+    <div class="row"><div id="log"></div></div>
+
+    <script>
+      const wsUrl = document.getElementById('wsUrl');
+      const userId = document.getElementById('userId');
+      const connectBtn = document.getElementById('connectBtn');
+      const disconnectBtn = document.getElementById('disconnectBtn');
+      const statusEl = document.getElementById('status');
+      const messageEl = document.getElementById('message');
+      const sendBtn = document.getElementById('sendBtn');
+      const clearBtn = document.getElementById('clearBtn');
+      const log = document.getElementById('log');
+      const fieldEl = document.getElementById('field');
+      const sendRec = document.getElementById('sendRec');
+
+      let ws = null;
+
+      function add(type, text){
+        const div=document.createElement('div');
+        div.className='msg '+type; div.textContent=text; log.appendChild(div); log.scrollTop=log.scrollHeight;
+      }
+      function addJson(type, obj){ add(type, JSON.stringify(obj, null, 2)); }
+      function addSchools(payload){
+        if(!payload || !payload.schools) return;
+        const tbl=document.createElement('table');
+        tbl.innerHTML='<thead><tr><th>#</th><th>Name</th><th>Tier</th><th>Prob.</th><th>Reasons</th></tr></thead>';
+        const tb=document.createElement('tbody');
+        payload.schools.slice(0,20).forEach((s,i)=>{
+          const tr=document.createElement('tr');
+          const reasons=Array.isArray(s.reasons)?s.reasons.join('; '):'';
+          tr.innerHTML=`<td>${i+1}</td><td>${s.name||''}</td><td>${s.tier||''}</td><td>${s.admission_probability??''}</td><td>${reasons}</td>`;
+          tb.appendChild(tr);
+        });
+        tbl.appendChild(tb); log.appendChild(tbl); log.scrollTop=log.scrollHeight;
+      }
+      function setConnected(c){ connectBtn.disabled=c; disconnectBtn.disabled=!c; sendBtn.disabled=!c; statusEl.textContent=c?'Connected':'Disconnected'; }
+
+      connectBtn.onclick=()=>{
+        if(ws) return; const url=`${wsUrl.value.replace(/\/$/, '')}/${encodeURIComponent(userId.value)}`;
+        ws=new WebSocket(url); add('sys', `Connecting to ${url} ...`);
+        ws.onopen=()=>{ setConnected(true); add('sys','Connected'); };
+        ws.onclose=()=>{ add('sys','Disconnected'); setConnected(false); ws=null; };
+        ws.onerror=()=>{ add('error','WebSocket error'); };
+        ws.onmessage=(e)=>{
+          try {
+            const data=JSON.parse(e.data);
+            if(data?.type==='status'){
+              const s=data.data?.status||'thinking'; addJson(s==='error'?'error':'status', data);
+            } else if(data?.type==='result'){
+              addJson('result', data); if(data.data?.payload) addSchools(data.data.payload);
+            } else { add('sys', e.data); }
+          } catch { add('sys', e.data); }
+        };
+      };
+      disconnectBtn.onclick=()=>{ if(ws) ws.close(); };
+      sendBtn.onclick=()=>{
+        const text=messageEl.value.trim(); if(!text||!ws||ws.readyState!==WebSocket.OPEN) return;
+        ws.send(JSON.stringify({ type:'user_message', data:{ message:text } })); add('me', text); messageEl.value='';
+      };
+      clearBtn.onclick=()=>{ log.innerHTML=''; };
+      sendRec.onclick=()=>{
+        const f=fieldEl.value.trim(); const msg=`Please recommend 10 ${f} master programs for me based on my profile.`;
+        messageEl.value=msg; sendBtn.click();
+      };
+    </script>
+  </body>
+  </html>
+
