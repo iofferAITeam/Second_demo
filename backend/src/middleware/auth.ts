@@ -9,6 +9,7 @@ interface AuthRequest extends Request {
     email: string
     name: string
   }
+  userId?: string
 }
 
 export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -20,17 +21,29 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
     }
 
     const token = authHeader.substring(7)
+    console.log('🔍 Received token:', token.substring(0, 50) + '...')
 
     const decoded = TokenService.verifyAccessToken(token)
+    console.log('🔍 Token decoded:', decoded)
     if (!decoded) {
+      console.log('❌ Token verification failed')
       return res.status(401).json({ error: 'Invalid token' })
     }
 
-    // 临时使用模拟用户数据，避免Prisma模型问题
-    const user = {
-      id: decoded.userId,
-      email: 'user@example.com',
-      name: 'Test User'
+    console.log('🔍 Looking up user with ID:', decoded.userId)
+    const user = await prisma.users.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        email: true,
+        name: true
+      }
+    })
+    console.log('🔍 User lookup result:', user ? 'Found' : 'Not found')
+
+    if (!user) {
+      console.log('❌ User not found in database')
+      return res.status(404).json({ error: 'User not found' })
     }
 
     // User always exists in mock mode
@@ -40,7 +53,9 @@ export const authenticateToken = async (req: AuthRequest, res: Response, next: N
       email: user.email,
       name: user.name
     }
+    req.userId = user.id
 
+    console.log('✅ Auth middleware completed, userId set:', user.id)
     next()
   } catch (error) {
     logger.error('Token authentication error:', error)
@@ -60,18 +75,21 @@ export const optionalAuth = async (req: AuthRequest, res: Response, next: NextFu
     const decoded = TokenService.verifyAccessToken(token)
 
     if (decoded) {
-      // 临时使用模拟用户数据，避免Prisma模型问题
-    const user = {
-      id: decoded.userId,
-      email: 'user@example.com',
-      name: 'Test User'
-    }
+      const user = await prisma.users.findUnique({
+        where: { id: decoded.userId },
+        select: {
+          id: true,
+          email: true,
+          name: true
+        }
+      })
 
-      // User always exists in mock mode
-      req.user = {
-        id: user.id,
-        email: user.email,
-        name: user.name
+      if (user) {
+        req.user = {
+          id: user.id,
+          email: user.email,
+          name: user.name
+        }
       }
     }
 

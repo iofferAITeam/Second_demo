@@ -143,7 +143,7 @@ export class ChatController {
                   Object.keys(extractedData.testScores).length > 0) {
                 try {
                   // 直接保存到userProfile表
-                  await prisma.userProfile.upsert({
+                  await prisma.user_profiles.upsert({
                     where: { userId },
                     create: {
                       id: `profile_${userId}`,
@@ -178,7 +178,7 @@ export class ChatController {
       let userProfile = null
       if (userId) {
         try {
-          userProfile = await prisma.userProfile.findUnique({
+          userProfile = await prisma.user_profiles.findUnique({
             where: { userId }
           })
           if (userProfile) {

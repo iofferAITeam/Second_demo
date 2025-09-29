@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -108,6 +107,11 @@ model user_profiles {
   wechat           String?
   birthDate        DateTime?
   nationality      String?
+  visaRequired     Boolean? @default(false)
+  mbti             String?
+  extracurricular  String?
+  personalStrengths String?
+  hobbies          String?
 
   // 学术背景
   currentEducation String?
@@ -118,17 +122,35 @@ model user_profiles {
   undergraduateUniversity String?
   universityRank   Int?
   universityType   String?  // 'overseas', '985_211', 'regular', 'unknown'
+  highSchoolName   String?
+  graduationYear   String?
+  majorSubjects    Json?    // Array of major subjects
+  majorSubjectsData Json?   // Array of MajorSubjectData objects
+  researchExperience String?
+  publications     String?
 
   // 标准化考试成绩
   toefl            Int?
   ielts            Float?
   gre              Int?
   gmat             Int?
+  satScore         Int?
+  actScore         Int?
 
   // 语言详细成绩 (JSON)
   toeflDetails     Json?    // {reading: 28, listening: 29, speaking: 23, writing: 25}
   ieltsDetails     Json?    // {reading: 8.0, listening: 7.5, speaking: 7.0, writing: 7.5}
   greDetails       Json?    // {verbal: 160, quantitative: 165, analytical: 4.0}
+  
+  // 语言测试和标准化测试 (Frontend Form Fields)
+  languageTestType     String?
+  languageTestScore    String?
+  languageTestDate     String?
+  languageTestsData    Json?    // Array of LanguageTestData objects
+  standardizedTestType String?
+  standardizedTestScore String?
+  standardizedTestDate String?
+  standardizedTestsData Json?  // Array of StandardizedTestData objects
 
   // 经历背景 (JSON Arrays)
   workExperiences  Json?    // Array of work experience objects
@@ -151,6 +173,15 @@ model user_profiles {
   targetCountries  Json?    // Array of target countries
   applicationYear  String?
   applicationTerm  String?  // 'fall', 'spring', 'summer'
+  intendedDegree   String?  // Alias for targetDegreeType
+  intendedIntakeTerm String? // Alias for applicationTerm
+  intendedMajor    String?  // Single major (from targetMajors array)
+  intendedCountries Json?   // Alias for targetCountries
+  intendedBudgets  String?  // Alias for budgetRange
+  scholarshipRequirements String?
+  otherPreference  String?
+  internshipExperience String?
+  volunteerExperience String?
 
   // 个人发展
   goals            String?
