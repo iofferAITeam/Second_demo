@@ -48,7 +48,7 @@ export const autoRefreshToken = async (req: AuthRequest, res: Response, next: Ne
     logger.info(`Token expiring soon for user ${decodedToken.userId}, attempting auto-refresh`)
 
     // 尝试从数据库获取用户信息和refresh token
-    const user = await prisma.user.findUnique({
+    const user = await prisma.users.findUnique({
       where: { id: decodedToken.userId },
       select: {
         id: true,
@@ -67,7 +67,7 @@ export const autoRefreshToken = async (req: AuthRequest, res: Response, next: Ne
     // 检查 refresh token 是否过期
     if (user.refreshTokenExpiresAt < new Date()) {
       logger.warn(`Auto-refresh failed: refresh token expired for user ${decodedToken.userId}`)
-      await prisma.user.update({
+      await prisma.users.update({
         where: { id: user.id },
         data: {
           refreshToken: null,
@@ -81,7 +81,7 @@ export const autoRefreshToken = async (req: AuthRequest, res: Response, next: Ne
     const newTokens = TokenService.generateTokenPair(user.id, user.email)
 
     // 更新数据库中的 refresh token
-    await prisma.user.update({
+    await prisma.users.update({
       where: { id: user.id },
       data: {
         refreshToken: newTokens.refreshTokenSecure,

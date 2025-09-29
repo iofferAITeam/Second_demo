@@ -134,7 +134,7 @@ export class UserController {
       }
 
       // TODO: 验证当前密码并更新（需要Prisma）
-      // const user = await prisma.user.findUnique({ where: { id: userId } })
+      // const user = await prisma.users.findUnique({ where: { id: userId } })
       // const isValidPassword = await bcrypt.compare(currentPassword, user.password)
 
       const hashedNewPassword = await bcrypt.hash(newPassword, 12)
@@ -154,7 +154,7 @@ export class UserController {
       const userId = req.user?.id
 
       // TODO: 删除用户账户（需要Prisma）
-      // await prisma.user.delete({ where: { id: userId } })
+      // await prisma.users.delete({ where: { id: userId } })
 
       logger.info(`User account deleted: ${userId}`)
 
