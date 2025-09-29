@@ -351,13 +351,17 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
                 </div>
                 
                 {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => removeLanguageTest(index)}
-                    className="text-red-500 hover:text-red-700 text-[14px] font-medium px-[12px] py-[8px] rounded-[6px] hover:bg-red-50 transition-colors"
-                  >
-                    Remove
-                  </button>
+                  <div className="w-[250px] flex items-end">
+                    <div className="mt-[32px]">
+                      <button
+                        type="button"
+                        onClick={() => removeLanguageTest(index)}
+                        className="text-red-500 hover:text-red-700 text-[14px] font-medium px-[12px] py-[8px] rounded-[6px] hover:bg-red-50 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
@@ -451,13 +455,17 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
                 </div>
                 
                 {index > 0 && (
-                  <button
-                    type="button"
-                    onClick={() => removeStandardizedTest(index)}
-                    className="text-red-500 hover:text-red-700 text-[14px] font-medium px-[12px] py-[8px] rounded-[6px] hover:bg-red-50 transition-colors"
-                  >
-                    Remove
-                  </button>
+                  <div className="w-[250px] flex items-end">
+                    <div className="mt-[32px]">
+                      <button
+                        type="button"
+                        onClick={() => removeStandardizedTest(index)}
+                        className="text-red-500 hover:text-red-700 text-[14px] font-medium px-[12px] py-[8px] rounded-[6px] hover:bg-red-50 transition-colors"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
                 )}
               </div>
             </div>
