@@ -2,74 +2,53 @@
 
 import { useState } from 'react'
 import { useProfile } from '@/hooks/useProfile'
-import { UpdateProfileRequest } from '@/types/profile'
-import BasicInfoForm from '@/components/profile/BasicInfoForm'
-import AcademicInfoForm from '@/components/profile/AcademicInfoForm'
-import DocumentManager from '@/components/profile/DocumentManager'
+import UserProfileCard from '@/components/profile/UserProfileCard'
+import AccountStatusTable from '@/components/profile/AccountStatusTable'
+import UpgradeBanner from '@/components/profile/UpgradeBanner'
+import EditProfileModal from '@/components/profile/EditProfileModal'
+import Navbar from '@/components/shared/Navbar'
 
 export default function ProfilePage() {
-  const { user, profile, isLoading, error, saveProfile, clearError, profileCompletion } = useProfile()
-  const [isEditing, setIsEditing] = useState(false)
-  const [activeTab, setActiveTab] = useState('basic')
-  const [formData, setFormData] = useState<UpdateProfileRequest>({})
-  const [saving, setSaving] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const { user, profile, isLoading, error } = useProfile()
 
   const handleEdit = () => {
-    // 预填充表单数据
-    setFormData({
-      name: user?.name || '',
-      phone: profile?.phone || '',
-      wechat: profile?.wechat || '',
-      birthDate: profile?.birthDate ? new Date(profile.birthDate).toISOString().split('T')[0] : '',
-      nationality: profile?.nationality || '',
-      currentEducation: profile?.currentEducation || '',
-      gpa: profile?.gpa || undefined,
-      major: profile?.major || '',
-      graduationDate: profile?.graduationDate ? new Date(profile.graduationDate).toISOString().split('T')[0] : '',
-      toefl: profile?.toefl || undefined,
-      ielts: profile?.ielts || undefined,
-      gre: profile?.gre || undefined,
-      gmat: profile?.gmat || undefined,
-      goals: profile?.goals || ''
-    })
-    setIsEditing(true)
-    clearError()
+    setIsEditModalOpen(true)
   }
 
-  const handleSave = async () => {
-    try {
-      setSaving(true)
-      await saveProfile(formData)
-      setIsEditing(false)
-      alert('Profile saved successfully!')
-    } catch (error) {
-      alert('Failed to save profile: ' + (error instanceof Error ? error.message : 'Unknown error'))
-    } finally {
-      setSaving(false)
-    }
+  const handleAvatarUpdate = (file: File) => {
+    // TODO: Implement avatar upload functionality
+    console.log('Avatar update:', file.name)
+    // You can implement the avatar upload logic here
+    // For example: uploadAvatar(file) and update user state
   }
 
-  const handleCancel = () => {
-    setIsEditing(false)
-    setFormData({})
-    clearError()
+  const handlePhoneUpdate = (phone: string) => {
+    // TODO: Implement phone update functionality
+    console.log('Phone update:', phone)
+    // You can implement the phone update logic here
+    // For example: updateUserPhone(phone)
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'gpa' || name === 'toefl' || name === 'ielts' || name === 'gre' || name === 'gmat'
-        ? (value ? parseFloat(value) : undefined)
-        : value
-    }))
+  const handlePricingClick = () => {
+    // TODO: Implement pricing page navigation
+    console.log('Pricing clicked')
+    // Navigate to pricing page or open pricing modal
   }
 
-  const tabs = [
-    { id: 'basic', name: 'Basic Info', icon: '👤' },
-    { id: 'academic', name: 'Academic', icon: '🎓' },
-    { id: 'documents', name: 'Documents', icon: '📄' },
-  ]
+  const handleUpgradeClick = () => {
+    // TODO: Implement upgrade functionality
+    console.log('Upgrade clicked')
+    // Navigate to upgrade page or open upgrade modal
+  }
+
+  const handleSaveProfile = (data: any) => {
+    // TODO: Implement save functionality
+    console.log('Profile data saved:', data)
+    // Here you would typically send the data to your backend API
+    // For now, just close the modal
+    setIsEditModalOpen(false)
+  }
 
   if (isLoading) {
     return (
@@ -106,152 +85,80 @@ export default function ProfilePage() {
     )
   }
 
+  // Sample data for AccountStatusTable
+  const usageData = [
+    {
+      service: 'School Selection AI',
+      conversationsTimes: 'X',
+      timesUsed: 9,
+      remainingUses: 1
+    }
+  ]
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header Section */}
-        <div className="bg-white rounded-lg shadow-sm border mb-6">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center overflow-hidden">
-                  {user.avatar ? (
-                    <img
-                      src={`${process.env.NEXT_PUBLIC_API_URL}${user.avatar}`}
-                      alt="Profile Avatar"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-xl text-white font-semibold">
-                      {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900">{user.name || user.email}</h1>
-                  <p className="text-gray-600">{user.email}</p>
-                  <p className="text-sm text-gray-500">Member since {new Date(user.createdAt).toLocaleDateString()}</p>
-                </div>
+    <div className="h-screen bg-[#f5f9ff] overflow-hidden">
+      {/* Navigation Bar */}
+      <Navbar />
+      
+      {/* Main Content */}
+      <div className="h-full flex justify-center items-center">
+        <div className="max-w-[1200px] px-4">
+          {/* Main Content Layout */}
+          <div className="space-y-8">
+            {/* Top Row - User Profile Card and Account Status */}
+            <div className="flex flex-col lg:flex-row gap-3 h-[320px]">
+              {/* User Profile Card */}
+              <div className="flex-1 h-full">
+                <UserProfileCard
+                  user={{
+                    name: user.name || 'User',
+                    email: user.email,
+                    phone: profile?.phone || undefined,
+                    avatar: user.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatar}` : undefined,
+                    createdAt: user.createdAt.toString()
+                  }}
+                  subscription={{
+                    plan: 'FREE', // This could come from user data
+                    status: 'active'
+                  }}
+                  onEdit={handleEdit}
+                  onAvatarUpdate={handleAvatarUpdate}
+                  onPhoneUpdate={handlePhoneUpdate}
+                />
               </div>
 
-              <div className="flex items-center space-x-4">
-                {/* Profile Completion */}
-                <div className="text-right">
-                  <div className="text-sm font-medium text-gray-700">Profile Completion</div>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-24 bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${profileCompletion.percentage}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm font-semibold text-gray-700">{profileCompletion.percentage}%</span>
-                  </div>
-                </div>
-
-                {!isEditing && (
-                  <button
-                    onClick={handleEdit}
-                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Edit Profile
-                  </button>
-                )}
+              {/* Account Status Table */}
+              <div className="flex-1 h-full">
+                <AccountStatusTable
+                  usageData={usageData}
+                  onPricingClick={handlePricingClick}
+                />
               </div>
             </div>
-          </div>
 
-          {/* Tab Navigation */}
-          <div className="px-6">
-            <nav className="flex space-x-8" aria-label="Tabs">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <span>{tab.icon}</span>
-                  <span>{tab.name}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="p-6">
-            {activeTab === 'basic' && (
-              <BasicInfoForm
-                user={user}
-                profile={profile}
-                formData={formData}
-                isEditing={isEditing}
-                onChange={handleChange}
-              />
-            )}
-
-            {activeTab === 'academic' && (
-              <AcademicInfoForm
-                profile={profile}
-                formData={formData}
-                isEditing={isEditing}
-                onChange={handleChange}
-              />
-            )}
-
-            {activeTab === 'documents' && (
-              <DocumentManager />
-            )}
-
-            {/* Action Buttons */}
-            {isEditing ? (
-              <div className="mt-8 flex space-x-4 pt-6 border-t border-gray-200">
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
-                >
-                  {saving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <span>Save Changes</span>
-                  )}
-                </button>
-                <button
-                  onClick={handleCancel}
-                  disabled={saving}
-                  className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="flex justify-between items-center">
-                  <div className="text-sm text-gray-600">
-                    {profileCompletion.missingFields.length > 0 ? (
-                      <p>Complete missing fields to improve your profile: <strong>{profileCompletion.missingFields.join(', ')}</strong></p>
-                    ) : (
-                      <p className="text-green-600">🎉 Your profile is complete!</p>
-                    )}
-                  </div>
-                  <button className="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                    View Applications
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Bottom Row - Upgrade Banner */}
+            <div className="!mt-6">
+              <UpgradeBanner onUpgradeClick={handleUpgradeClick} />
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      {user && (
+        <EditProfileModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          user={{
+            name: user.name || 'User',
+            email: user.email,
+            phone: profile?.phone || undefined,
+            avatar: user.avatar ? `${process.env.NEXT_PUBLIC_API_URL}${user.avatar}` : undefined,
+            createdAt: user.createdAt.toString()
+          }}
+          onSave={handleSaveProfile}
+        />
+      )}
     </div>
   )
 }

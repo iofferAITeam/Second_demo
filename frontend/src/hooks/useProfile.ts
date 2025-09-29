@@ -12,7 +12,10 @@ export function useProfile() {
 
   // 自动加载用户Profile数据
   const loadProfile = async () => {
+    console.log('🔄 loadProfile called:', { isAuthenticated, user: user?.email })
+    
     if (!isAuthenticated || !user) {
+      console.log('❌ Not authenticated or no user, skipping profile load')
       setIsLoading(false)
       return
     }
@@ -20,6 +23,8 @@ export function useProfile() {
     try {
       setIsLoading(true)
       const token = localStorage.getItem('access_token')
+      console.log('🔑 Token for API call:', token ? 'exists' : 'null')
+      console.log('🔑 Full token:', token ? token.substring(0, 50) + '...' : 'null')
 
       const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
         headers: {
@@ -27,6 +32,8 @@ export function useProfile() {
           'Content-Type': 'application/json'
         }
       })
+      
+      console.log('📡 API Response status:', response.status, response.statusText)
 
       if (!response.ok) {
         throw new Error('Failed to load profile')
