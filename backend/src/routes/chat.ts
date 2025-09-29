@@ -9,7 +9,7 @@ const router = Router()
 // router.post('/message', authenticateToken, ChatController.sendMessage)
 
 // 临时测试端点 - 不需要认证
-router.post('/test-message', ChatController.sendMessage)
+// router.post('/test-message', ChatController.sendMessage)
 
 // 获取聊天历史
 // router.get('/history', authenticateToken, ChatController.getChatHistory)

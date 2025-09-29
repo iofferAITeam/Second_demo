@@ -15,52 +15,65 @@ interface User {
 interface UserProfile {
   id: string
   userId: string
-  phone?: string
-  wechat?: string
-  birthDate?: Date
-  nationality?: string
-  visaRequired?: boolean
-  mbti?: string
-  extracurricular?: string
-  personalStrengths?: string
-  hobbies?: string
-  currentEducation?: string
-  gpa?: number
-  majorGpa?: number
-  major?: string
-  graduationDate?: Date
-  highestDegree?: string
-  highSchoolName?: string
-  universityName?: string
-  graduationYear?: string
-  majorSubjects?: string[]
-  satScore?: number
-  actScore?: number
-  toefl?: number
-  ielts?: number
-  gre?: number
-  gmat?: number
-  languageTestType?: string
-  languageTestScore?: string
-  languageTestDate?: string
-  standardizedTestType?: string
-  standardizedTestScore?: string
-  standardizedTestDate?: string
-  researchExperience?: string
-  publications?: string
-  intendedDegree?: string
-  intendedIntakeTerm?: string
-  intendedMajor?: string
-  intendedCountries?: string[]
-  intendedBudgets?: string
-  scholarshipRequirements?: string
-  otherFinancialAidsRequired?: boolean
-  otherPreference?: string
-  careerIntentions?: string
-  internshipExperience?: string
-  volunteerExperience?: string
-  experiences?: any
-  goals?: string
+  phone?: string | null
+  wechat?: string | null
+  birthDate?: Date | null
+  nationality?: string | null
+  visaRequired?: boolean | null
+  mbti?: string | null
+  extracurricular?: string | null
+  personalStrengths?: string | null
+  hobbies?: string | null
+  currentEducation?: string | null
+  gpa?: number | null
+  lastTwoYearsGpa?: number | null
+  major?: string | null
+  graduationDate?: Date | null
+  undergraduateUniversity?: string | null
+  universityRank?: number | null
+  universityType?: string | null
+  highSchoolName?: string | null
+  graduationYear?: string | null
+  majorSubjects?: any | null
+  majorSubjectsData?: any | null
+  researchExperience?: string | null
+  publications?: string | null
+  toefl?: number | null
+  ielts?: number | null
+  gre?: number | null
+  gmat?: number | null
+  satScore?: number | null
+  actScore?: number | null
+  languageTestType?: string | null
+  languageTestScore?: string | null
+  languageTestDate?: string | null
+  languageTestsData?: any | null
+  standardizedTestType?: string | null
+  standardizedTestScore?: string | null
+  standardizedTestDate?: string | null
+  standardizedTestsData?: any | null
+  targetDegreeType?: string | null
+  targetMajors?: any | null
+  targetCountries?: any | null
+  applicationYear?: string | null
+  applicationTerm?: string | null
+  intendedDegree?: string | null
+  intendedIntakeTerm?: string | null
+  intendedMajor?: string | null
+  intendedCountries?: any | null
+  intendedBudgets?: string | null
+  scholarshipRequirements?: string | null
+  otherPreference?: string | null
+  internshipExperience?: string | null
+  volunteerExperience?: string | null
+  goals?: string | null
+  careerGoals?: string | null
+  personalStatement?: string | null
+  budgetRange?: string | null
+  scholarshipNeeds?: boolean | null
+  preferredCityType?: string | null
+  climatePreference?: string | null
+  campusSize?: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -79,7 +92,7 @@ export function transformFormDataToDatabase(formData: ProfileFormData): {
     name: `${basicInfo.firstName} ${basicInfo.lastName}`.trim()
   }
 
-  // Transform profile data
+  // Transform profile data - now includes all fields that exist in the updated Prisma schema
   const profileUpdates: ProfileUpdateData = {
     // Basic Information
     phone: basicInfo.phone || undefined,
@@ -93,43 +106,45 @@ export function transformFormDataToDatabase(formData: ProfileFormData): {
     // Academic Performance
     currentEducation: academicPerformance.highestDegree || undefined,
     gpa: academicPerformance.gpa ? parseFloat(academicPerformance.gpa) : undefined,
-    majorGpa: academicPerformance.majorGpa ? parseFloat(academicPerformance.majorGpa) : undefined,
     major: academicPerformance.universityName || undefined,
     graduationDate: academicPerformance.graduationYear ? new Date(academicPerformance.graduationYear) : undefined,
-    highestDegree: academicPerformance.highestDegree || undefined,
+    undergraduateUniversity: academicPerformance.graduatedInstitution || undefined,
     highSchoolName: academicPerformance.highSchoolName || undefined,
-    universityName: academicPerformance.universityName || undefined,
     graduationYear: academicPerformance.graduationYear || undefined,
-    majorSubjects: academicPerformance.majorSubjects || [],
+    majorSubjects: academicPerformance.majorSubjects || undefined,
+    majorSubjectsData: academicPerformance.majorSubjectsData || undefined,
+    researchExperience: academicPerformance.researchExperience || undefined,
+    publications: academicPerformance.publications || undefined,
     
     // Test Scores
-    satScore: academicPerformance.satScore ? parseInt(academicPerformance.satScore) : undefined,
-    actScore: academicPerformance.actScore ? parseInt(academicPerformance.actScore) : undefined,
     toefl: academicPerformance.toeflScore ? parseInt(academicPerformance.toeflScore) : undefined,
     ielts: academicPerformance.ieltsScore ? parseFloat(academicPerformance.ieltsScore) : undefined,
     gre: academicPerformance.greScore ? parseInt(academicPerformance.greScore) : undefined,
     gmat: academicPerformance.gmatScore ? parseInt(academicPerformance.gmatScore) : undefined,
-    languageTestType: academicPerformance.languageTestType || undefined,
-    languageTestScore: academicPerformance.languageTestScore || undefined,
-    languageTestDate: academicPerformance.languageTestDate || undefined,
-    standardizedTestType: academicPerformance.standardizedTestType || undefined,
-    standardizedTestScore: academicPerformance.standardizedTestScore || undefined,
-    standardizedTestDate: academicPerformance.standardizedTestDate || undefined,
+    satScore: academicPerformance.satScore ? parseInt(academicPerformance.satScore) : undefined,
+    actScore: academicPerformance.actScore ? parseInt(academicPerformance.actScore) : undefined,
     
-    // Research & Publications
-    researchExperience: academicPerformance.researchExperience || undefined,
-    publications: academicPerformance.publications || undefined,
+    // Language and Standardized Tests (arrays of test records)
+    languageTestsData: academicPerformance.languageTestsData || undefined,
+    standardizedTestsData: academicPerformance.standardizedTestsData || undefined,
     
     // Application Intentions
+    targetDegreeType: applicationIntentions.intendedDegree || undefined,
+    applicationTerm: applicationIntentions.intendedIntakeTerm || undefined,
+    targetMajors: applicationIntentions.intendedMajor ? [applicationIntentions.intendedMajor] : undefined,
+    targetCountries: applicationIntentions.intendedCountries || undefined,
+    budgetRange: applicationIntentions.intendedBudgets || undefined,
+    scholarshipNeeds: applicationIntentions.otherFinancialAidsRequired,
+    goals: applicationIntentions.careerIntentions || undefined,
+    
+    // Additional fields for direct mapping
     intendedDegree: applicationIntentions.intendedDegree || undefined,
     intendedIntakeTerm: applicationIntentions.intendedIntakeTerm || undefined,
     intendedMajor: applicationIntentions.intendedMajor || undefined,
-    intendedCountries: applicationIntentions.intendedCountries || [],
+    intendedCountries: applicationIntentions.intendedCountries || undefined,
     intendedBudgets: applicationIntentions.intendedBudgets || undefined,
     scholarshipRequirements: applicationIntentions.scholarshipRequirements || undefined,
-    otherFinancialAidsRequired: applicationIntentions.otherFinancialAidsRequired,
     otherPreference: applicationIntentions.otherPreference || undefined,
-    careerIntentions: applicationIntentions.careerIntentions || undefined,
     internshipExperience: applicationIntentions.internshipExperience || undefined,
     volunteerExperience: applicationIntentions.volunteerExperience || undefined
   }
@@ -213,37 +228,41 @@ export function transformDatabaseToFormData(user: User, profile: UserProfile | n
     },
     academicPerformance: {
       gpa: profile.gpa?.toString() || '',
-      majorGpa: profile.majorGpa?.toString() || '',
+      majorGpa: profile.lastTwoYearsGpa?.toString() || '',
       satScore: profile.satScore?.toString() || '',
       actScore: profile.actScore?.toString() || '',
       toeflScore: profile.toefl?.toString() || '',
       ieltsScore: profile.ielts?.toString() || '',
       greScore: profile.gre?.toString() || '',
       gmatScore: profile.gmat?.toString() || '',
-      highestDegree: profile.highestDegree || '',
+      highestDegree: profile.currentEducation || '',
       highSchoolName: profile.highSchoolName || '',
-      universityName: profile.universityName || '',
-      graduationYear: profile.graduationYear || '',
-      majorSubjects: profile.majorSubjects || [],
+      universityName: profile.undergraduateUniversity || '',
+      graduatedInstitution: profile.undergraduateUniversity || '',
+      graduationYear: profile.graduationYear || profile.graduationDate?.getFullYear().toString() || '',
+      majorSubjects: Array.isArray(profile.majorSubjects) ? profile.majorSubjects : [],
+    majorSubjectsData: profile.majorSubjectsData || [],
       languageTestType: profile.languageTestType || '',
       languageTestScore: profile.languageTestScore || '',
       languageTestDate: profile.languageTestDate || '',
+      languageTestsData: profile.languageTestsData || [],
       standardizedTestType: profile.standardizedTestType || '',
       standardizedTestScore: profile.standardizedTestScore || '',
       standardizedTestDate: profile.standardizedTestDate || '',
+      standardizedTestsData: profile.standardizedTestsData || [],
       researchExperience: profile.researchExperience || '',
       publications: profile.publications || ''
     },
     applicationIntentions: {
-      intendedDegree: profile.intendedDegree || '',
-      intendedIntakeTerm: profile.intendedIntakeTerm || '',
-      intendedMajor: profile.intendedMajor || '',
-      intendedCountries: profile.intendedCountries || [],
-      intendedBudgets: profile.intendedBudgets || '',
+      intendedDegree: profile.targetDegreeType || profile.intendedDegree || '',
+      intendedIntakeTerm: profile.applicationTerm || profile.intendedIntakeTerm || '',
+      intendedMajor: profile.intendedMajor || (Array.isArray(profile.targetMajors) ? profile.targetMajors[0] || '' : ''),
+      intendedCountries: profile.intendedCountries || (Array.isArray(profile.targetCountries) ? profile.targetCountries : []),
+      intendedBudgets: profile.intendedBudgets || profile.budgetRange || '',
       scholarshipRequirements: profile.scholarshipRequirements || '',
-      otherFinancialAidsRequired: profile.otherFinancialAidsRequired || false,
+      otherFinancialAidsRequired: profile.scholarshipNeeds || false,
       otherPreference: profile.otherPreference || '',
-      careerIntentions: profile.careerIntentions || '',
+      careerIntentions: profile.goals || '',
       internshipExperience: profile.internshipExperience || '',
       volunteerExperience: profile.volunteerExperience || ''
     }

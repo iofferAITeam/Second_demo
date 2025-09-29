@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus } from 'lucide-react'
 import { AcademicPerformanceData, MajorSubjectData, LanguageTestData, StandardizedTestData, FormSectionProps } from '@/types/profile-form'
@@ -15,6 +15,35 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
   const handleInputChange = (field: keyof AcademicPerformanceData, value: any) => {
     onChange(field, value)
   }
+
+  // Initialize arrays when there's no existing data
+  useEffect(() => {
+    // Initialize languageTestsData if not present
+    if (!data.languageTestsData) {
+      const defaultLanguageTest = [{
+        testType: data.languageTestType || '',
+        score: data.languageTestScore || '',
+        date: data.languageTestDate || ''
+      }]
+      handleInputChange('languageTestsData', defaultLanguageTest)
+    }
+
+    // Initialize standardizedTestsData if not present
+    if (!data.standardizedTestsData) {
+      const defaultStandardizedTest = [{
+        testType: data.standardizedTestType || '',
+        score: data.standardizedTestScore || '',
+        date: data.standardizedTestDate || ''
+      }]
+      handleInputChange('standardizedTestsData', defaultStandardizedTest)
+    }
+
+    // Initialize majorSubjectsData if not present
+    if (!data.majorSubjectsData && data.majorSubjects) {
+      const defaultMajorSubjects = (data.majorSubjects || []).map(subject => ({ subject, gpa: '', majorGpa: '' }))
+      handleInputChange('majorSubjectsData', defaultMajorSubjects)
+    }
+  }, []) // Only run once on mount
 
   // Get major subjects data for UI (use majorSubjectsData if available, otherwise initialize from majorSubjects)
   const getMajorSubjectsData = (): MajorSubjectData[] => {
@@ -54,15 +83,11 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
 
   // Language Tests functions
   const getLanguageTestsData = (): LanguageTestData[] => {
-    if (data.languageTestsData) {
+    if (data.languageTestsData && data.languageTestsData.length > 0) {
       return data.languageTestsData
     }
-    // Initialize from existing single language test for backward compatibility
-    return [{
-      testType: data.languageTestType || '',
-      score: data.languageTestScore || '',
-      date: data.languageTestDate || ''
-    }]
+    // Return at least one empty record for new users
+    return [{ testType: '', score: '', date: '' }]
   }
 
   const addLanguageTest = () => {
@@ -86,15 +111,11 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
 
   // Standardized Tests functions
   const getStandardizedTestsData = (): StandardizedTestData[] => {
-    if (data.standardizedTestsData) {
+    if (data.standardizedTestsData && data.standardizedTestsData.length > 0) {
       return data.standardizedTestsData
     }
-    // Initialize from existing single standardized test for backward compatibility
-    return [{
-      testType: data.standardizedTestType || '',
-      score: data.standardizedTestScore || '',
-      date: data.standardizedTestDate || ''
-    }]
+    // Return at least one empty record for new users
+    return [{ testType: '', score: '', date: '' }]
   }
 
   const addStandardizedTest = () => {

@@ -26,14 +26,18 @@ export interface AcademicPerformanceData {
   highestDegree?: string
   highSchoolName?: string
   universityName?: string
+  graduatedInstitution?: string
   graduationYear?: string
   majorSubjects?: string[]
+  majorSubjectsData?: any[]
   languageTestType?: string
   languageTestScore?: string
   languageTestDate?: string
+  languageTestsData?: any[]
   standardizedTestType?: string
   standardizedTestScore?: string
   standardizedTestDate?: string
+  standardizedTestsData?: any[]
   researchExperience?: string
   publications?: string
 }
@@ -78,49 +82,60 @@ export interface ProfileUpdateData {
   // Academic Performance
   currentEducation?: string
   gpa?: number
-  majorGpa?: number
+  lastTwoYearsGpa?: number
   major?: string
   graduationDate?: Date
-  highestDegree?: string
+  undergraduateUniversity?: string
+  universityRank?: number
+  universityType?: string
   highSchoolName?: string
-  universityName?: string
   graduationYear?: string
-  majorSubjects?: string[]
+  majorSubjects?: any
+  majorSubjectsData?: any
+  researchExperience?: string
+  publications?: string
   
   // Test Scores
-  satScore?: number
-  actScore?: number
   toefl?: number
   ielts?: number
   gre?: number
   gmat?: number
+  satScore?: number
+  actScore?: number
+  
+  // Language and Standardized Tests
   languageTestType?: string
   languageTestScore?: string
   languageTestDate?: string
+  languageTestsData?: any
   standardizedTestType?: string
   standardizedTestScore?: string
   standardizedTestDate?: string
-  
-  // Research & Publications
-  researchExperience?: string
-  publications?: string
+  standardizedTestsData?: any
   
   // Application Intentions
+  targetDegreeType?: string
+  targetMajors?: any
+  targetCountries?: any
+  applicationYear?: string
+  applicationTerm?: string
   intendedDegree?: string
   intendedIntakeTerm?: string
   intendedMajor?: string
-  intendedCountries?: string[]
+  intendedCountries?: any
   intendedBudgets?: string
   scholarshipRequirements?: string
-  otherFinancialAidsRequired?: boolean
   otherPreference?: string
-  careerIntentions?: string
   internshipExperience?: string
   volunteerExperience?: string
-  
-  // Legacy fields
-  experiences?: any
   goals?: string
+  careerGoals?: string
+  personalStatement?: string
+  budgetRange?: string
+  scholarshipNeeds?: boolean
+  preferredCityType?: string
+  climatePreference?: string
+  campusSize?: string
 }
 
 // Response types
@@ -143,47 +158,14 @@ export interface ProfileResponse {
     wechat?: string
     birthDate?: Date
     nationality?: string
-    visaRequired?: boolean
-    mbti?: string
-    extracurricular?: string
-    personalStrengths?: string
-    hobbies?: string
     currentEducation?: string
     gpa?: number
-    majorGpa?: number
     major?: string
     graduationDate?: Date
-    highestDegree?: string
-    highSchoolName?: string
-    universityName?: string
-    graduationYear?: string
-    majorSubjects?: string[]
-    satScore?: number
-    actScore?: number
     toefl?: number
     ielts?: number
     gre?: number
     gmat?: number
-    languageTestType?: string
-    languageTestScore?: string
-    languageTestDate?: string
-    standardizedTestType?: string
-    standardizedTestScore?: string
-    standardizedTestDate?: string
-    researchExperience?: string
-    publications?: string
-    intendedDegree?: string
-    intendedIntakeTerm?: string
-    intendedMajor?: string
-    intendedCountries?: string[]
-    intendedBudgets?: string
-    scholarshipRequirements?: string
-    otherFinancialAidsRequired?: boolean
-    otherPreference?: string
-    careerIntentions?: string
-    internshipExperience?: string
-    volunteerExperience?: string
-    experiences?: any
     goals?: string
     createdAt: Date
     updatedAt: Date

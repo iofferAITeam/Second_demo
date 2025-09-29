@@ -3,7 +3,7 @@ import { StructuredProfileData, UpdateProfileRequest, ProfileResponse, ProfileCo
 import { useAuth } from '@/hooks/useAuth'
 import { apiClient } from '@/utils/api-client'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
 
 export function useProfile() {
   const [profileData, setProfileData] = useState<StructuredProfileData | null>(null)

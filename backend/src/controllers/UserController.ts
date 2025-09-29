@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
+import crypto from 'crypto'
 import { logger } from '../utils/logger'
 import { prisma } from '../lib/prisma'
 import { ProfileFormData, StructuredProfileResponse, ProfileResponse } from '../types/profile'
@@ -46,10 +47,30 @@ export class UserController {
       })
 
       // Transform database data to frontend form structure
-      const profileData = transformDatabaseToFormData(user, profile)
+      const userForTransform = {
+        ...user,
+        avatar: user.avatar || undefined
+      }
+      const profileForTransform = profile ? {
+        ...profile,
+        phone: profile.phone || undefined,
+        wechat: profile.wechat || undefined,
+        birthDate: profile.birthDate || undefined,
+        nationality: profile.nationality || undefined,
+        currentEducation: profile.currentEducation || undefined,
+        gpa: profile.gpa || undefined,
+        major: profile.major || undefined,
+        graduationDate: profile.graduationDate || undefined,
+        toefl: profile.toefl || undefined,
+        ielts: profile.ielts || undefined,
+        gre: profile.gre || undefined,
+        gmat: profile.gmat || undefined,
+        goals: profile.goals || undefined
+      } : null
+      const profileData = transformDatabaseToFormData(userForTransform, profileForTransform)
 
       const response: StructuredProfileResponse = {
-        user,
+        user: userForTransform,
         profileData
       }
 
@@ -85,10 +106,15 @@ export class UserController {
       // Update or create UserProfile
       const profile = await prisma.user_profiles.upsert({
         where: { userId },
-        update: cleanedProfileUpdates,
+        update: {
+          ...cleanedProfileUpdates,
+          updatedAt: new Date()
+        },
         create: {
+          id: crypto.randomUUID(),
           userId,
-          ...cleanedProfileUpdates
+          ...cleanedProfileUpdates,
+          updatedAt: new Date()
         }
       })
 
@@ -111,8 +137,29 @@ export class UserController {
 
       const response: ProfileResponse = {
         message: 'Profile updated successfully',
-        user: updatedUser!,
-        profile
+        user: {
+          ...updatedUser!,
+          avatar: updatedUser!.avatar || undefined
+        },
+        profile: {
+          id: profile.id,
+          userId: profile.userId,
+          phone: profile.phone || undefined,
+          wechat: profile.wechat || undefined,
+          birthDate: profile.birthDate || undefined,
+          nationality: profile.nationality || undefined,
+          currentEducation: profile.currentEducation || undefined,
+          gpa: profile.gpa || undefined,
+          major: profile.major || undefined,
+          graduationDate: profile.graduationDate || undefined,
+          toefl: profile.toefl || undefined,
+          ielts: profile.ielts || undefined,
+          gre: profile.gre || undefined,
+          gmat: profile.gmat || undefined,
+          goals: profile.goals || undefined,
+          createdAt: profile.createdAt,
+          updatedAt: profile.updatedAt
+        }
       }
 
       res.json(response)
