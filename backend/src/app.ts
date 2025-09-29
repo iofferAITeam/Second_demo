@@ -16,14 +16,16 @@ import routes from './routes'
 const app = express()
 
 // 🔒 安全中间件
-app.use(helmet())
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}))
 
 // 🌐 CORS配置
 app.use(cors({
   origin: process.env.FRONTEND_URL || ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3007'],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
 }))
 
 // 📊 请求日志
@@ -60,7 +62,20 @@ app.get('/health', (req, res) => {
 })
 
 // 📁 静态文件服务 - 用于提供上传的文件
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')))
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'), {
+  setHeaders: (res, filePath) => {
+    // Set appropriate content type for images
+    if (filePath.endsWith('.png')) {
+      res.setHeader('Content-Type', 'image/png')
+    } else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
+      res.setHeader('Content-Type', 'image/jpeg')
+    } else if (filePath.endsWith('.gif')) {
+      res.setHeader('Content-Type', 'image/gif')
+    } else if (filePath.endsWith('.webp')) {
+      res.setHeader('Content-Type', 'image/webp')
+    }
+  }
+}))
 
 // 🔄 自动 Token 续期中间件
 app.use('/api', autoRefreshToken)

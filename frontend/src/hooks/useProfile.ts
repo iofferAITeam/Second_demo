@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react'
-import { ProfileData, UpdateProfileRequest, ProfileResponse, ProfileCompletion } from '@/types/profile'
+import { StructuredProfileData, UpdateProfileRequest, ProfileResponse, ProfileCompletion } from '@/types/profile'
 import { useAuth } from '@/hooks/useAuth'
+import { apiClient } from '@/utils/api-client'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
 
 export function useProfile() {
-  const [profileData, setProfileData] = useState<ProfileData | null>(null)
+  const [profileData, setProfileData] = useState<StructuredProfileData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { user, isAuthenticated } = useAuth()
@@ -14,8 +15,8 @@ export function useProfile() {
   const loadProfile = async () => {
     console.log('🔄 loadProfile called:', { isAuthenticated, user: user?.email })
     
-    if (!isAuthenticated || !user) {
-      console.log('❌ Not authenticated or no user, skipping profile load')
+    if (!isAuthenticated) {
+      console.log('❌ Not authenticated, skipping profile load')
       setIsLoading(false)
       return
     }
@@ -39,7 +40,12 @@ export function useProfile() {
         throw new Error('Failed to load profile')
       }
 
-      const data: ProfileData = await response.json()
+      const data: StructuredProfileData = await response.json()
+      console.log('📥 Received profile data:', { 
+        userId: data.user?.id, 
+        avatarUrl: data.user?.avatar,
+        hasProfileData: !!data.profileData 
+      })
       setProfileData(data)
       setError(null)
     } catch (err) {
@@ -86,11 +92,8 @@ export function useProfile() {
 
       const result: ProfileResponse = await response.json()
 
-      // 更新本地状态
-      setProfileData({
-        user: result.user,
-        profile: result.profile
-      })
+      // Refresh profile data after successful update
+      await loadProfile()
 
       return result
     } catch (err) {
@@ -112,9 +115,61 @@ export function useProfile() {
     await loadProfile()
   }
 
+  // 上传头像
+  const uploadAvatar = async (file: File): Promise<string> => {
+    if (!isAuthenticated) {
+      throw new Error('User not authenticated')
+    }
+
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      // Create FormData for file upload
+      const formData = new FormData()
+      formData.append('avatar', file)
+
+      // Get fresh token
+      const token = localStorage.getItem('access_token')
+      if (!token) {
+        throw new Error('No access token found')
+      }
+
+      // Make direct fetch call with proper headers
+      const response = await fetch(`${API_BASE_URL}/api/user/avatar`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+          // Don't set Content-Type - let browser set it with boundary for FormData
+        },
+        body: formData
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      console.log('✅ Avatar upload successful:', { avatarUrl: result.avatarUrl })
+
+      // Refresh profile data to get updated avatar
+      console.log('🔄 Refreshing profile data after avatar upload...')
+      await loadProfile()
+
+      return result.avatarUrl || ''
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to upload avatar'
+      setError(errorMessage)
+      throw new Error(errorMessage)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   // 计算Profile完成度
   const profileCompletion: ProfileCompletion = useMemo(() => {
-    if (!profileData?.user || !profileData?.profile) {
+    if (!profileData?.user || !profileData?.profileData) {
       return {
         percentage: 0,
         completedFields: [],
@@ -122,42 +177,57 @@ export function useProfile() {
       }
     }
 
-    const { user, profile } = profileData
+    const { user, profileData: formData } = profileData
 
-    // 定义所有需要填写的字段
+    // 定义所有需要填写的字段 (基于新的结构化数据)
     const requiredFields = [
       { key: 'name', value: user.name, label: 'Name' },
-      { key: 'phone', value: profile.phone, label: 'Phone' },
-      { key: 'nationality', value: profile.nationality, label: 'Nationality' },
-      { key: 'birthDate', value: profile.birthDate, label: 'Birth Date' },
-      { key: 'currentEducation', value: profile.currentEducation, label: 'Current Education' },
-      { key: 'major', value: profile.major, label: 'Major' },
-      { key: 'gpa', value: profile.gpa, label: 'GPA' },
-      { key: 'goals', value: profile.goals, label: 'Goals' }
+      { key: 'firstName', value: formData.basicInfo.firstName, label: 'First Name' },
+      { key: 'lastName', value: formData.basicInfo.lastName, label: 'Last Name' },
+      { key: 'phone', value: formData.basicInfo.phone, label: 'Phone' },
+      { key: 'nationality', value: formData.basicInfo.nationality, label: 'Nationality' },
+      { key: 'intendedDegree', value: formData.applicationIntentions.intendedDegree, label: 'Intended Degree' },
+      { key: 'intendedMajor', value: formData.applicationIntentions.intendedMajor, label: 'Intended Major' },
+      { key: 'intendedCountries', value: formData.applicationIntentions.intendedCountries, label: 'Intended Countries' }
     ]
 
     // 可选字段（不计入必需完成度，但会显示）
     const optionalFields = [
-      { key: 'wechat', value: profile.wechat, label: 'WeChat' },
-      { key: 'toefl', value: profile.toefl, label: 'TOEFL' },
-      { key: 'ielts', value: profile.ielts, label: 'IELTS' },
-      { key: 'gre', value: profile.gre, label: 'GRE' },
-      { key: 'gmat', value: profile.gmat, label: 'GMAT' },
-      { key: 'graduationDate', value: profile.graduationDate, label: 'Graduation Date' }
+      { key: 'gpa', value: formData.academicPerformance.gpa, label: 'GPA' },
+      { key: 'toefl', value: formData.academicPerformance.toeflScore, label: 'TOEFL' },
+      { key: 'sat', value: formData.academicPerformance.satScore, label: 'SAT' },
+      { key: 'careerIntentions', value: formData.applicationIntentions.careerIntentions, label: 'Career Intentions' },
+      { key: 'mbti', value: formData.basicInfo.mbti, label: 'MBTI' },
+      { key: 'hobbies', value: formData.basicInfo.hobbies, label: 'Hobbies' }
     ]
 
     const allFields = [...requiredFields, ...optionalFields]
 
     const completedFields = allFields
-      .filter(field => field.value !== null && field.value !== undefined && field.value !== '')
+      .filter(field => {
+        if (Array.isArray(field.value)) {
+          return field.value.length > 0
+        }
+        return field.value !== null && field.value !== undefined && field.value !== ''
+      })
       .map(field => field.label)
 
     const missingFields = requiredFields
-      .filter(field => !field.value)
+      .filter(field => {
+        if (Array.isArray(field.value)) {
+          return field.value.length === 0
+        }
+        return !field.value
+      })
       .map(field => field.label)
 
     // 计算必需字段的完成百分比
-    const requiredCompleted = requiredFields.filter(field => field.value).length
+    const requiredCompleted = requiredFields.filter(field => {
+      if (Array.isArray(field.value)) {
+        return field.value.length > 0
+      }
+      return field.value
+    }).length
     const percentage = Math.round((requiredCompleted / requiredFields.length) * 100)
 
     return {
@@ -171,13 +241,14 @@ export function useProfile() {
     // 状态
     profileData,
     user: profileData?.user || null,
-    profile: profileData?.profile || null,
+    formData: profileData?.profileData || null,
     isLoading,
     error,
     profileCompletion,
 
     // 操作
     saveProfile,
+    uploadAvatar,
     clearError,
     refreshProfile
   }

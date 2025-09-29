@@ -91,7 +91,7 @@ export default function UserProfileCard({
               handleAvatarClick()
             }}
           >
-            <Avatar className="w-20 h-20">
+            <Avatar className="w-20 h-20" key={user.avatar}>
               <AvatarImage 
                 src={user.avatar} 
                 alt="Profile Avatar"

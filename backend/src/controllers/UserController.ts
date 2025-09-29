@@ -2,61 +2,57 @@ import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import { logger } from '../utils/logger'
 import { prisma } from '../lib/prisma'
+import { ProfileFormData, StructuredProfileResponse, ProfileResponse } from '../types/profile'
+import { transformFormDataToDatabase, transformDatabaseToFormData, cleanProfileUpdateData } from '../utils/profile-transformer'
+import { AvatarProcessor } from '../utils/avatar-processor'
+import path from 'path'
 
 interface AuthRequest extends Request {
-  user?: {
-    id: string
-    email: string
-    name: string
-  }
+  userId?: string
 }
 
 export class UserController {
   static async getProfile(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id
+      const userId = req.userId
 
       if (!userId) {
         return res.status(401).json({ error: 'Unauthorized' })
       }
 
-      // 临时返回模拟数据，避免Prisma模型问题
-      const mockUser = {
-        id: userId,
-        email: 'user@example.com',
-        name: 'Test User',
-        avatar: null,
-        createdAt: new Date(),
-        language: 'zh',
-        notifications: true,
-        theme: 'light'
-      }
-
-      const mockProfile = {
-        id: 'mock-profile-id',
-        userId,
-        phone: null,
-        wechat: null,
-        birthDate: null,
-        nationality: null,
-        currentEducation: null,
-        gpa: null,
-        major: null,
-        graduationDate: null,
-        toefl: null,
-        ielts: null,
-        gre: null,
-        gmat: null,
-        experiences: null,
-        goals: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }
-
-      res.json({
-        user: mockUser,
-        profile: mockProfile
+      // Get user basic information
+      const user = await prisma.users.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          avatar: true,
+          createdAt: true,
+          language: true,
+          notifications: true,
+          theme: true
+        }
       })
+
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' })
+      }
+
+      // Get detailed profile information
+      const profile = await prisma.user_profiles.findUnique({
+        where: { userId }
+      })
+
+      // Transform database data to frontend form structure
+      const profileData = transformDatabaseToFormData(user, profile)
+
+      const response: StructuredProfileResponse = {
+        user,
+        profileData
+      }
+
+      res.json(response)
     } catch (error) {
       next(error)
     }
@@ -64,61 +60,122 @@ export class UserController {
 
   static async updateProfile(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id
+      const userId = req.userId
+      const formData: ProfileFormData = req.body
 
       if (!userId) {
         return res.status(401).json({ error: 'Unauthorized' })
       }
 
-      // 临时返回成功响应，避免Prisma模型问题
-      logger.info(`Profile update requested for user: ${userId}`)
+      // Transform frontend form data to database format
+      const { userUpdates, profileUpdates } = transformFormDataToDatabase(formData)
 
-      res.json({
-        message: 'Profile updated successfully',
-        user: {
-          id: userId,
-          email: 'user@example.com',
-          name: req.body.name || 'Test User',
-          avatar: null,
-          createdAt: new Date(),
-          language: 'zh',
-          notifications: true,
-          theme: 'light'
-        },
-        profile: {
-          id: 'mock-profile-id',
+      // Clean up undefined values
+      const cleanedProfileUpdates = cleanProfileUpdateData(profileUpdates)
+
+      // Update user basic information if needed
+      if (userUpdates.name) {
+        await prisma.users.update({
+          where: { id: userId },
+          data: userUpdates
+        })
+      }
+
+      // Update or create UserProfile
+      const profile = await prisma.user_profiles.upsert({
+        where: { userId },
+        update: cleanedProfileUpdates,
+        create: {
           userId,
-          ...req.body,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          ...cleanedProfileUpdates
         }
       })
+
+      // Get updated user information
+      const updatedUser = await prisma.users.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          avatar: true,
+          createdAt: true,
+          language: true,
+          notifications: true,
+          theme: true
+        }
+      })
+
+      logger.info(`User profile updated: ${userId}`)
+
+      const response: ProfileResponse = {
+        message: 'Profile updated successfully',
+        user: updatedUser!,
+        profile
+      }
+
+      res.json(response)
     } catch (error) {
+      logger.error('Profile update error:', error)
       next(error)
     }
   }
 
   static async uploadAvatar(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id
+      const userId = req.userId
 
-      // TODO: 处理文件上传（需要multer配置）
-      // const avatarUrl = req.file?.path
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' })
+      }
 
-      logger.info(`Avatar uploaded for user: ${userId}`)
+      // Check if file was uploaded
+      if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded' })
+      }
+
+      // Validate the uploaded image
+      const isValidImage = await AvatarProcessor.validateImage(req.file.path)
+      if (!isValidImage) {
+        return res.status(400).json({ error: 'Invalid image file' })
+      }
+
+      // Generate optimized filename
+      const optimizedFilename = AvatarProcessor.generateOptimizedFilename(req.file.originalname, userId)
+      const outputPath = path.join('uploads/avatars', optimizedFilename)
+
+      // Process and resize the avatar
+      await AvatarProcessor.processAvatar(req.file.path, outputPath, {
+        width: 200,
+        height: 200,
+        quality: 90,
+        format: 'jpeg'
+      })
+
+      // Generate avatar URL (relative to public directory)
+      const avatarUrl = `/uploads/avatars/${optimizedFilename}`
+
+      // Update user's avatar in database
+      await prisma.users.update({
+        where: { id: userId },
+        data: { avatar: avatarUrl }
+      })
+
+      logger.info(`Avatar uploaded and processed for user: ${userId}, file: ${optimizedFilename}`)
 
       res.json({
         message: 'Avatar uploaded successfully',
-        avatarUrl: '/uploads/avatars/temp-avatar.jpg'
+        avatarUrl: avatarUrl
       })
     } catch (error) {
+      logger.error('Avatar upload error:', error)
       next(error)
     }
   }
 
   static async changePassword(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id
+      const userId = req.userId
       const { currentPassword, newPassword } = req.body
 
       if (!currentPassword || !newPassword) {
@@ -151,7 +208,7 @@ export class UserController {
 
   static async deleteAccount(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id
+      const userId = req.userId
 
       // TODO: 删除用户账户（需要Prisma）
       // await prisma.users.delete({ where: { id: userId } })
@@ -168,7 +225,7 @@ export class UserController {
 
   static async getPreferences(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id
+      const userId = req.userId
 
       // TODO: 获取用户偏好设置（需要Prisma）
       const mockPreferences = {
@@ -200,7 +257,7 @@ export class UserController {
 
   static async updatePreferences(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.user?.id
+      const userId = req.userId
       const preferences = req.body
 
       // TODO: 更新用户偏好设置（需要Prisma）

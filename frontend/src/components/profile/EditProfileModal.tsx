@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { X } from 'lucide-react'
@@ -21,53 +21,90 @@ interface EditProfileModalProps {
     avatar?: string
     createdAt: string
   }
+  profileData?: ProfileFormData | null  // Preloaded profile data
   onSave: (data: ProfileFormData) => void
+  onAvatarUpload?: (file: File) => Promise<void>  // Avatar upload handler
 }
 
 export default function EditProfileModal({ 
   isOpen, 
   onClose, 
   user, 
-  onSave 
+  profileData: preloadedData,
+  onSave,
+  onAvatarUpload
 }: EditProfileModalProps) {
   const [activeTab, setActiveTab] = useState('basic')
   
-  // Form state using proper types
-  const [formData, setFormData] = useState<ProfileFormData>({
-    basicInfo: {
-      firstName: user.name?.split(' ')[0] || '',
-      middleName: user.name?.split(' ')[1] || '',
-      lastName: user.name?.split(' ')[2] || '',
-      phone: user.phone || '',
-      email: user.email || '',
-      nationality: '',
-      visaRequired: false
-    },
-    academicPerformance: {
-      gpa: '',
-      satScore: '',
-      actScore: '',
-      toeflScore: '',
-      ieltsScore: '',
-      greScore: '',
-      gmatScore: '',
-      highSchoolName: '',
-      graduationYear: ''
-    },
-    applicationIntentions: {
-      intendedDegree: '',
-      intendedIntakeTerm: '',
-      intendedMajor: '',
-      intendedCountries: [],
-      intendedBudgets: '',
-      scholarshipRequirements: '',
-      otherFinancialAidsRequired: false,
-      otherPreference: '',
-      careerIntentions: '',
-      internshipExperience: '',
-      volunteerExperience: ''
+  // Parse name correctly for different name formats
+  const parseUserName = (fullName: string) => {
+    const nameParts = fullName?.split(' ').filter(Boolean) || []
+    let firstName = ''
+    let middleName = ''
+    let lastName = ''
+
+    if (nameParts.length === 1) {
+      firstName = nameParts[0]
+    } else if (nameParts.length === 2) {
+      firstName = nameParts[0]
+      lastName = nameParts[1]
+    } else if (nameParts.length >= 3) {
+      firstName = nameParts[0]
+      middleName = nameParts[1]
+      lastName = nameParts.slice(2).join(' ')
     }
-  })
+
+    return { firstName, middleName, lastName }
+  }
+
+  // Form state using proper types - use preloaded data if available
+  const [formData, setFormData] = useState<ProfileFormData>(
+    preloadedData || (() => {
+      const { firstName, middleName, lastName } = parseUserName(user.name || '')
+      return {
+        basicInfo: {
+          firstName: firstName,
+          middleName: middleName,
+          lastName: lastName,
+          phone: user.phone || '',
+          email: user.email || '',
+          nationality: '',
+          visaRequired: false
+        },
+        academicPerformance: {
+          gpa: '',
+          satScore: '',
+          actScore: '',
+          toeflScore: '',
+          ieltsScore: '',
+          greScore: '',
+          gmatScore: '',
+          highSchoolName: '',
+          graduationYear: ''
+        },
+        applicationIntentions: {
+          intendedDegree: '',
+          intendedIntakeTerm: '',
+          intendedMajor: '',
+          intendedCountries: [],
+          intendedBudgets: '',
+          scholarshipRequirements: '',
+          otherFinancialAidsRequired: false,
+          otherPreference: '',
+          careerIntentions: '',
+          internshipExperience: '',
+          volunteerExperience: ''
+        }
+      }
+    })
+  )
+
+  // Update form data when preloaded data changes
+  useEffect(() => {
+    if (preloadedData) {
+      setFormData(preloadedData)
+    }
+  }, [preloadedData])
 
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [isLoading, setIsLoading] = useState(false)
@@ -121,9 +158,17 @@ export default function EditProfileModal({
     }
   }
 
-  const handleAvatarChange = (file: File) => {
-    // TODO: Implement avatar upload
-    console.log('Avatar file:', file.name)
+  const handleAvatarChange = async (file: File) => {
+    if (onAvatarUpload) {
+      try {
+        await onAvatarUpload(file)
+        console.log('Avatar uploaded successfully:', file.name)
+      } catch (error) {
+        console.error('Avatar upload failed:', error)
+      }
+    } else {
+      console.log('Avatar change:', file.name, '- upload handler not provided')
+    }
   }
 
   return (

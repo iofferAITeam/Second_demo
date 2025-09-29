@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import { UserController } from '../controllers/UserController'
 import { authenticateToken } from '../middleware/auth'
+import { uploadAvatar, handleUploadError } from '../middleware/upload'
 
 const router = Router()
 
@@ -11,7 +12,7 @@ router.get('/profile', authenticateToken, UserController.getProfile)
 router.put('/profile', authenticateToken, UserController.updateProfile)
 
 // 上传头像
-router.post('/avatar', authenticateToken, UserController.uploadAvatar)
+router.post('/avatar', authenticateToken, uploadAvatar.single('avatar'), handleUploadError, UserController.uploadAvatar)
 
 // 更改密码
 router.put('/password', authenticateToken, UserController.changePassword)
