@@ -39,6 +39,7 @@ export class UserController {
         return res.status(404).json({ error: 'User not found' })
       }
 
+
       // Get detailed profile information
       const profile = await prisma.user_profiles.findUnique({
         where: { userId }
@@ -160,8 +161,6 @@ export class UserController {
         where: { id: userId },
         data: { avatar: avatarUrl }
       })
-
-      logger.info(`Avatar uploaded and processed for user: ${userId}, file: ${optimizedFilename}`)
 
       res.json({
         message: 'Avatar uploaded successfully',

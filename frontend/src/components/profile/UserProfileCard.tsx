@@ -2,7 +2,6 @@
 
 import React, { useState, useRef } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
@@ -91,16 +90,26 @@ export default function UserProfileCard({
               handleAvatarClick()
             }}
           >
-            <Avatar className="w-20 h-20" key={user.avatar}>
-              <AvatarImage 
-                src={user.avatar} 
-                alt="Profile Avatar"
-                className="object-cover"
-              />
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-xl text-white font-semibold">
+            <div className="relative w-20 h-20 rounded-full overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+              {user.avatar ? (
+                <img
+                  key={user.avatar}
+                  src={user.avatar}
+                  alt="Profile Avatar"
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                  style={{ zIndex: 10, position: 'relative' }}
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+              ) : null}
+              <div 
+                className="absolute inset-0 flex items-center justify-center text-white text-xl font-semibold pointer-events-none"
+                style={{ zIndex: 5 }}
+              >
                 {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+              </div>
+            </div>
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 flex items-center justify-center transition-all rounded-full">
               <span className="text-white text-xs opacity-0 group-hover:opacity-100">Change</span>
             </div>

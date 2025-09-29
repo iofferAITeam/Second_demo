@@ -1,99 +1,119 @@
 'use client'
 
-import React, { useState } from 'react'
+import React from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus } from 'lucide-react'
-import { AcademicPerformanceData, FormSectionProps } from '@/types/profile-form'
+import { AcademicPerformanceData, MajorSubjectData, LanguageTestData, StandardizedTestData, FormSectionProps } from '@/types/profile-form'
 
 interface AcademicPerformanceFormProps extends FormSectionProps {
   data: AcademicPerformanceData
   errors?: Partial<Record<keyof AcademicPerformanceData, string>>
 }
 
-interface GraduateSchool {
-  id: string
-  schoolName: string
-  degreeType: string
-  graduationYear: string
-  gpa: string
-}
-
-interface Minor {
-  id: string
-  name: string
-}
-
-interface Course {
-  id: string
-  name: string
-  grade: string
-}
 
 export default function AcademicPerformanceForm({ data, errors, onChange }: AcademicPerformanceFormProps) {
-  const [graduateSchools, setGraduateSchools] = useState<GraduateSchool[]>([])
-  const [minors, setMinors] = useState<Minor[]>([])
-  const [courses, setCourses] = useState<Course[]>([])
-
   const handleInputChange = (field: keyof AcademicPerformanceData, value: string | string[]) => {
     onChange(field, value)
   }
 
-  const addGraduateSchool = () => {
-    const newSchool: GraduateSchool = {
-      id: Date.now().toString(),
-      schoolName: '',
-      degreeType: '',
-      graduationYear: '',
-      gpa: ''
+  // Get major subjects data for UI (use majorSubjectsData if available, otherwise initialize from majorSubjects)
+  const getMajorSubjectsData = (): MajorSubjectData[] => {
+    if (data.majorSubjectsData) {
+      return data.majorSubjectsData
     }
-    setGraduateSchools([...graduateSchools, newSchool])
+    // Initialize from existing majorSubjects (string array) for backward compatibility
+    return (data.majorSubjects || []).map(subject => ({ subject, gpa: '', majorGpa: '' }))
   }
 
-  const removeGraduateSchool = (id: string) => {
-    setGraduateSchools(graduateSchools.filter(school => school.id !== id))
+  const addMajorSubject = () => {
+    const currentSubjects = getMajorSubjectsData()
+    const newSubjects = [...currentSubjects, { subject: '', gpa: '', majorGpa: '' }]
+    handleInputChange('majorSubjectsData', newSubjects)
+    // Also update the backend-compatible format
+    handleInputChange('majorSubjects', newSubjects.map(s => s.subject))
   }
 
-  const updateGraduateSchool = (id: string, field: keyof GraduateSchool, value: string) => {
-    setGraduateSchools(graduateSchools.map(school => 
-      school.id === id ? { ...school, [field]: value } : school
-    ))
+  const removeMajorSubject = (index: number) => {
+    const currentSubjects = getMajorSubjectsData()
+    const newSubjects = currentSubjects.filter((_, i) => i !== index)
+    handleInputChange('majorSubjectsData', newSubjects)
+    // Also update the backend-compatible format
+    handleInputChange('majorSubjects', newSubjects.map(s => s.subject))
   }
 
-  const addMinor = () => {
-    const newMinor: Minor = {
-      id: Date.now().toString(),
-      name: ''
+  const updateMajorSubject = (index: number, field: keyof MajorSubjectData, value: string) => {
+    const currentSubjects = getMajorSubjectsData()
+    const newSubjects = [...currentSubjects]
+    newSubjects[index] = { ...newSubjects[index], [field]: value }
+    handleInputChange('majorSubjectsData', newSubjects)
+    // Also update the backend-compatible format when subject changes
+    if (field === 'subject') {
+      handleInputChange('majorSubjects', newSubjects.map(s => s.subject))
     }
-    setMinors([...minors, newMinor])
   }
 
-  const removeMinor = (id: string) => {
-    setMinors(minors.filter(minor => minor.id !== id))
-  }
-
-  const updateMinor = (id: string, value: string) => {
-    setMinors(minors.map(minor => 
-      minor.id === id ? { ...minor, name: value } : minor
-    ))
-  }
-
-  const addCourse = () => {
-    const newCourse: Course = {
-      id: Date.now().toString(),
-      name: '',
-      grade: ''
+  // Language Tests functions
+  const getLanguageTestsData = (): LanguageTestData[] => {
+    if (data.languageTestsData) {
+      return data.languageTestsData
     }
-    setCourses([...courses, newCourse])
+    // Initialize from existing single language test for backward compatibility
+    return [{
+      testType: data.languageTestType || '',
+      score: data.languageTestScore || '',
+      date: data.languageTestDate || ''
+    }]
   }
 
-  const removeCourse = (id: string) => {
-    setCourses(courses.filter(course => course.id !== id))
+  const addLanguageTest = () => {
+    const currentTests = getLanguageTestsData()
+    const newTests = [...currentTests, { testType: '', score: '', date: '' }]
+    handleInputChange('languageTestsData', newTests)
   }
 
-  const updateCourse = (id: string, field: keyof Course, value: string) => {
-    setCourses(courses.map(course => 
-      course.id === id ? { ...course, [field]: value } : course
-    ))
+  const removeLanguageTest = (index: number) => {
+    const currentTests = getLanguageTestsData()
+    const newTests = currentTests.filter((_, i) => i !== index)
+    handleInputChange('languageTestsData', newTests)
+  }
+
+  const updateLanguageTest = (index: number, field: keyof LanguageTestData, value: string) => {
+    const currentTests = getLanguageTestsData()
+    const newTests = [...currentTests]
+    newTests[index] = { ...newTests[index], [field]: value }
+    handleInputChange('languageTestsData', newTests)
+  }
+
+  // Standardized Tests functions
+  const getStandardizedTestsData = (): StandardizedTestData[] => {
+    if (data.standardizedTestsData) {
+      return data.standardizedTestsData
+    }
+    // Initialize from existing single standardized test for backward compatibility
+    return [{
+      testType: data.standardizedTestType || '',
+      score: data.standardizedTestScore || '',
+      date: data.standardizedTestDate || ''
+    }]
+  }
+
+  const addStandardizedTest = () => {
+    const currentTests = getStandardizedTestsData()
+    const newTests = [...currentTests, { testType: '', score: '', date: '' }]
+    handleInputChange('standardizedTestsData', newTests)
+  }
+
+  const removeStandardizedTest = (index: number) => {
+    const currentTests = getStandardizedTestsData()
+    const newTests = currentTests.filter((_, i) => i !== index)
+    handleInputChange('standardizedTestsData', newTests)
+  }
+
+  const updateStandardizedTest = (index: number, field: keyof StandardizedTestData, value: string) => {
+    const currentTests = getStandardizedTestsData()
+    const newTests = [...currentTests]
+    newTests[index] = { ...newTests[index], [field]: value }
+    handleInputChange('standardizedTestsData', newTests)
   }
 
   return (
@@ -113,14 +133,14 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
               errors?.highestDegree ? 'border-red-500' : 'border-[#e8efff]'
             }`}>
               <Select value={data.highestDegree || ''} onValueChange={(value: string) => handleInputChange('highestDegree', value)}>
-                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-black [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
                   <SelectValue placeholder="Please Choose" />
             </SelectTrigger>
             <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
               <SelectItem value="high-school">High School Diploma</SelectItem>
               <SelectItem value="associate">Associate Degree</SelectItem>
-              <SelectItem value="bachelor">Bachelor's Degree</SelectItem>
-              <SelectItem value="master">Master's Degree</SelectItem>
+              <SelectItem value="bachelor">Bachelor&apos;s Degree</SelectItem>
+              <SelectItem value="master">Master&apos;s Degree</SelectItem>
               <SelectItem value="phd">PhD/Doctorate</SelectItem>
               <SelectItem value="other">Other</SelectItem>
             </SelectContent>
@@ -136,196 +156,107 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
       {/* Graduated Institution Section */}
       <div className="space-y-[16px]">
         <h4 className="text-[16px] font-semibold text-black font-inter">Graduated Institution</h4>
-        <div className="flex gap-[16px]">
-          <div className="w-[300px]">
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-              errors?.highSchoolName ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <Select value={data.highSchoolName || ''} onValueChange={(value: string) => handleInputChange('highSchoolName', value)}>
-                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
-                  <SelectValue placeholder="Name of High School" />
-                </SelectTrigger>
-                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
-                  <SelectItem value="example-hs-1">Example High School 1</SelectItem>
-                  <SelectItem value="example-hs-2">Example High School 2</SelectItem>
-                  <SelectItem value="example-hs-3">Example High School 3</SelectItem>
-                  <SelectItem value="other-hs">Other High School</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-              {errors?.highSchoolName && (
-                <p className="text-red-500 text-xs mt-1">{errors.highSchoolName}</p>
-              )}
-            </div>
-          <div className="w-[300px]">
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-              errors?.universityName ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <Select value={data.universityName || ''} onValueChange={(value: string) => handleInputChange('universityName', value)}>
-                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
-                  <SelectValue placeholder="Name of University" />
-                </SelectTrigger>
-                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
-                  <SelectItem value="harvard">Harvard University</SelectItem>
-                  <SelectItem value="stanford">Stanford University</SelectItem>
-                  <SelectItem value="mit">MIT</SelectItem>
-                  <SelectItem value="berkeley">UC Berkeley</SelectItem>
-                  <SelectItem value="yale">Yale University</SelectItem>
-                  <SelectItem value="princeton">Princeton University</SelectItem>
-                  <SelectItem value="other-uni">Other University</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-              {errors?.universityName && (
-                <p className="text-red-500 text-xs mt-1">{errors.universityName}</p>
-              )}
-            </div>
+        <div className="w-[400px]">
+          <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+            errors?.graduatedInstitution ? 'border-red-500' : 'border-[#e8efff]'
+          }`}>
+            <input
+              type="text"
+              placeholder="Name of Institution"
+              value={data.graduatedInstitution}
+              onChange={(e) => handleInputChange('graduatedInstitution', e.target.value)}
+              className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+            />
           </div>
-        <div className="flex gap-[8px] items-center">
-          <Plus className="h-4 w-4 text-[#1c5dff]" />
-          <button 
-            onClick={addGraduateSchool}
-            className="text-[#1c5dff] text-[16px] font-inter bg-transparent border-none cursor-pointer hover:underline"
-          >
-            Graduate School
-          </button>
-          </div>
+          {errors?.graduatedInstitution && (
+            <p className="text-red-500 text-xs mt-1">{errors.graduatedInstitution}</p>
+          )}
         </div>
+      </div>
 
       {/* Major & GPA Section */}
       <div className="space-y-[16px]">
-        <div className="flex gap-[16px]">
-          <div className="w-[300px]">
-            <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Major</h4>
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-              errors?.majorSubjects ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <input
-                type="text"
-                placeholder="Name of Major"
-                value={data.majorSubjects?.join(', ') || ''}
-                onChange={(e) => {
-                  const subjects = e.target.value.split(',').map(s => s.trim()).filter(s => s);
-                  handleInputChange('majorSubjects', subjects);
-                }}
-                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-              />
-            </div>
-            {errors?.majorSubjects && (
-              <p className="text-red-500 text-xs mt-1">{errors.majorSubjects}</p>
-            )}
-          </div>
-          <div className="w-[300px]">
-            <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">GPA</h4>
-            <div className="flex gap-[16px]">
-              <div className="w-[140px]">
-              <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-                  errors?.gpa ? 'border-red-500' : 'border-[#e8efff]'
-              }`}>
-                <input
-                  type="text"
-                    placeholder="Overall GPA"
-                    value={data.gpa || ''}
-                    onChange={(e) => handleInputChange('gpa', e.target.value)}
-                  className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-                />
+        <div className="space-y-[24px]">
+          {getMajorSubjectsData().map((majorSubject, index) => (
+            <div key={index} className="space-y-[16px]">
+              <div className="flex gap-[16px] items-start">
+                <div className="flex-1">
+                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Major Subject {index + 1}</h4>
+                  <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+                    errors?.majorSubjects ? 'border-red-500' : 'border-[#e8efff]'
+                  }`}>
+                    <input
+                      type="text"
+                      placeholder="Name of Major Subject"
+                      value={majorSubject.subject || ''}
+                      onChange={(e) => updateMajorSubject(index, 'subject', e.target.value)}
+                      className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+                    />
+                  </div>
                 </div>
-                {errors?.gpa && (
-                  <p className="text-red-500 text-xs mt-1">{errors.gpa}</p>
-                )}
-              </div>
-              <div className="w-[140px]">
-                <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-                  errors?.majorGpa ? 'border-red-500' : 'border-[#e8efff]'
-                }`}>
-                  <input
-                    type="text"
-                    placeholder="Major GPA"
-                    value={data.majorGpa || ''}
-                    onChange={(e) => handleInputChange('majorGpa', e.target.value)}
-                    className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-                  />
+                <div className="flex-1">
+                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">GPA</h4>
+                  <div className="flex gap-[16px] items-center">
+                    <div className="w-[140px]">
+                      <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+                        errors?.gpa ? 'border-red-500' : 'border-[#e8efff]'
+                      }`}>
+                        <input
+                          type="text"
+                          placeholder="Overall GPA"
+                          value={majorSubject.gpa || ''}
+                          onChange={(e) => updateMajorSubject(index, 'gpa', e.target.value)}
+                          className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+                        />
+                      </div>
+                      {errors?.gpa && (
+                        <p className="text-red-500 text-xs mt-1">{errors.gpa}</p>
+                      )}
+                    </div>
+                    <div className="w-[140px]">
+                      <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+                        errors?.majorGpa ? 'border-red-500' : 'border-[#e8efff]'
+                      }`}>
+                        <input
+                          type="text"
+                          placeholder="Major GPA"
+                          value={majorSubject.majorGpa || ''}
+                          onChange={(e) => updateMajorSubject(index, 'majorGpa', e.target.value)}
+                          className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+                        />
+                      </div>
+                      {errors?.majorGpa && (
+                        <p className="text-red-500 text-xs mt-1">{errors.majorGpa}</p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeMajorSubject(index)}
+                      className="text-red-500 hover:text-red-700 text-[14px] font-medium px-[12px] py-[8px] rounded-[6px] hover:bg-red-50 transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
-                {errors?.majorGpa && (
-                  <p className="text-red-500 text-xs mt-1">{errors.majorGpa}</p>
-                )}
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Minor Section */}
-      <div className="space-y-[16px]">
-        <h4 className="text-[16px] font-semibold text-black font-inter">Minor</h4>
-        <div className="flex gap-[16px] items-center">
-          <div className="w-[300px]">
-            <div className="bg-white border border-[#e8efff] rounded-[30px] px-[20px] py-[16px]">
-              <input
-                type="text"
-                placeholder="Name of Minor"
-                value={minors.map(m => m.name).join(', ') || ''}
-                onChange={(e) => {
-                  const minorNames = e.target.value.split(',').map(s => s.trim()).filter(s => s);
-                  const newMinors = minorNames.map((name, index) => ({
-                    id: minors[index]?.id || Date.now().toString() + index,
-                    name
-                  }));
-                  setMinors(newMinors);
-                }}
-                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-              />
-            </div>
-          </div>
+          ))}
           <div className="flex gap-[8px] items-center">
             <Plus className="h-4 w-4 text-[#1c5dff]" />
             <button 
-              onClick={addMinor}
+              type="button"
+              onClick={addMajorSubject}
               className="text-[#1c5dff] text-[16px] font-inter bg-transparent border-none cursor-pointer hover:underline"
             >
-              Add More Minor
+              Add More Major Subject
             </button>
           </div>
         </div>
+        {errors?.majorSubjects && (
+          <p className="text-red-500 text-xs mt-1">{errors.majorSubjects}</p>
+        )}
       </div>
 
-      {/* Transcript Section */}
-      <div className="space-y-[16px]">
-        <h4 className="text-[16px] font-semibold text-black font-inter">Transcript</h4>
-        <div className="flex gap-[16px] items-center">
-          <div className="w-[500px]">
-            <div className="bg-white border border-[#e8efff] rounded-[30px] px-[20px] py-[16px]">
-            <textarea
-                placeholder="Name of the Course / Detailed Grades"
-                value={courses.map(c => `${c.name}: ${c.grade}`).join(', ') || ''}
-              onChange={(e) => {
-                  const courseEntries = e.target.value.split(',').map(s => s.trim()).filter(s => s);
-                  const newCourses = courseEntries.map((entry, index) => {
-                    const [name, grade] = entry.split(':').map(s => s.trim());
-                    return {
-                      id: courses[index]?.id || Date.now().toString() + index,
-                      name: name || '',
-                      grade: grade || ''
-                    };
-                  });
-                  setCourses(newCourses);
-              }}
-              className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none resize-none min-h-[80px]"
-              rows={3}
-            />
-          </div>
-          </div>
-          <div className="flex gap-[8px] items-center">
-            <Plus className="h-4 w-4 text-[#1c5dff]" />
-            <button 
-              onClick={addCourse}
-              className="text-[#1c5dff] text-[16px] font-inter bg-transparent border-none cursor-pointer hover:underline"
-            >
-              Add More Courses
-            </button>
-          </div>
-        </div>
-      </div>
 
       {/* Language Proficiency Section */}
       <div className="space-y-[16px]">
@@ -334,65 +265,92 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
           <h3 className="text-[20px] font-bold text-black font-inter">LANGUAGE PROFICIENCY</h3>
         </div>
         
-        <div className="flex gap-[16px]">
-          <div className="w-[250px]">
-            <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Language Test Type</h4>
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] h-[56px] flex items-center ${
-              errors?.languageTestType ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <Select value={data.languageTestType || ''} onValueChange={(value: string) => handleInputChange('languageTestType', value)}>
-                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
-                  <SelectValue placeholder="Choose types" />
-                </SelectTrigger>
-                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
-                  <SelectItem value="toefl">TOEFL</SelectItem>
-                  <SelectItem value="ielts">IELTS</SelectItem>
-                  <SelectItem value="duolingo">Duolingo English Test</SelectItem>
-                  <SelectItem value="pte">PTE Academic</SelectItem>
-                  <SelectItem value="cambridge">Cambridge English</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+        <div className="space-y-[24px]">
+          {getLanguageTestsData().map((languageTest, index) => (
+            <div key={index} className="space-y-[16px]">
+              <div className="flex gap-[16px] items-center">
+                <div className="w-[250px]">
+                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Language Test Type</h4>
+                  <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] h-[56px] flex items-center ${
+                    errors?.languageTestType ? 'border-red-500' : 'border-[#e8efff]'
+                  }`}>
+                    <Select value={languageTest.testType || ''} onValueChange={(value: string) => updateLanguageTest(index, 'testType', value)}>
+                      <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-black [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+                        <SelectValue placeholder="Choose types" />
+                      </SelectTrigger>
+                      <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
+                        <SelectItem value="toefl">TOEFL</SelectItem>
+                        <SelectItem value="ielts">IELTS</SelectItem>
+                        <SelectItem value="duolingo">Duolingo English Test</SelectItem>
+                        <SelectItem value="pte">PTE Academic</SelectItem>
+                        <SelectItem value="cambridge">Cambridge English</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {errors?.languageTestType && (
+                    <p className="text-red-500 text-xs mt-1">{errors?.languageTestType}</p>
+                  )}
+                </div>
+                
+                <div className="w-[250px]">
+                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Test Scores</h4>
+                  <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+                    errors?.languageTestScore ? 'border-red-500' : 'border-[#e8efff]'
+                  }`}>
+                    <input
+                      type="text"
+                      placeholder="Highest Records"
+                      value={languageTest.score || ''}
+                      onChange={(e) => updateLanguageTest(index, 'score', e.target.value)}
+                      className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+                    />
+                  </div>
+                  {errors?.languageTestScore && (
+                    <p className="text-red-500 text-xs mt-1">{errors?.languageTestScore}</p>
+                  )}
+                </div>
+                
+                <div className="w-[250px]">
+                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Test Date</h4>
+                  <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+                    errors?.languageTestDate ? 'border-red-500' : 'border-[#e8efff]'
+                  }`}>
+                    <input
+                      type="date"
+                      placeholder="Choose Date"
+                      value={languageTest.date || ''}
+                      onChange={(e) => updateLanguageTest(index, 'date', e.target.value)}
+                      className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+                    />
+                  </div>
+                  {errors?.languageTestDate && (
+                    <p className="text-red-500 text-xs mt-1">{errors?.languageTestDate}</p>
+                  )}
+                </div>
+                
+                {index > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => removeLanguageTest(index)}
+                    className="text-red-500 hover:text-red-700 text-[14px] font-medium px-[12px] py-[8px] rounded-[6px] hover:bg-red-50 transition-colors"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             </div>
-            {errors?.languageTestType && (
-              <p className="text-red-500 text-xs mt-1">{errors.languageTestType}</p>
-            )}
-          </div>
+          ))}
           
-          <div className="w-[250px]">
-            <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Test Scores</h4>
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-              errors?.languageTestScore ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <input
-                type="text"
-                placeholder="Highest Records"
-                value={data.languageTestScore || ''}
-                onChange={(e) => handleInputChange('languageTestScore', e.target.value)}
-                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-              />
-            </div>
-            {errors?.languageTestScore && (
-              <p className="text-red-500 text-xs mt-1">{errors.languageTestScore}</p>
-            )}
-          </div>
-          
-          <div className="w-[250px]">
-            <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Test Date</h4>
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-              errors?.languageTestDate ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <input
-                type="date"
-                placeholder="Choose Date"
-                value={data.languageTestDate || ''}
-                onChange={(e) => handleInputChange('languageTestDate', e.target.value)}
-                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-              />
-            </div>
-            {errors?.languageTestDate && (
-              <p className="text-red-500 text-xs mt-1">{errors.languageTestDate}</p>
-            )}
+          <div className="flex gap-[8px] items-center">
+            <Plus className="h-4 w-4 text-[#1c5dff]" />
+            <button 
+              type="button"
+              onClick={addLanguageTest}
+              className="text-[#1c5dff] text-[16px] font-inter bg-transparent border-none cursor-pointer hover:underline"
+            >
+              Add More Language Test
+            </button>
           </div>
         </div>
       </div>
@@ -404,68 +362,95 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
           <h3 className="text-[20px] font-bold text-black font-inter">STANDARDIZED TESTS</h3>
         </div>
         
-        <div className="flex gap-[16px]">
-          <div className="w-[250px]">
-            <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Standardized Test Type</h4>
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] h-[56px] flex items-center ${
-              errors?.standardizedTestType ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <Select value={data.standardizedTestType || ''} onValueChange={(value: string) => handleInputChange('standardizedTestType', value)}>
-                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-[#cdd4e4] [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
-                  <SelectValue placeholder="Choose types" />
-                </SelectTrigger>
-                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
-                  <SelectItem value="sat">SAT</SelectItem>
-                  <SelectItem value="act">ACT</SelectItem>
-                  <SelectItem value="gre">GRE</SelectItem>
-                  <SelectItem value="gmat">GMAT</SelectItem>
-                  <SelectItem value="lsat">LSAT</SelectItem>
-                  <SelectItem value="mcat">MCAT</SelectItem>
-                  <SelectItem value="ap">AP Exams</SelectItem>
-                  <SelectItem value="ib">IB Exams</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
+        <div className="space-y-[24px]">
+          {getStandardizedTestsData().map((standardizedTest, index) => (
+            <div key={index} className="space-y-[16px]">
+              <div className="flex gap-[16px] items-center">
+                <div className="w-[250px]">
+                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Standardized Test Type</h4>
+                  <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] h-[56px] flex items-center ${
+                    errors?.standardizedTestType ? 'border-red-500' : 'border-[#e8efff]'
+                  }`}>
+                    <Select value={standardizedTest.testType || ''} onValueChange={(value: string) => updateStandardizedTest(index, 'testType', value)}>
+                      <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-black [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+                        <SelectValue placeholder="Choose types" />
+                      </SelectTrigger>
+                      <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
+                        <SelectItem value="sat">SAT</SelectItem>
+                        <SelectItem value="act">ACT</SelectItem>
+                        <SelectItem value="gre">GRE</SelectItem>
+                        <SelectItem value="gmat">GMAT</SelectItem>
+                        <SelectItem value="lsat">LSAT</SelectItem>
+                        <SelectItem value="mcat">MCAT</SelectItem>
+                        <SelectItem value="ap">AP Exams</SelectItem>
+                        <SelectItem value="ib">IB Exams</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {errors?.standardizedTestType && (
+                    <p className="text-red-500 text-xs mt-1">{errors?.standardizedTestType}</p>
+                  )}
+                </div>
+                
+                <div className="w-[250px]">
+                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Test Scores</h4>
+                  <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+                    errors?.standardizedTestScore ? 'border-red-500' : 'border-[#e8efff]'
+                  }`}>
+                    <input
+                      type="text"
+                      placeholder="Highest Records"
+                      value={standardizedTest.score || ''}
+                      onChange={(e) => updateStandardizedTest(index, 'score', e.target.value)}
+                      className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+                    />
+                  </div>
+                  {errors?.standardizedTestScore && (
+                    <p className="text-red-500 text-xs mt-1">{errors?.standardizedTestScore}</p>
+                  )}
+                </div>
+                
+                <div className="w-[250px]">
+                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Test Date</h4>
+                  <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+                    errors?.standardizedTestDate ? 'border-red-500' : 'border-[#e8efff]'
+                  }`}>
+                    <input
+                      type="date"
+                      placeholder="Choose Date"
+                      value={standardizedTest.date || ''}
+                      onChange={(e) => updateStandardizedTest(index, 'date', e.target.value)}
+                      className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+                    />
+                  </div>
+                  {errors?.standardizedTestDate && (
+                    <p className="text-red-500 text-xs mt-1">{errors?.standardizedTestDate}</p>
+                  )}
+                </div>
+                
+                {index > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => removeStandardizedTest(index)}
+                    className="text-red-500 hover:text-red-700 text-[14px] font-medium px-[12px] py-[8px] rounded-[6px] hover:bg-red-50 transition-colors"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
             </div>
-            {errors?.standardizedTestType && (
-              <p className="text-red-500 text-xs mt-1">{errors.standardizedTestType}</p>
-            )}
-          </div>
+          ))}
           
-          <div className="w-[250px]">
-            <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Test Scores</h4>
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-              errors?.standardizedTestScore ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <input
-                type="text"
-                placeholder="Highest Records"
-                value={data.standardizedTestScore || ''}
-                onChange={(e) => handleInputChange('standardizedTestScore', e.target.value)}
-                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-              />
-            </div>
-            {errors?.standardizedTestScore && (
-              <p className="text-red-500 text-xs mt-1">{errors.standardizedTestScore}</p>
-            )}
-          </div>
-          
-          <div className="w-[250px]">
-            <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Test Date</h4>
-            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-              errors?.standardizedTestDate ? 'border-red-500' : 'border-[#e8efff]'
-            }`}>
-              <input
-                type="date"
-                placeholder="Choose Date"
-                value={data.standardizedTestDate || ''}
-                onChange={(e) => handleInputChange('standardizedTestDate', e.target.value)}
-                className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-              />
-            </div>
-            {errors?.standardizedTestDate && (
-              <p className="text-red-500 text-xs mt-1">{errors.standardizedTestDate}</p>
-            )}
+          <div className="flex gap-[8px] items-center">
+            <Plus className="h-4 w-4 text-[#1c5dff]" />
+            <button 
+              type="button"
+              onClick={addStandardizedTest}
+              className="text-[#1c5dff] text-[16px] font-inter bg-transparent border-none cursor-pointer hover:underline"
+            >
+              Add More Standardized Test
+            </button>
           </div>
         </div>
       </div>
@@ -496,7 +481,7 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
               </div>
             </div>
             {errors?.researchExperience && (
-              <p className="text-red-500 text-xs mt-1">{errors.researchExperience}</p>
+              <p className="text-red-500 text-xs mt-1">{errors?.researchExperience}</p>
             )}
           </div>
           
@@ -518,7 +503,7 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
               </div>
             </div>
             {errors?.publications && (
-              <p className="text-red-500 text-xs mt-1">{errors.publications}</p>
+              <p className="text-red-500 text-xs mt-1">{errors?.publications}</p>
             )}
           </div>
         </div>

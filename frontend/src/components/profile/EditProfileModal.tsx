@@ -162,12 +162,9 @@ export default function EditProfileModal({
     if (onAvatarUpload) {
       try {
         await onAvatarUpload(file)
-        console.log('Avatar uploaded successfully:', file.name)
       } catch (error) {
         console.error('Avatar upload failed:', error)
       }
-    } else {
-      console.log('Avatar change:', file.name, '- upload handler not provided')
     }
   }
 
