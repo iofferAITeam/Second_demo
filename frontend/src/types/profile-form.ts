@@ -101,5 +101,5 @@ export interface TabComponentProps {
 export interface FormSectionProps {
   data: any
   errors?: any
-  onChange: (field: string, value: string | boolean | string[]) => void
+  onChange: (field: string, value: any) => void
 }

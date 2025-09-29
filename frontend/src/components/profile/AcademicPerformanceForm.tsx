@@ -12,7 +12,7 @@ interface AcademicPerformanceFormProps extends FormSectionProps {
 
 
 export default function AcademicPerformanceForm({ data, errors, onChange }: AcademicPerformanceFormProps) {
-  const handleInputChange = (field: keyof AcademicPerformanceData, value: string | string[]) => {
+  const handleInputChange = (field: keyof AcademicPerformanceData, value: any) => {
     onChange(field, value)
   }
 
