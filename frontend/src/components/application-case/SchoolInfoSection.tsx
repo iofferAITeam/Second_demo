@@ -1,4 +1,5 @@
 import Image from "next/image";
+import CaseAnalysis from "./CaseAnalysis";
 
 export default function SchoolInfoSection() {
   return (
@@ -84,6 +85,7 @@ export default function SchoolInfoSection() {
           </div>
         </div>
       </div>
+      <CaseAnalysis />
     </section>
   );
 }

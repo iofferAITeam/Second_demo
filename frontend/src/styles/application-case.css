@@ -175,3 +175,27 @@
   font-size: 12px;
   color: #0055aa;
 }
+
+/* =========================
+   Case Analysis Section
+   ========================= */
+.case-analysis {
+  display: flex;
+  align-items: center;   /* 改这里：上下居中 */
+  background: #eef6ff;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  gap: 12px;
+}
+
+
+.case-icon img {
+  display: block;
+}
+
+.case-content {
+  flex: 1;                   /* 右侧文字区域占满剩余空间 */
+}
+
+
