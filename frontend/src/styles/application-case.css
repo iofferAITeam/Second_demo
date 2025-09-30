@@ -53,35 +53,6 @@
   color: #111827;
 }
 
-.school-list p {
-  margin: 0;
-  font-size: 14px;
-  color: #374151;
-}
-
-.background-tags,
-.profile-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tag {
-  background: #f3f4f6;
-  color: #111827;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-}
-
-.profile-tag {
-  background: #e0f2fe;
-  color: #0284c7;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-}
-
 /* user-icon */
 .user-block {
   display: flex;
@@ -98,4 +69,109 @@
   font-size: 18px;
   font-weight: 600;
   color: #111827;
+}
+
+/* offer results and background */
+.section-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin: 12px 0 6px;
+  color: #333;
+}
+
+.offer-results ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.offer-results li {
+  display: grid;
+  grid-template-columns: 100px auto; /* 左列固定宽度，右列自适应 */
+  align-items: start;
+  font-size: 13px;
+  margin-bottom: 6px;
+  line-height: 1.4;
+  color: #000;
+}
+
+
+.offer-label {
+  width: 90px;          /* 固定宽度，让下面对齐 */
+  font-size: 13px;
+  color: #6a6a6a;       /* 灰色文字 */
+  flex-shrink: 0;
+}
+
+.offer-item {
+  display: flex;
+  align-items: center;
+  gap: 6px; /* 图标和文字之间的间距 */
+}
+
+.offer-icon {
+  flex-shrink: 0;
+}
+
+/* background */
+.background-row {
+  display: grid;
+  grid-template-columns: 100px auto;
+  align-items: start;
+  font-size: 13px;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+/* 最后一行占满，不留左边空位 */
+.background-row.full {
+  grid-template-columns: auto;
+}
+
+
+.background ul {
+  list-style: none;  /* 去掉前面的黑点 */
+  padding: 0;
+  margin: 0;
+}
+
+.background li {
+  display: grid;
+  grid-template-columns: 100px auto;
+  align-items: start;
+  font-size: 13px;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+
+.background-label {
+  width: 90px;          /* 跟 offer-label 一致 */
+  font-size: 13px;
+  color: #6a6a6a;       /* 灰色说明文字 */
+  flex-shrink: 0;
+}
+
+/* 背景标签 */
+.background-tags,
+.profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background: #eef4ff;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #333;
+}
+
+.profile-tag {
+  background: #dceeff;
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #0055aa;
 }
