@@ -7,6 +7,7 @@ import "@/styles/application-case.css";
 export default function ApplicationCasePage() {
   return (
     <div>
+      <title>Application Case</title>
       <Header />
       <SchoolInfoSection />
       <SchoolSelectionPlan />

@@ -24,7 +24,7 @@ export default function SchoolCard() {
         }}>OFFER 合作</span>
         </p>
         <h4 className="project-name">
-          Project name text text text text text text text text text text text text text…
+          Project name text text text text text text text text text text text text text text text text…
         </h4>
       </div>
 
