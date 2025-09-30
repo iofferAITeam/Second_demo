@@ -46,7 +46,7 @@ export default function SchoolCard() {
       </div>
 
       {/* 底部右侧指标 */}
-      <div className="school-card-footer" style={{
+      <div style={{
         width: "438px",
         height: "180px",
         position: "relative",
@@ -62,6 +62,75 @@ export default function SchoolCard() {
           fill
           className="score-bg"
         />
+        
+        {/* 六边形容器 */}
+        <div style={{
+          display: "flex",
+          gap: "0px",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "absolute",
+          top: "55%",
+          left: "68%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 1
+        }}>
+          {/* 第一个六边形 */}
+          <div style={{ position: "relative", textAlign: "center", flexShrink: 0 }}>
+            <Image
+              src="/images/六边形地图册.svg"
+              alt="hexagon"
+              width={140}
+              height={140}
+            />
+            <div style={{
+              position: "absolute",
+              top: "45%",
+              left: "51%",
+              transform: "translate(-50%, -50%)"
+            }}>
+              <h3 style={{ 
+                margin: 0, 
+                fontSize: "28px",
+                fontWeight: "bold",
+                color: "#1c5dff"
+              }}>89%</h3>
+              <p style={{ 
+                margin: 0,
+                fontSize: "10px",
+                color: "#999",
+                whiteSpace: "nowrap"
+              }}>Admission Rate</p>
+            </div>
+          </div>
+          {/* 第二个六边形 */}
+          <div style={{ position: "relative", textAlign: "center", flexShrink: 0 }}>
+            <Image
+              src="/images/六边形地图册.svg"
+              alt="hexagon"
+              width={140}
+              height={140}
+            />
+            <div style={{
+              position: "absolute",
+              top: "45%",
+              left: "50%",
+              transform: "translate(-50%, -50%)"
+            }}>
+              <h3 style={{ 
+                margin: 0, 
+                fontSize: "28px",
+                fontWeight: "bold",
+                color: "#1c5dff"
+              }}>4.8</h3>
+              <p style={{ 
+                margin: 0,
+                fontSize: "11px",
+                color: "#999"
+              }}>Perfect Fit</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
