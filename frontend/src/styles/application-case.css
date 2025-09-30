@@ -199,3 +199,70 @@
 }
 
 
+/* School Selection Plan */
+
+.school-plan {
+  max-width: 1000px;  
+  margin: 24px auto; 
+  padding: 0 16px;  
+  background: none;  
+}
+
+/* 标题 */
+.school-plan h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+/* 按钮组 */
+.tab-buttons {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.tab-button {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 16px;
+  border: none;
+  background: #f0f2f5;
+  color: #333;
+  cursor: pointer;
+}
+
+.tab-button.active {
+  background: #2f80ed;
+  color: #fff;
+}
+
+/* 内容区 */
+.tab-content {
+  margin-top: 12px;
+}
+
+.tab-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tab-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.tab-text {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.6;
+}
+
+.tab-icon {
+  filter: invert(77%) sepia(22%) saturate(3623%) hue-rotate(315deg) brightness(101%) contrast(101%);
+}
+
