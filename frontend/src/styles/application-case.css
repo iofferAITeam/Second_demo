@@ -144,14 +144,6 @@
   line-height: 1.4;
 }
 
-
-.background-label {
-  width: 90px;          /* 跟 offer-label 一致 */
-  font-size: 13px;
-  color: #6a6a6a;       /* 灰色说明文字 */
-  flex-shrink: 0;
-}
-
 /* 背景标签 */
 .background-tags,
 .profile-tags {
@@ -173,7 +165,7 @@
   border-radius: 12px;
   padding: 4px 10px;
   font-size: 12px;
-  color: #0055aa;
+  color: #1c5dff;
 }
 
 /* =========================
@@ -234,7 +226,7 @@
 }
 
 .tab-button.active {
-  background: #2f80ed;
+  background: #1c5dff;
   color: #fff;
 }
 
@@ -250,11 +242,6 @@
   margin-bottom: 8px;
 }
 
-.tab-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #333;
-}
 
 .tab-text {
   font-size: 13px;
@@ -266,3 +253,88 @@
   filter: invert(77%) sepia(22%) saturate(3623%) hue-rotate(315deg) brightness(101%) contrast(101%);
 }
 
+/* =========================
+   School Card Section
+   ========================= */
+
+/* 外层卡片 */
+.school-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  margin-bottom: 16px;
+}
+
+/* 左边文字部分 */
+.school-card-header {
+  flex: 1;
+  margin-right: 16px;
+}
+
+.school-name {
+  font-size: 13px;
+  color: #444;
+  margin: 0 0 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.school-icon {
+  flex-shrink: 0;
+}
+
+.offer-tag {
+  font-size: 12px;
+  color: #2f80ed;
+  background: #eef4ff;
+  padding: 2px 6px;
+  border-radius: 12px;
+  margin-left: 6px;
+}
+
+.project-name {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 0px;
+  color: #000;
+}
+
+/* 标签区 */
+.school-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* 右边统计指标 */
+.school-card-footer {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+}
+
+.stat {
+  text-align: center;
+  min-width: 80px;
+  padding: 12px 8px;
+  background: linear-gradient(135deg, #3d7bfd, #5ca9ff);
+  border-radius: 8px;
+  color: #fff;
+}
+
+.stat-value {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.stat-label {
+  font-size: 12px;
+  opacity: 0.9;
+}

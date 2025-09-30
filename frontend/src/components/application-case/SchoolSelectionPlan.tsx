@@ -4,7 +4,13 @@ export default function SchoolSelectionPlan() {
   return (
     <section className="school-plan">
       {/* 标题 */}
-      <h3>Her School Selection Plan</h3>
+      <h3  style={{
+        fontFamily: "PingFang SC, sans-serif",
+        fontSize: "20px",
+        fontWeight: 600,
+        lineHeight: "100%",
+        color: "#000000",
+      }}>Her School Selection Plan</h3>
 
       {/* Tab 按钮组 */}
       <div className="tab-buttons">
@@ -23,9 +29,9 @@ export default function SchoolSelectionPlan() {
             height={16}
             className="tab-icon"
           />
-          <span className="tab-title">3 Target Schools</span>
+          <span><strong>3 Target Schools</strong></span>
         </div>
-        <p className="tab-text">
+        <p>
           Introduction content  enhancement, enroll in advanced quantitative courses (e.g., Python/Financial Modeling) to strengthenhancement, enroll in advanced quantitative courses (e.g., Python/Financial Modeling) to strengthenhancement, enroll in advanced quantitative courses (e.g., Python/Financial Modeling) to strength
         </p>
       </div>
