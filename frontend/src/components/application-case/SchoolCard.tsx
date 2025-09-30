@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function SchoolCard() {
   return (
-    <div className="school-info-section">
+    <div className="school-info-section" style={{ position: "relative" }}>
       {/* 上半部分：学校名 + 项目名 */}
       <div className="school-card-header">
         <p className="school-name">
@@ -44,6 +44,31 @@ export default function SchoolCard() {
         <span className="tag">TOEFL 110</span>
         <span className="profile-tag">High employment rate</span>
       </div>
+
+      {/* Share 区域 */}
+        <div 
+          style={{
+            position: "absolute",
+            bottom: "10px",
+            left: "20px",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            cursor: "pointer",
+            color: "#1c5dff",
+            fontSize: "12px",
+            fontWeight: 500
+          }}
+        >
+          <Image 
+            src="/images/icon-16-通用.svg"
+            alt="share"
+            width={14}
+            height={14}
+          />
+          <span>Share</span>
+        </div>
+
 
       {/* 底部右侧指标 */}
       <div style={{
