@@ -11,15 +11,19 @@
 }
 
 .case-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #111827;
+  font-family: "PingFang SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-weight: 600;   /* Semibold */
+  font-size: 20px;
+  line-height: 100%;
+  letter-spacing: 0;
+  color: #000000;
 }
+
 
 .close-btn {
   border: none;
   background: transparent;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: bold;
   color: #6b7280;
   cursor: pointer;
@@ -33,7 +37,7 @@
 /* school-info */
 .school-info-section {
   margin: 20px auto;              /* 上下 20px，左右自动居中 */
-  max-width: 800px;               /* 限制卡片最大宽度，避免太宽 */
+  max-width: 1000px;               /* 限制卡片最大宽度，避免太宽 */
   background: #fff;               /* 白色背景 */
   border-radius: 12px;            /* 圆角 */
   padding: 20px;
@@ -76,4 +80,22 @@
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 12px;
+}
+
+/* user-icon */
+.user-block {
+  display: flex;
+  align-items: center;
+  gap: 8px; 
+}
+
+.user-icon {
+  width:30px; 
+  height: 30px;
+}
+
+.user-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
 }

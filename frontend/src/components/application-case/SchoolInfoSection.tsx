@@ -1,8 +1,17 @@
+import Image from "next/image";
+
 export default function SchoolInfoSection() {
   return (
     <section className="school-info-section">
       {/* 用户名 */}
       <div className="user-block">
+        <Image
+          src="/images/photo images.svg"   
+          alt="user icon"
+          width={20}
+          height={20}
+          className="user-icon"
+        />
         <h2 className="user-name">Nickyouth</h2>
       </div>
 
