@@ -1,3 +1,4 @@
+/* header */
 .case-header {
   display: flex;
   justify-content: space-between;
@@ -11,7 +12,7 @@
 
 .case-title {
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
   color: #111827;
 }
 
@@ -26,4 +27,53 @@
 
 .close-btn:hover {
   color: #111827;
+}
+
+
+/* school-info */
+.school-info-section {
+  margin: 20px auto;              /* 上下 20px，左右自动居中 */
+  max-width: 800px;               /* 限制卡片最大宽度，避免太宽 */
+  background: #fff;               /* 白色背景 */
+  border-radius: 12px;            /* 圆角 */
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); /* 轻微阴影 */
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.user-block {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.school-list p {
+  margin: 0;
+  font-size: 14px;
+  color: #374151;
+}
+
+.background-tags,
+.profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  background: #f3f4f6;
+  color: #111827;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.profile-tag {
+  background: #e0f2fe;
+  color: #0284c7;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
 }
