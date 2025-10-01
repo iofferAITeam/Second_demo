@@ -202,8 +202,7 @@ export class ChatController {
         // 构建包含用户资料的请求
         const aiRequest: any = {
           message: message,
-          user_id: userId,
-          session_id: sessionId
+          user_id: userId || 'anonymous_user'
         }
 
         // 让AI服务的teams系统自动决定路由，不强制指定团队类型
@@ -226,7 +225,7 @@ export class ChatController {
 
         // 先尝试调用新的AI服务
         const aiServiceResponse = await axios.post(`${process.env.AI_SERVICE_URL}/chat/message`, aiRequest, {
-          timeout: 120000, // 2分钟超时，给AI团队足够时间生成推荐
+          timeout: 300000, // 5分钟超时，给AI团队足够时间生成详细推荐
           headers: {
             'Content-Type': 'application/json'
           }
@@ -288,17 +287,19 @@ export class ChatController {
 
       logger.info(`Message sent by user: ${userId}`)
 
+      // 直接返回前端期望的ChatResponse格式
       res.json({
-        message: 'Message sent successfully',
-        userMessage: {
-          id: 'temp-user-msg-' + Date.now(),
-          content: message,
-          type: 'user',
-          timestamp: new Date().toISOString()
-        },
-        aiResponse,
-        // 包含资料提取结果
-        profileExtraction: profileExtraction
+        message: aiResponse.content || 'No response',
+        thinking_process: aiResponse.thinkingProcess,
+        reference_links: aiResponse.referenceLinks || [],
+        strategy: aiResponse.strategy,
+        source: aiResponse.source,
+        rag_similarity: 0,
+        team_used: aiResponse.teamUsed || 'GENERAL_QA',
+        timestamp: aiResponse.timestamp || new Date().toISOString(),
+        status: 'success',
+        confidence: aiResponse.confidence || 0.8,
+        fallback: aiResponse.fallback || false
       })
     } catch (error) {
       next(error)

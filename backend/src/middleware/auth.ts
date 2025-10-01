@@ -1,16 +1,8 @@
-import { Request, Response, NextFunction } from 'express'
+import { Response, NextFunction } from 'express'
 import { TokenService } from '../utils/token'
 import { prisma } from '../lib/prisma'
 import { logger } from '../utils/logger'
-
-interface AuthRequest extends Request {
-  user?: {
-    id: string
-    email: string
-    name: string
-  }
-  userId?: string
-}
+import { AuthRequest } from '../types/auth'
 
 export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {

@@ -54,7 +54,7 @@ async function testProfileExtraction() {
       goals: '申请美国研究生项目'
     }
 
-    const updatedProfile = await prisma.userProfile.upsert({
+    const updatedProfile = await prisma.user_profiles.upsert({
       where: { userId: testUser.id },
       create: {
         id: `profile_${testUser.id}`,
@@ -76,7 +76,7 @@ async function testProfileExtraction() {
     })
 
     // Test profile retrieval
-    const retrievedProfile = await prisma.userProfile.findUnique({
+    const retrievedProfile = await prisma.user_profiles.findUnique({
       where: { userId: testUser.id }
     })
 
