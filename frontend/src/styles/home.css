@@ -248,22 +248,19 @@
   text-align: center;
   margin-bottom: 60px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-left: 0;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0px;
+  margin-left: -80px;
 }
 
 .stats-icon {
   margin-bottom: 0;
-  margin-top: -120;
-  margin-right: 20px;
-  flex-shrink: 0;
+  margin-top: -60px;
 }
 
 .stats-text {
-  text-align: center;
-  flex: 1;
+  text-align: left;
 }
 
 .stats-header h2 {
@@ -280,7 +277,6 @@
   line-height: 1.6;
   max-width: 800px;
   margin: 0 auto;
-  text-align: center;
 }
 
 .stats-numbers {
@@ -351,12 +347,11 @@
 }
 
 .privacy-icon {
-  position: relative !important;
+  position: relative;
   z-index: 10;
   display: flex;
-  justify-content: flex-start !important;
+  justify-content: center;
   margin-bottom: -30px;
-  margin-left: 200px !important;
 }
 
 .privacy-content {
@@ -375,7 +370,7 @@
 }
 
 .privacy-content h2 {
-  font-size: 2.2rem;
+  font-size: 2.75rem;
   font-weight: 700;
   color: #000;
   margin-bottom: 50px;
@@ -463,7 +458,6 @@
   font-size: 1rem;
   color: #666;
   line-height: 1.6;
-  margin: 0 auto 0 -80px;
 }
 
 .faq-list {

@@ -1,6 +1,8 @@
 /* Base Global Styles */
 * {
-  /* margin: 0; */
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
@@ -72,12 +74,6 @@ html {
   align-items: center;
   gap: 1.5rem;
   position: relative;
-}
-
-.language-selector {
-  color: #666;
-  font-size: 0.9rem;
-  font-weight: 500;
 }
 
 .signup-button {
