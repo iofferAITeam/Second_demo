@@ -54,8 +54,7 @@ services:
         condition: service_started
     restart: unless-stopped
     volumes:
-      - ./ai-service/data:/app/data
-      - ./ai-service/uploads:/app/uploads
+      - ./ai-service:/app
 
   # 后端服务 (Node.js Express)
   backend:
@@ -80,6 +79,9 @@ services:
       ai-service:
         condition: service_started
     restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
 
   # 前端服务 (Next.js)
   frontend:
@@ -96,6 +98,9 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
 volumes:
   postgres_data:
