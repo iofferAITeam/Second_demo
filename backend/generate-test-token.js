@@ -12,7 +12,7 @@ async function generateTestToken() {
     // Create or find test user
     const hashedPassword = await bcrypt.hash('testpassword123', 10)
 
-    const testUser = await prisma.users.upsert({
+    const testUser = await prisma.user.upsert({
       where: { email: 'test-profile@example.com' },
       create: {
         id: 'test-user-profile-' + Date.now(),

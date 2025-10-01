@@ -100,7 +100,8 @@ class ApiClient {
 
   // Chat API
   async sendMessage(message: string, sessionId?: string): Promise<ChatResponse> {
-    return this.request<ChatResponse>('/api/chat/message', {
+    // 使用正确的聊天端点（不需要 /api 前缀）
+    return this.request<ChatResponse>('/chat/message', {
       method: 'POST',
       body: JSON.stringify({
         message,

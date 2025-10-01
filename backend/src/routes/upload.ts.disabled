@@ -68,7 +68,7 @@ router.post('/avatar', authenticateToken, upload.single('avatar'), async (req: A
     const avatarUrl = `/uploads/avatars/${fileName}`
 
     // Update user avatar in database
-    await prisma.users.update({
+    await prisma.user.update({
       where: { id: userId },
       data: { avatar: avatarUrl }
     })
@@ -114,7 +114,7 @@ router.post('/document', authenticateToken, upload.single('document'), async (re
 
     // Save document info to database (we'll need to create a Document model)
     // For now, we'll store in the experiences JSON field as documents
-    const profile = await prisma.user_profiles.findUnique({
+    const profile = await prisma.userProfile.findUnique({
       where: { userId }
     })
 
@@ -134,7 +134,7 @@ router.post('/document', authenticateToken, upload.single('document'), async (re
 
     documents.push(newDocument)
 
-    await prisma.user_profiles.upsert({
+    await prisma.userProfile.upsert({
       where: { userId },
       update: {
         experiences: {
@@ -170,7 +170,7 @@ router.get('/documents', authenticateToken, async (req: AuthRequest, res) => {
       return res.status(401).json({ error: 'User not authenticated' })
     }
 
-    const profile = await prisma.user_profiles.findUnique({
+    const profile = await prisma.userProfile.findUnique({
       where: { userId }
     })
 
@@ -197,7 +197,7 @@ router.delete('/document/:documentId', authenticateToken, async (req: AuthReques
       return res.status(401).json({ error: 'User not authenticated' })
     }
 
-    const profile = await prisma.user_profiles.findUnique({
+    const profile = await prisma.userProfile.findUnique({
       where: { userId }
     })
 
@@ -206,7 +206,7 @@ router.delete('/document/:documentId', authenticateToken, async (req: AuthReques
 
     const updatedDocuments = documents.filter((doc: any) => doc.id !== documentId)
 
-    await prisma.user_profiles.update({
+    await prisma.userProfile.update({
       where: { userId },
       data: {
         experiences: {

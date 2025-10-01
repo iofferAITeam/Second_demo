@@ -1,12 +1,12 @@
 import { Router } from 'express'
-import { ChatController } from '../controllers/ChatController'
+// import { ChatController } from '../controllers/ChatController'
 import { authenticateToken } from '../middleware/auth'
 
 const router = Router()
 
+// Chat routes are temporarily disabled until ChatController is implemented
 // 发送消息
-router.post('/send-message', authenticateToken, ChatController.sendMessage)
-router.post('/message', authenticateToken, ChatController.sendMessage)
+// router.post('/message', authenticateToken, ChatController.sendMessage)
 
 // 临时测试端点 - 不需要认证
 // router.post('/test-message', ChatController.sendMessage)

@@ -10,11 +10,11 @@ class Settings(BaseSettings):
     GOOGLE_API_KEY: str | None = None
     
     # PostgreSQL configuration (unified database)
-    DATABASE_URL: str = "postgresql://ioffer_user:ioffer_password@postgres:5432/ioffer_db"
-    SQL_DATABASE_URI: str = "postgresql://ioffer_user:ioffer_password@postgres:5432/ioffer_db"
+    DATABASE_URL: str = "postgresql://ioffer_user:ioffer_password@localhost:5432/ioffer_db"
+    SQL_DATABASE_URI: str = "postgresql://ioffer_user:ioffer_password@localhost:5432/ioffer_db"
 
     # Legacy MongoDB configuration (deprecated)
-    DATABASE_HOST: str = "mongodb://mongodb:27017"
+    DATABASE_HOST: str = "mongodb://127.0.0.1:27017"
     DATABASE_NAME: str = "ioffer_agent"
     MONGODB_URL: str | None = None
 

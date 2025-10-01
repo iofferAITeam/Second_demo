@@ -1,5 +1,3 @@
-import { Request } from 'express'
-
 export interface LoginRequest {
   email: string
   password: string
@@ -33,20 +31,3 @@ export interface JWTPayload {
   userId: string
   email: string
 }
-
-// Augment Express Request to add our custom properties
-declare global {
-  namespace Express {
-    interface Request {
-      user?: {
-        id: string
-        email: string
-        name: string
-      }
-      userId?: string
-    }
-  }
-}
-
-// Export a type alias for convenience
-export type AuthRequest = Request

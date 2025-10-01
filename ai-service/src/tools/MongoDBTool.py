@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from src.tools.extraction import STUDENT_INFO_TEMPLATE_JSON
 from src.settings import settings
 
-load_dotenv()
+load_dotenv(dotenv_path="c:/Users/Jupit/OneDrive/Desktop/Extration_Agent/.venv/config.env")
 
 class MongoDBTool:
     def __init__(self, user_id: str = None):

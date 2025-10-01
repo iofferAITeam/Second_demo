@@ -19,8 +19,8 @@ COPY . .
 RUN pip install --no-cache-dir uv && \
     uv sync --no-dev
 
-# 暴露端口（AI服务8000）
-EXPOSE 8000
+# 暴露端口（AI服务8010）
+EXPOSE 8010
 
 # 设置环境变量
 ENV PYTHONPATH=/app

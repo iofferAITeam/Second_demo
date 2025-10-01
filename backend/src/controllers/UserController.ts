@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express'
+import { Request, Response, NextFunction } from 'express'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
 import { logger } from '../utils/logger'
@@ -6,8 +6,11 @@ import { prisma } from '../lib/prisma'
 import { ProfileFormData, StructuredProfileResponse, ProfileResponse } from '../types/profile'
 import { transformFormDataToDatabase, transformDatabaseToFormData, cleanProfileUpdateData } from '../utils/profile-transformer'
 import { AvatarProcessor } from '../utils/avatar-processor'
-import { AuthRequest } from '../types/auth'
 import path from 'path'
+
+interface AuthRequest extends Request {
+  userId?: string
+}
 
 export class UserController {
   static async getProfile(req: AuthRequest, res: Response, next: NextFunction) {
