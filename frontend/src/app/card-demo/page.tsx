@@ -1,4 +1,4 @@
-import UniversityRecommendationCard from '@/components/UniversityRecommendationCard';
+import UniversityRecommendationCard from '@/components/RecommendationCard/UniversityRecommendationCard';
 
 export default function CardDemoPage() {
   const sampleData = {
