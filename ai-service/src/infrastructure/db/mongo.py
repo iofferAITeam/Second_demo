@@ -10,9 +10,7 @@ class MongoDatabaseConnector:
     def __new__(cls, *args, **kwargs) -> MongoClient:
         if cls._instance is None:
             try:
-                # Use Docker service name for MongoDB connection
-                mongo_url = "mongodb://mongodb:27017"
-                cls._instance = MongoClient(mongo_url)
+                cls._instance = MongoClient(settings.DATABASE_HOST)
                 # Verify connection is working
                 cls._instance.admin.command('ping')
                 logger.info(f"Connection to MongoDB successful: {settings.DATABASE_HOST}")
