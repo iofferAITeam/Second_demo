@@ -3,6 +3,7 @@ import authRoutes from './auth'
 import userRoutes from './user'
 import chatRoutes from './chat'
 import recommendationRoutes from './recommendations'
+import paymentRoutes from './payments'
 
 const router = Router()
 
@@ -18,6 +19,9 @@ router.use('/chat', chatRoutes)
 // 🎓 推荐路由
 router.use('/recommendations', recommendationRoutes)
 
+// 💳 支付路由
+router.use('/payments', paymentRoutes)
+
 // 📁 上传路由 - 暂时禁用
 // router.use('/upload', uploadRoutes)
 
@@ -30,7 +34,8 @@ router.get('/', (req, res) => {
       auth: '/api/auth',
       user: '/api/user',
       chat: '/api/chat',
-      recommendations: '/api/recommendations'
+      recommendations: '/api/recommendations',
+      payments: '/api/payments'
     },
     docs: '/api/docs' // TODO: 添加Swagger文档
   })

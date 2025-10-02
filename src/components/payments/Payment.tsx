@@ -4,6 +4,7 @@ import { useState } from "react";
 import PricingModal from "./PricingModal";
 import PaymentSuccessModal from "./PaymentSuccessModal";
 import PaymentFailureModal from "./PaymentFailureModal";
+import StripePayment from "./StripePayment";
 
 interface PricingModalProps {
   isOpen: boolean;
@@ -13,7 +14,7 @@ interface PricingModalProps {
   onAttemptCountChange?: (count: number) => void;
 }
 
-type ModalState = "pricing" | "success" | "failed";
+type ModalState = "pricing" | "stripe" | "success" | "failed";
 
 export default function PaymentModalContainer({
   isOpen,
@@ -23,25 +24,33 @@ export default function PaymentModalContainer({
   onAttemptCountChange,
 }: PricingModalProps) {
   const [modalState, setModalState] = useState<ModalState>("pricing");
+  const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handlePayment = async () => {
-    // Simulate payment processing with alternating result
-    setTimeout(() => {
-      // Increment attempt count
-      const newAttemptCount = attemptCount + 1;
-      onAttemptCountChange?.(newAttemptCount);
+    // Move to Stripe payment form
+    setModalState("stripe");
+  };
 
-      // First click shows success, second shows failure, third shows success, etc.
-      const isSuccess = newAttemptCount % 2 === 1; // Odd attempts = success, even attempts = failure
-      setModalState(isSuccess ? "success" : "failed");
-      onPayment?.();
-    }, 2000);
+  const handleStripeSuccess = (intentId: string) => {
+    setPaymentIntentId(intentId);
+    setModalState("success");
+    onPayment?.();
+  };
+
+  const handleStripeError = (error: string) => {
+    console.error('Stripe payment error:', error);
+    setModalState("failed");
+  };
+
+  const handleStripeCancel = () => {
+    setModalState("pricing");
   };
 
   const handleClose = () => {
     setModalState("pricing");
+    setPaymentIntentId(null);
     onClose();
   };
 
@@ -62,6 +71,44 @@ export default function PaymentModalContainer({
         onClose={handleClose}
         onPayment={handlePayment}
       />
+
+      {modalState === "stripe" && (
+        <div className="pricing-modal-overlay">
+          <div className="pricing-modal">
+            <div className="pricing-modal-header">
+              <h1 className="pricing-modal-title">Complete Payment</h1>
+              <button
+                className="close-button"
+                onClick={handleStripeCancel}
+                aria-label="Close modal"
+              >
+                <svg
+                  className="close-icon"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
+                  <path
+                    d="M6 6L18 18M6 18L18 6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="stripe-payment-container">
+              <StripePayment
+                amount={9.90}
+                currency="usd"
+                onSuccess={handleStripeSuccess}
+                onError={handleStripeError}
+                onCancel={handleStripeCancel}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       <PaymentSuccessModal
         isOpen={modalState === "success"}
