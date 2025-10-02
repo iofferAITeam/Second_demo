@@ -1,9 +1,9 @@
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/shared/Navbar'
 import Hero from '@/components/home/Hero'
 import Stats from '@/components/home/Stats'
 import FAQ from '@/components/home/FAQ'
 import PrivacySection from '@/components/home/PrivacySection'
-import Footer from '@/components/Footer'
+import Footer from '@/components/shared/Footer'
 
 export default function Home() {
   return (
