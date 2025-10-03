@@ -13,17 +13,18 @@ COPY package*.json ./
 # 安装依赖
 RUN npm install
 
-# 全局安装TypeScript和ts-node
-RUN npm install -g typescript ts-node
+# 全局安装TypeScript和ts-node以及wait-port
+RUN npm install -g typescript ts-node wait-port
 
 # 复制源代码
 COPY . .
 
-# 生成Prisma客户端
-RUN npx prisma generate
+# 复制启动脚本
+COPY scripts/start.sh /app/scripts/start.sh
+RUN chmod +x /app/scripts/start.sh
 
 # 暴露端口
 EXPOSE 8001
 
-# 启动开发服务器（跳过迁移直接启动）
-CMD ["npm", "run", "dev"]
+# 使用启动脚本（包含数据库初始化）
+CMD ["/app/scripts/start.sh"]
