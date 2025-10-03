@@ -56,6 +56,167 @@ function cleanAiResponse(message: string): string {
   return message.trim()
 }
 
+// 检测是否为学校推荐响应
+function isSchoolRecommendationResponse(content: string): boolean {
+  const recommendationKeywords = [
+    'Academic Background Score',
+    'Practical Experience Score',
+    'Language Proficiency Score',
+    'Overall Fit Score',
+    'Carnegie Mellon',
+    'UC Berkeley',
+    'Stanford',
+    'University of Washington',
+    'Georgia Tech',
+    'UCLA',
+    'Cornell',
+    'USC',
+    'Purdue',
+    'UC Irvine',
+    'Strategist\'s Note'
+  ]
+
+  return recommendationKeywords.some(keyword => content.includes(keyword)) &&
+         content.includes('Score') &&
+         content.includes('University')
+}
+
+// 解析学校推荐数据
+function parseSchoolRecommendations(content: string) {
+  const detailRegex = /(\d+)\.\s+([^(]+?)(?:\([^)]+\))?\s*\n([\s\S]*?)(?=\d+\.\s+[A-Z]|$)/g
+  let match
+  const recommendations = []
+
+  while ((match = detailRegex.exec(content)) !== null) {
+    const id = match[1]
+    const name = match[2].trim()
+    const details = match[3]
+
+    // 提取评分
+    const academicMatch = details.match(/Academic Background Score:\s*(\d+)\/5/)
+    const practicalMatch = details.match(/Practical Experience Score:\s*(\d+)\/5/)
+    const languageMatch = details.match(/Language Proficiency Score:\s*(\d+)\/5/)
+    const fitMatch = details.match(/Overall Fit Score:\s*(\d+)\/5/)
+    const noteMatch = details.match(/Strategist's Note:\s*(.*?)(?=\n\d+\.|$)/s)
+
+    // 推断学校详细信息
+    const schoolInfo = getSchoolInfo(name)
+
+    recommendations.push({
+      id,
+      schoolName: name,
+      programName: 'Master of Science in Computer Science',
+      academicScore: academicMatch ? parseFloat(academicMatch[1]) : null,
+      practicalScore: practicalMatch ? parseFloat(practicalMatch[1]) : null,
+      languageScore: languageMatch ? parseFloat(languageMatch[1]) : null,
+      fitScore: fitMatch ? parseFloat(fitMatch[1]) : null,
+      strategistNote: noteMatch ? noteMatch[1].trim() : null,
+      analysisContent: details,
+      ...schoolInfo,
+      category: getCategoryFromScores({
+        academic: academicMatch ? parseFloat(academicMatch[1]) : 0,
+        fit: fitMatch ? parseFloat(fitMatch[1]) : 0
+      }),
+      displayOrder: parseInt(id) || 0
+    })
+  }
+
+  return recommendations
+}
+
+// 获取学校信息
+function getSchoolInfo(schoolName: string) {
+  const schoolMappings = {
+    'Carnegie Mellon': {
+      location: 'Pittsburgh, PA',
+      tuition: '$58,924',
+      toeflRequirement: '102',
+      schoolType: 'One Click Apply'
+    },
+    'UC Berkeley': {
+      location: 'Berkeley, CA',
+      tuition: '$44,007',
+      toeflRequirement: '90',
+      schoolType: 'One Click Apply'
+    },
+    'Stanford': {
+      location: 'Stanford, CA',
+      tuition: '$58,416',
+      toeflRequirement: '100',
+      schoolType: 'One Click Apply'
+    },
+    'University of Washington': {
+      location: 'Seattle, WA',
+      tuition: '$36,898',
+      toeflRequirement: '92',
+      schoolType: 'iOffer Cooperation'
+    },
+    'Georgia Tech': {
+      location: 'Atlanta, GA',
+      tuition: '$29,140',
+      toeflRequirement: '100',
+      schoolType: 'iOffer Cooperation'
+    },
+    'UCLA': {
+      location: 'Los Angeles, CA',
+      tuition: '$44,066',
+      toeflRequirement: '96',
+      schoolType: 'iOffer Cooperation'
+    },
+    'Cornell': {
+      location: 'Ithaca, NY',
+      tuition: '$60,286',
+      toeflRequirement: '100',
+      schoolType: 'One Click Apply'
+    },
+    'USC': {
+      location: 'Los Angeles, CA',
+      tuition: '$64,726',
+      toeflRequirement: '90',
+      schoolType: 'iOffer Cooperation'
+    },
+    'Purdue': {
+      location: 'West Lafayette, IN',
+      tuition: '$29,132',
+      toeflRequirement: '88',
+      schoolType: 'iOffer Cooperation'
+    },
+    'UC Irvine': {
+      location: 'Irvine, CA',
+      tuition: '$44,007',
+      toeflRequirement: '80',
+      schoolType: 'iOffer Cooperation'
+    }
+  }
+
+  for (const [key, info] of Object.entries(schoolMappings)) {
+    if (schoolName.includes(key)) {
+      return {
+        duration: '2 years',
+        admissionRate: '15-25%',
+        ...info
+      }
+    }
+  }
+
+  return {
+    location: 'USA',
+    tuition: '$45,000',
+    duration: '2 years',
+    toeflRequirement: '90',
+    admissionRate: '20%',
+    schoolType: 'Regular'
+  }
+}
+
+// 根据评分确定类别
+function getCategoryFromScores(scores: any): string {
+  const avgScore = ((scores.academic || 0) + (scores.fit || 0)) / 2
+  if (avgScore >= 4.5) return 'target'
+  if (avgScore >= 3.5) return 'fit'
+  return 'safety'
+}
+
 export class ChatController {
 
   static async sendMessage(req: AuthRequest, res: Response, next: NextFunction) {
@@ -92,14 +253,14 @@ export class ChatController {
             user_id: userId,
             team_type: "STUDENT_INFO"
           }, {
-            timeout: 30000,
+            timeout: 300000,
             headers: {
               'Content-Type': 'application/json'
             }
           })
 
           profileExtraction = extractionResponse.data
-          logger.info(`Profile extraction result:`, profileExtraction)
+          logger.info('Profile extraction result', profileExtraction)
 
           // 简单的资料信息检测 - 检查消息是否包含有用的学术信息
           const hasAcademicInfo = message.toLowerCase().includes('gpa') ||
@@ -160,17 +321,17 @@ export class ChatController {
                       updatedAt: new Date()
                     }
                   })
-                  logger.info(`Profile data saved to database for user ${userId}:`, extractedData)
+                  logger.info('Profile data saved to database for user', { userId, extractedData })
                 } catch (saveError) {
-                  logger.error('Failed to save profile data to database:', saveError)
+                  logger.error('Failed to save profile data to database', saveError)
                 }
               }
             } catch (saveError) {
-              logger.error('Failed to auto-save profile data:', saveError)
+              logger.error('Failed to auto-save profile data', saveError)
             }
           }
         } catch (error) {
-          logger.warn('Profile extraction failed:', error)
+          logger.warn('Profile extraction failed', error)
         }
       }
 
@@ -182,7 +343,7 @@ export class ChatController {
             where: { userId }
           })
           if (userProfile) {
-            logger.info(`Retrieved user profile for personalized recommendation:`, {
+            logger.info('Retrieved user profile for personalized recommendation', {
               userId,
               gpa: userProfile.gpa,
               major: userProfile.major,
@@ -192,7 +353,7 @@ export class ChatController {
             })
           }
         } catch (error) {
-          logger.warn('Failed to retrieve user profile:', error)
+          logger.warn('Failed to retrieve user profile', error)
         }
       }
 
@@ -226,7 +387,7 @@ export class ChatController {
 
         // 先尝试调用新的AI服务
         const aiServiceResponse = await axios.post(`${process.env.AI_SERVICE_URL}/chat/message`, aiRequest, {
-          timeout: 120000, // 2分钟超时，给AI团队足够时间生成推荐
+          timeout: 300000, // 5分钟超时，给AI团队足够时间生成推荐
           headers: {
             'Content-Type': 'application/json'
           }
@@ -248,15 +409,116 @@ export class ChatController {
             strategy: aiServiceResponse.data.strategy,
             source: aiServiceResponse.data.source
           }
-          logger.info(`AI service responded with team: ${aiServiceResponse.data.team_used}`)
+          logger.info('AI service responded with team', { team: aiServiceResponse.data.team_used })
 
-          // 保存AI回复到数据库（如果有chat_messages表）
+          // 检测是否为学校推荐响应并保存到数据库
+          if (userId && isSchoolRecommendationResponse(cleanedContent)) {
+            try {
+              // 解析推荐数据
+              const recommendations = parseSchoolRecommendations(cleanedContent)
+
+              // 获取用户资料快照
+              const userProfile = await prisma.user_profiles.findUnique({
+                where: { userId }
+              })
+
+              // 保存AI推荐记录
+              const recommendationRecord = await prisma.ai_recommendations.create({
+                data: {
+                  userId,
+                  sessionId,
+                  originalQuery: message,
+                  queryType: 'school_recommendation',
+                  aiResponse: cleanedContent,
+                  teamUsed: aiServiceResponse.data.team_used,
+                  confidence: aiServiceResponse.data.rag_similarity || 0.9,
+                  thinkingProcess: aiServiceResponse.data.thinking_process,
+                  strategy: aiServiceResponse.data.strategy,
+                  source: aiServiceResponse.data.source,
+                  recommendedSchools: recommendations,
+                  totalSchools: recommendations.length,
+                  userProfileSnapshot: userProfile ? {
+                    gpa: userProfile.gpa,
+                    major: userProfile.major,
+                    toefl: userProfile.toefl,
+                    gre: userProfile.gre,
+                    nationality: userProfile.nationality,
+                    goals: userProfile.goals,
+                    experiences: userProfile.experiences
+                  } : undefined
+                }
+              })
+
+              // 保存每个推荐学校的详细信息
+              if (recommendations.length > 0) {
+                await prisma.ai_recommendation_schools.createMany({
+                  data: recommendations.map((school: any) => ({
+                    recommendationId: recommendationRecord.id,
+                    schoolName: school.schoolName,
+                    programName: school.programName,
+                    academicScore: school.academicScore,
+                    practicalScore: school.practicalScore,
+                    languageScore: school.languageScore,
+                    fitScore: school.fitScore,
+                    strategistNote: school.strategistNote,
+                    analysisContent: school.analysisContent,
+                    location: school.location,
+                    tuition: school.tuition,
+                    duration: school.duration,
+                    toeflRequirement: school.toeflRequirement,
+                    admissionRate: school.admissionRate,
+                    category: school.category,
+                    schoolType: school.schoolType,
+                    displayOrder: school.displayOrder
+                  }))
+                })
+              }
+
+              logger.info('AI recommendation saved to database')
+
+              // 在响应中包含推荐ID
+              ;(aiResponse as any).recommendationId = recommendationRecord.id
+
+            } catch (saveError) {
+              logger.error('Failed to save AI recommendation to database', saveError)
+            }
+          }
+
+          // 保存普通聊天消息到数据库
           if (userId) {
             try {
-              // 暂时跳过聊天消息保存，直到chat_messages表实现
-              logger.info('Chat message would be saved to database when chat_messages table is implemented')
+              // 保存用户消息
+              await prisma.chat_messages.create({
+                data: {
+                  id: `msg_${Date.now()}_user`,
+                  userId,
+                  sessionId,
+                  content: message,
+                  type: 'USER'
+                }
+              })
+
+              // 保存AI回复消息
+              await prisma.chat_messages.create({
+                data: {
+                  id: `msg_${Date.now()}_ai`,
+                  userId,
+                  sessionId,
+                  content: cleanedContent,
+                  type: 'ASSISTANT',
+                  metadata: {
+                    teamUsed: aiServiceResponse.data.team_used,
+                    confidence: aiServiceResponse.data.rag_similarity,
+                    thinkingProcess: aiServiceResponse.data.thinking_process,
+                    strategy: aiServiceResponse.data.strategy,
+                    source: aiServiceResponse.data.source
+                  }
+                }
+              })
+
+              logger.info('Chat messages saved to database')
             } catch (error) {
-              logger.warn('Chat message save skipped:', error)
+              logger.warn('Failed to save chat messages', error)
             }
           }
         } else {
@@ -286,7 +548,7 @@ export class ChatController {
         }
       }
 
-      logger.info(`Message sent by user: ${userId}`)
+      logger.info('Message sent by user', { userId })
 
       res.json({
         message: 'Message sent successfully',
@@ -359,7 +621,7 @@ export class ChatController {
         messageCount: 0
       }
 
-      logger.info(`Mock chat session created: ${mockSession.id}`)
+      logger.info('Mock chat session created', { sessionId: mockSession.id })
 
       res.status(201).json({
         message: 'Session created successfully',
@@ -397,7 +659,7 @@ export class ChatController {
       }
 
       // 暂时返回成功，因为chat模型还未实现
-      logger.info(`Mock chat session deletion: ${sessionId}`)
+      logger.info('Mock chat session deletion', { sessionId })
 
       res.json({
         message: 'Session deleted successfully'
@@ -414,7 +676,7 @@ export class ChatController {
       // TODO: 处理文件上传（需要multer配置）
       // const file = req.file
 
-      logger.info(`File uploaded by user: ${userId}`)
+      logger.info('File uploaded by user', { userId })
 
       res.json({
         message: 'File uploaded successfully',
@@ -467,7 +729,7 @@ export class ChatController {
       // 更新用户资料功能已移除UnifiedProfileService依赖
       const updatedProfile = null
 
-      logger.info(`Profile updated for user: ${userId}`, extractedData)
+      logger.info('Profile updated for user', { userId, extractedData })
 
       res.json({
         success: true,
@@ -476,7 +738,7 @@ export class ChatController {
       })
 
     } catch (error) {
-      logger.error('Profile update confirmation error:', error)
+      logger.error('Profile update confirmation error', error)
       next(error)
     }
   }
