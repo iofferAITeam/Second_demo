@@ -23,9 +23,10 @@ interface ServiceUsage {
 interface AccountStatusTableProps {
   usageData: ServiceUsage[]
   onPricingClick: () => void
+  isPremium?: boolean
 }
 
-export default function AccountStatusTable({ usageData, onPricingClick }: AccountStatusTableProps) {
+export default function AccountStatusTable({ usageData, onPricingClick, isPremium = false }: AccountStatusTableProps) {
   return (
     <Card className="flex-1 h-full min-h-[320px] shadow-[0px_0px_100px_0px_rgba(28,93,255,0.16)] border-0 bg-white rounded-[20px] min-w-0 flex flex-col">
       <CardHeader className="pb-6">
@@ -90,14 +91,25 @@ export default function AccountStatusTable({ usageData, onPricingClick }: Accoun
           </Table>
         </div>
 
-        {/* Pricing Button */}
+        {/* Pricing Button or Contact Support Button */}
         <div className="flex justify-end mt-auto">
-          <Button 
-            onClick={onPricingClick}
-            className="bg-black text-white text-[16px] font-normal font-['PingFang_SC'] rounded-[1000px] px-4 py-3 h-auto hover:bg-gray-800 w-full sm:w-auto"
-          >
-            iOffer Pricing
-          </Button>
+          {isPremium ? (
+            <Button 
+              onClick={() => {
+                console.log('Contact Support clicked')
+              }}
+              className="border border-black text-black text-[14px] font-normal font-['PingFang_SC'] rounded-[1000px] px-3 py-2 h-auto hover:bg-gray-100 w-full sm:w-auto"
+            >
+              Contact Support
+            </Button>
+          ) : (
+            <Button 
+              onClick={onPricingClick}
+              className="bg-black text-white text-[16px] font-normal font-['PingFang_SC'] rounded-[1000px] px-4 py-3 h-auto hover:bg-gray-800 w-full sm:w-auto"
+            >
+              iOffer Pricing
+            </Button>
+          )}
         </div>
       </CardContent>
     </Card>

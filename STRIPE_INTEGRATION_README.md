@@ -17,10 +17,26 @@ The integration includes:
 - `backend/src/config/stripe.ts` - Stripe configuration
 - `backend/src/routes/index.ts` - Added payments route
 - `backend/package.json` - Added Stripe dependency
+- `backend/prisma/schema.prisma` - Added premium subscription fields
+
+### Database Changes:
+- Added premium subscription fields to `users` table:
+  - `isPremium` (Boolean) - Whether user has premium subscription
+  - `subscriptionStatus` (Enum) - ACTIVE, INACTIVE, TRIAL, CANCELLED, EXPIRED, PAST_DUE
+  - `stripeCustomerId` (String) - Stripe customer ID
+  - `stripeSubscriptionId` (String) - Stripe subscription ID
+  - `subscriptionStartDate` (DateTime) - When subscription started
+  - `subscriptionEndDate` (DateTime) - When subscription expires
+  - `subscriptionPlan` (String) - Plan type (e.g., 'premium')
+  - `paymentMethod` (String) - Payment method used
+  - `lastPaymentDate` (DateTime) - Last payment date
+  - `nextPaymentDate` (DateTime) - Next payment due date
 
 ### API Endpoints:
 - `POST /api/payments/create-payment-intent` - Create payment intent
 - `POST /api/payments/confirm-payment` - Confirm payment
+- `POST /api/payments/handle-successful-payment` - Update user subscription after successful payment
+- `GET /api/payments/subscription-status/:userId` - Get user subscription status
 - `GET /api/payments/payment-status/:id` - Get payment status
 - `POST /api/payments/create-customer` - Create customer (optional)
 - `POST /api/payments/webhook` - Stripe webhook endpoint
@@ -28,13 +44,14 @@ The integration includes:
 ## Frontend Integration
 
 ### Files Added/Modified:
-- `frontend/src/lib/stripe.ts` - Stripe service functions
-- `frontend/src/components/payments/StripePayment.tsx` - Stripe payment component
+- `frontend/src/lib/stripe.ts` - Stripe service functions (updated with subscription handling)
+- `frontend/src/components/payments/StripePayment.tsx` - Stripe payment component (updated to handle subscription updates)
 - `frontend/src/components/payments/Payment.tsx` - Updated to integrate Stripe
 - `frontend/src/styles/stripe-payment.css` - Stripe payment styles
 - `frontend/src/app/globals.css` - Added Stripe styles import
-- `frontend/src/app/api/payments/*` - API route proxies
+- `frontend/src/app/api/payments/*` - API route proxies (including new subscription endpoints)
 - `frontend/src/app/payments/success/page.tsx` - Payment success page
+- `frontend/src/hooks/useSubscription.ts` - Hook for checking subscription status
 - `frontend/package.json` - Added Stripe dependencies
 
 ## Configuration

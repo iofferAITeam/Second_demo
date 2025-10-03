@@ -71,6 +71,10 @@ export interface User {
   language: string
   notifications: boolean
   theme: string
+  // Premium subscription fields
+  isPremium?: boolean
+  subscriptionStatus?: 'INACTIVE' | 'ACTIVE' | 'TRIAL' | 'CANCELLED' | 'EXPIRED' | 'PAST_DUE'
+  subscriptionEndDate?: Date
 }
 
 // New structured response from backend

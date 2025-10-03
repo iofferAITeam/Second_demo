@@ -11,6 +11,9 @@ export function useProfile() {
   const [error, setError] = useState<string | null>(null)
   const { user, isAuthenticated } = useAuth()
 
+  // Use user data from useAuth instead of making separate API call
+  const userFromAuth = user
+
   // 自动加载用户Profile数据
   const loadProfile = async () => {
     if (!isAuthenticated) {
@@ -226,7 +229,7 @@ export function useProfile() {
   return {
     // 状态
     profileData,
-    user: profileData?.user || null,
+    user: userFromAuth, // Use user from auth instead of profile API
     formData: profileData?.profileData || null,
     isLoading,
     error,

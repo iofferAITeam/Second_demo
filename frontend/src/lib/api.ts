@@ -1,6 +1,6 @@
 import { getToken, getUserIdFromToken } from './auth'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
 
 export interface ApiResponse<T = any> {
   success?: boolean

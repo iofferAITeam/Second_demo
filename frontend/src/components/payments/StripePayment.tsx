@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Elements, PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
-import { getStripe, paymentService } from "@/lib/stripe";
+import { useAuth } from "@/hooks/useAuth";
 
 interface StripePaymentProps {
   amount: number;
@@ -13,46 +12,53 @@ interface StripePaymentProps {
 }
 
 function StripePaymentForm({ amount, currency = 'usd', onSuccess, onError, onCancel }: StripePaymentProps) {
-  const stripe = useStripe();
-  const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    if (!stripe || !elements) {
-      return;
-    }
 
     setIsProcessing(true);
     setError(null);
 
     try {
-      // Create payment intent
-      const { clientSecret } = await paymentService.createPaymentIntent(amount, currency, {
-        service: 'iOffer Premium Subscription',
-        user_agent: navigator.userAgent,
-        timestamp: new Date().toISOString()
-      });
-
-      // Confirm payment with Stripe
-      const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/payments/success`,
+      // Get card number from form
+      const cardNumberInput = document.getElementById('card-number') as HTMLInputElement;
+      const cardNumber = cardNumberInput?.value?.replace(/\s/g, '') || '';
+      
+      // Simulate payment processing with test payment API
+      const userId = user?.id;
+      
+      if (!userId) {
+        setError('User not authenticated');
+        onError('User not authenticated');
+        setIsProcessing(false);
+        return;
+      }
+      
+      console.log('Processing payment for user:', userId);
+      
+      // Call the payment processing API with card number
+      const response = await fetch('/api/payments/process-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        redirect: 'if_required',
+        body: JSON.stringify({ userId, cardNumber }),
       });
 
-      if (stripeError) {
-        setError(stripeError.message || 'Payment failed');
-        onError(stripeError.message || 'Payment failed');
-      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-        onSuccess(paymentIntent.id);
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Payment successful
+        const paymentIntentId = 'test-payment-' + Date.now();
+        onSuccess(paymentIntentId);
       } else {
-        setError('Payment was not completed');
-        onError('Payment was not completed');
+        // Payment failed
+        const errorMessage = data.error || 'Payment failed';
+        setError(errorMessage);
+        onError(errorMessage);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
@@ -64,91 +70,137 @@ function StripePaymentForm({ amount, currency = 'usd', onSuccess, onError, onCan
   };
 
   return (
-    <form onSubmit={handleSubmit} className="stripe-payment-form">
+    <form onSubmit={handleSubmit} className="stripe-payment-form" style={{ 
+      padding: '20px',
+      minHeight: '400px',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
       <div className="payment-element-container">
-        <PaymentElement 
-          options={{
-            layout: 'tabs',
-            fields: {
-              billingDetails: 'auto'
-            }
-          }}
-        />
+        <div className="payment-form-fields" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            <label htmlFor="card-number" style={{ fontWeight: 'bold', fontSize: '14px' }}>Card Number</label>
+            <input
+              type="text"
+              id="card-number"
+              placeholder="1234 5678 9012 3456"
+              className="payment-input"
+              required
+              style={{ 
+                padding: '10px', 
+                border: '1px solid #ddd', 
+                borderRadius: '4px', 
+                fontSize: '16px' 
+              }}
+            />
+          </div>
+          
+          <div className="form-row" style={{ display: 'flex', gap: '10px' }}>
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1 }}>
+              <label htmlFor="expiry" style={{ fontWeight: 'bold', fontSize: '14px' }}>Expiry Date</label>
+              <input
+                type="text"
+                id="expiry"
+                placeholder="MM/YY"
+                className="payment-input"
+                required
+                style={{ 
+                  padding: '10px', 
+                  border: '1px solid #ddd', 
+                  borderRadius: '4px', 
+                  fontSize: '16px' 
+                }}
+              />
+            </div>
+            
+            <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px', flex: 1 }}>
+              <label htmlFor="cvc" style={{ fontWeight: 'bold', fontSize: '14px' }}>CVC</label>
+              <input
+                type="text"
+                id="cvc"
+                placeholder="123"
+                className="payment-input"
+                required
+                style={{ 
+                  padding: '10px', 
+                  border: '1px solid #ddd', 
+                  borderRadius: '4px', 
+                  fontSize: '16px' 
+                }}
+              />
+            </div>
+          </div>
+          
+          <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+            <label htmlFor="cardholder" style={{ fontWeight: 'bold', fontSize: '14px' }}>Cardholder Name</label>
+            <input
+              type="text"
+              id="cardholder"
+              placeholder="John Doe"
+              className="payment-input"
+              required
+              style={{ 
+                padding: '10px', 
+                border: '1px solid #ddd', 
+                borderRadius: '4px', 
+                fontSize: '16px' 
+              }}
+            />
+          </div>
+        </div>
       </div>
       
       {error && (
-        <div className="payment-error">
-          <p>{error}</p>
+        <div className="payment-error" style={{ 
+          background: '#fee', 
+          border: '1px solid #fcc', 
+          borderRadius: '4px', 
+          padding: '10px', 
+          color: '#c33',
+          marginTop: '10px'
+        }}>
+          <p style={{ margin: 0 }}>{error}</p>
         </div>
       )}
 
-      <div className="payment-actions">
-        <button
-          type="button"
-          onClick={onCancel}
-          className="payment-button secondary"
-          disabled={isProcessing}
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="payment-button primary"
-          disabled={!stripe || !elements || isProcessing}
-        >
-          {isProcessing ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
-        </button>
+      {/* FORCE REFRESH - Simple test buttons */}
+      <div id="payment-buttons-container" style={{ 
+        marginTop: '30px', 
+      }}>
+        
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            id="pay-now-btn"
+            type="submit"
+            style={{ 
+              padding: '15px 25px',
+              border: '3px solid #1C5DFF',
+              borderRadius: '8px',
+              background: '#1C5DFF',
+              color: 'white',
+              fontSize: '16px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              minWidth: '150px'
+            }}
+          >
+            ✅ {isProcessing ? 'Processing...' : `Pay $${amount.toFixed(2)}`}
+          </button>
+        </div>
       </div>
     </form>
   );
 }
 
 export default function StripePayment({ amount, currency, onSuccess, onError, onCancel }: StripePaymentProps) {
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  const initializePayment = async () => {
-    setIsLoading(true);
-    try {
-      const { clientSecret: secret } = await paymentService.createPaymentIntent(amount, currency, {
-        service: 'iOffer Premium Subscription',
-        user_agent: navigator.userAgent,
-        timestamp: new Date().toISOString()
-      });
-      setClientSecret(secret);
-    } catch (error) {
-      onError(error instanceof Error ? error.message : 'Failed to initialize payment');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  if (!clientSecret) {
-    return (
-      <div className="stripe-payment-initializer">
-        <button
-          onClick={initializePayment}
-          className="payment-button primary"
-          disabled={isLoading}
-        >
-          {isLoading ? 'Initializing...' : 'Initialize Payment'}
-        </button>
-      </div>
-    );
-  }
-
-  const stripePromise = getStripe();
-
   return (
-    <Elements stripe={stripePromise} options={{ clientSecret }}>
-      <StripePaymentForm
-        amount={amount}
-        currency={currency}
-        onSuccess={onSuccess}
-        onError={onError}
-        onCancel={onCancel}
-      />
-    </Elements>
+    <StripePaymentForm
+      amount={amount}
+      currency={currency}
+      onSuccess={onSuccess}
+      onError={onError}
+      onCancel={onCancel}
+    />
   );
 }
 

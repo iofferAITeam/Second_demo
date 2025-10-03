@@ -2,6 +2,9 @@ import { Router, Request, Response } from 'express'
 import { stripe, paymentConfig } from '../config/stripe'
 import { logger } from '../utils/logger'
 import Stripe from 'stripe'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
 
 const router = Router()
 
@@ -82,6 +85,68 @@ router.post('/confirm-payment', async (req: Request, res: Response) => {
   }
 })
 
+// Handle successful payment and update user subscription
+router.post('/handle-successful-payment', async (req: Request, res: Response) => {
+  try {
+    const { paymentIntentId, userId } = req.body
+
+    if (!paymentIntentId || !userId) {
+      return res.status(400).json({
+        error: 'Payment intent ID and user ID are required'
+      })
+    }
+
+    // Retrieve payment intent from Stripe
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
+
+    if (!paymentIntent || paymentIntent.status !== 'succeeded') {
+      return res.status(400).json({
+        error: 'Payment not successful'
+      })
+    }
+
+    // Calculate subscription end date (1 month from now)
+    const subscriptionStartDate = new Date()
+    const subscriptionEndDate = new Date()
+    subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1)
+
+    // Update user subscription status
+    const updatedUser = await prisma.users.update({
+      where: { id: userId },
+      data: {
+        isPremium: true,
+        subscriptionStatus: 'ACTIVE',
+        stripeCustomerId: paymentIntent.customer as string || null,
+        subscriptionStartDate: subscriptionStartDate,
+        subscriptionEndDate: subscriptionEndDate,
+        subscriptionPlan: 'premium',
+        paymentMethod: 'stripe',
+        lastPaymentDate: new Date(),
+        nextPaymentDate: subscriptionEndDate
+      }
+    })
+
+    logger.info(`User ${userId} subscription updated to premium`)
+
+    res.json({
+      success: true,
+      message: 'Subscription activated successfully',
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        isPremium: updatedUser.isPremium,
+        subscriptionStatus: updatedUser.subscriptionStatus,
+        subscriptionEndDate: updatedUser.subscriptionEndDate
+      }
+    })
+  } catch (error) {
+    logger.error('Error handling successful payment:', error)
+    res.status(500).json({
+      error: 'Failed to update subscription'
+    })
+  }
+})
+
 // Get payment status
 router.get('/payment-status/:paymentIntentId', async (req: Request, res: Response) => {
   try {
@@ -129,6 +194,127 @@ router.post('/create-customer', async (req: Request, res: Response) => {
     logger.error('Error creating customer:', error)
     res.status(500).json({
       error: 'Failed to create customer'
+    })
+  }
+})
+
+// Get user subscription status
+router.get('/subscription-status/:userId', async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params
+
+    const user = await prisma.users.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        isPremium: true,
+        subscriptionStatus: true,
+        subscriptionStartDate: true,
+        subscriptionEndDate: true,
+        subscriptionPlan: true,
+        paymentMethod: true,
+        lastPaymentDate: true,
+        nextPaymentDate: true
+      }
+    })
+
+    if (!user) {
+      return res.status(404).json({
+        error: 'User not found'
+      })
+    }
+
+    // Check if subscription is expired
+    const now = new Date()
+    const isExpired = user.subscriptionEndDate && user.subscriptionEndDate < now
+
+    res.json({
+      success: true,
+      subscription: {
+        isPremium: user.isPremium && !isExpired,
+        status: isExpired ? 'EXPIRED' : user.subscriptionStatus,
+        plan: user.subscriptionPlan,
+        startDate: user.subscriptionStartDate,
+        endDate: user.subscriptionEndDate,
+        paymentMethod: user.paymentMethod,
+        lastPaymentDate: user.lastPaymentDate,
+        nextPaymentDate: user.nextPaymentDate,
+        isExpired: isExpired
+      }
+    })
+  } catch (error) {
+    logger.error('Error getting subscription status:', error)
+    res.status(500).json({
+      error: 'Failed to get subscription status'
+    })
+  }
+})
+
+// MAIN PAYMENT ENDPOINT: Process payment based on card number
+router.post('/process-payment', async (req: Request, res: Response) => {
+  try {
+    const { userId, cardNumber } = req.body
+
+    if (!userId) {
+      return res.status(400).json({
+        error: 'User ID is required'
+      })
+    }
+
+    // Check for failure test cards
+    if (cardNumber === '4000000000000002') {
+      return res.status(400).json({
+        success: false,
+        error: 'Your card was declined. Please try a different payment method.'
+      })
+    }
+
+    if (cardNumber === '4000000000009995') {
+      return res.status(400).json({
+        success: false,
+        error: 'Insufficient funds. Please try a different payment method.'
+      })
+    }
+
+    // Calculate subscription end date (1 month from now)
+    const subscriptionStartDate = new Date()
+    const subscriptionEndDate = new Date()
+    subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1)
+
+    // Update user subscription status
+    const updatedUser = await prisma.users.update({
+      where: { id: userId },
+      data: {
+        isPremium: true,
+        subscriptionStatus: 'ACTIVE',
+        stripeCustomerId: 'test_customer_' + Date.now(),
+        subscriptionStartDate: subscriptionStartDate,
+        subscriptionEndDate: subscriptionEndDate,
+        subscriptionPlan: 'premium',
+        paymentMethod: 'test',
+        lastPaymentDate: new Date(),
+        nextPaymentDate: subscriptionEndDate
+      }
+    })
+
+    logger.info(`TEST: User ${userId} subscription updated to premium`)
+
+    res.json({
+      success: true,
+      message: 'TEST: Subscription activated successfully',
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        isPremium: updatedUser.isPremium,
+        subscriptionStatus: updatedUser.subscriptionStatus,
+        subscriptionEndDate: updatedUser.subscriptionEndDate
+      }
+    })
+  } catch (error) {
+    logger.error('Error in test payment:', error)
+    res.status(500).json({
+      error: 'Failed to update subscription'
     })
   }
 })

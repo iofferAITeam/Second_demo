@@ -32,7 +32,11 @@ export class UserController {
           createdAt: true,
           language: true,
           notifications: true,
-          theme: true
+          theme: true,
+          // Premium subscription fields
+          isPremium: true,
+          subscriptionStatus: true,
+          subscriptionEndDate: true
         }
       })
 

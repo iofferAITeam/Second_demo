@@ -78,6 +78,71 @@ export const paymentService = {
       console.error('Error getting payment status:', error)
       throw error
     }
+  },
+
+  // Handle successful payment and update user subscription
+  async handleSuccessfulPayment(paymentIntentId: string, userId: string) {
+    try {
+      const response = await fetch('/api/payments/handle-successful-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          paymentIntentId,
+          userId
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update subscription')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error handling successful payment:', error)
+      throw error
+    }
+  },
+
+  // Get user subscription status
+  async getSubscriptionStatus(userId: string) {
+    try {
+      const response = await fetch(`/api/payments/subscription-status/${userId}`)
+
+      if (!response.ok) {
+        throw new Error('Failed to get subscription status')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error getting subscription status:', error)
+      throw error
+    }
+  },
+
+  // MAIN PAYMENT FUNCTION: Process payment for user
+  async processPayment(userId: string) {
+    try {
+      const response = await fetch('/api/payments/process-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to process payment')
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error processing payment:', error)
+      throw error
+    }
   }
 }
 

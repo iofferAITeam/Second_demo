@@ -206,8 +206,11 @@ class AuthService {
     if (!this.state.isAuthenticated) return
 
     try {
+      console.log('AuthService: Refreshing user data...')
       const response = await apiClient.verify()
       if (response.user) {
+        console.log('AuthService: User data refreshed:', response.user)
+        console.log('AuthService: New isPremium status:', response.user.isPremium)
         this.setState({ user: response.user })
       }
     } catch (error) {

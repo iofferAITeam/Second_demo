@@ -235,6 +235,19 @@ model users {
   theme                 String          @default("light")
   refreshToken          String?
   refreshTokenExpiresAt DateTime?
+  
+  // Premium subscription fields
+  isPremium             Boolean         @default(false)
+  subscriptionStatus    SubscriptionStatus @default(INACTIVE)
+  stripeCustomerId      String?
+  stripeSubscriptionId String?
+  subscriptionStartDate DateTime?
+  subscriptionEndDate   DateTime?
+  subscriptionPlan      String?         // 'premium', 'basic', etc.
+  paymentMethod         String?         // 'stripe', 'paypal', etc.
+  lastPaymentDate       DateTime?
+  nextPaymentDate       DateTime?
+  
   applications          applications[]
   chat_messages         chat_messages[]
   chat_sessions         chat_sessions[]
@@ -274,6 +287,15 @@ enum MessageType {
   USER
   ASSISTANT
   SYSTEM
+}
+
+enum SubscriptionStatus {
+  INACTIVE
+  ACTIVE
+  TRIAL
+  CANCELLED
+  EXPIRED
+  PAST_DUE
 }
 
 // 用户申请历史追踪

@@ -1,17 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useProfile } from '@/hooks/useProfile'
+import { useAuth } from '@/hooks/useAuth'
 import UserProfileCard from '@/components/profile/UserProfileCard'
 import AccountStatusTable from '@/components/profile/AccountStatusTable'
 import UpgradeBanner from '@/components/profile/UpgradeBanner'
 import EditProfileModal from '@/components/profile/EditProfileModal'
 import Navbar from '@/components/shared/Navbar'
+import PaymentModalContainer from '@/components/payments/Payment'
 
 export default function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
   const [avatarCacheBuster, setAvatarCacheBuster] = useState(0)
   const { user, formData, isLoading, error, saveProfile, uploadAvatar } = useProfile()
+  const { refreshUser } = useAuth()
 
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
   const avatarUrl = user?.avatar ? `${API_BASE_URL}${user.avatar}?v=${avatarCacheBuster}&t=${Date.now()}&bust=${Math.random()}` : undefined
@@ -41,15 +45,26 @@ export default function ProfilePage() {
   }
 
   const handlePricingClick = () => {
-    // TODO: Implement pricing page navigation
     console.log('Pricing clicked')
-    // Navigate to pricing page or open pricing modal
+    setIsPaymentModalOpen(true)
   }
 
   const handleUpgradeClick = () => {
-    // TODO: Implement upgrade functionality
     console.log('Upgrade clicked')
-    // Navigate to upgrade page or open upgrade modal
+    setIsPaymentModalOpen(true)
+  }
+
+  const handlePaymentSuccess = async () => {
+    console.log('Payment success - refreshing user data')
+    try {
+      await refreshUser()
+      console.log('User data refreshed successfully')
+      // No need to reload the page - React will re-render with updated data
+    } catch (error) {
+      console.error('Failed to refresh user data:', error)
+      // Fallback: reload page if refresh fails
+      window.location.reload()
+    }
   }
 
   const handleSaveProfile = async (data: any) => {
@@ -131,8 +146,8 @@ export default function ProfilePage() {
                     createdAt: user.createdAt.toString()
                   }}
                   subscription={{
-                    plan: 'FREE', // This could come from user data
-                    status: 'active'
+                    plan: user.isPremium ? 'Pro-AI' : 'Free',
+                    status: user.isPremium ? 'premium' : 'free'
                   }}
                   onEdit={handleEdit}
                   onAvatarUpdate={handleAvatarUpdate}
@@ -145,14 +160,17 @@ export default function ProfilePage() {
                 <AccountStatusTable
                   usageData={usageData}
                   onPricingClick={handlePricingClick}
+                  isPremium={user.isPremium}
                 />
               </div>
             </div>
 
-            {/* Bottom Row - Upgrade Banner */}
-            <div className="!mt-6">
-              <UpgradeBanner onUpgradeClick={handleUpgradeClick} />
-            </div>
+            {/* Bottom Row - Upgrade Banner (only for free users) */}
+            {!user.isPremium && (
+              <div className="!mt-6">
+                <UpgradeBanner onUpgradeClick={handleUpgradeClick} />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -174,6 +192,22 @@ export default function ProfilePage() {
               onAvatarUpload={handleAvatarUpdate}
             />
       )}
+
+      {/* Payment Modal */}
+      <PaymentModalContainer
+        key={isPaymentModalOpen ? 'open' : 'closed'}
+        isOpen={isPaymentModalOpen}
+        onClose={() => {
+          console.log('PaymentModal onClose called - closing modal');
+          console.log('Current isPaymentModalOpen:', isPaymentModalOpen);
+          setIsPaymentModalOpen(false);
+          console.log('Set isPaymentModalOpen to false');
+        }}
+        onPayment={() => {
+          console.log("Payment processing completed!");
+        }}
+        onPaymentSuccess={handlePaymentSuccess}
+      />
     </div>
   )
 }
