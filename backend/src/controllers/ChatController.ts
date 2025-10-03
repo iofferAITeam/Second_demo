@@ -83,29 +83,44 @@ function isSchoolRecommendationResponse(content: string): boolean {
 
 // 解析学校推荐数据
 function parseSchoolRecommendations(content: string) {
-  const detailRegex = /(\d+)\.\s+([^(]+?)(?:\([^)]+\))?\s*\n([\s\S]*?)(?=\d+\.\s+[A-Z]|$)/g
+  // 更准确的正则表达式，匹配格式："数字. 学校名称 - 项目名称"
+  const schoolRegex = /(\d+)\.\s+([^-\n]+?)(?:\s*-\s*([^\n]+?))?\s*\n\*?\s*([\s\S]*?)(?=\n\d+\.\s+[A-Z]|\n---|\n### |$)/g
   let match
   const recommendations = []
 
-  while ((match = detailRegex.exec(content)) !== null) {
+  while ((match = schoolRegex.exec(content)) !== null) {
     const id = match[1]
-    const name = match[2].trim()
-    const details = match[3]
+    let schoolName = match[2].trim()
+    const programName = match[3] ? match[3].trim() : 'Master of Science in Computer Science'
+    const details = match[4]
+
+    // 清理学校名称，移除括号中的内容和额外空格
+    schoolName = schoolName.replace(/\s*\([^)]*\)/, '').trim()
+
+    // 跳过非学校条目（如描述性文本）
+    if (schoolName.length > 100 || (!schoolName.includes('University') && !schoolName.includes('College') && !schoolName.includes('Institute'))) {
+      continue
+    }
 
     // 提取评分
-    const academicMatch = details.match(/Academic Background Score:\s*(\d+)\/5/)
-    const practicalMatch = details.match(/Practical Experience Score:\s*(\d+)\/5/)
-    const languageMatch = details.match(/Language Proficiency Score:\s*(\d+)\/5/)
-    const fitMatch = details.match(/Overall Fit Score:\s*(\d+)\/5/)
+    const academicMatch = details.match(/Academic Background Score:\s*(\d+(?:\.\d+)?)\/5/)
+    const practicalMatch = details.match(/Practical Experience Score:\s*(\d+(?:\.\d+)?)\/5/)
+    const languageMatch = details.match(/Language Proficiency Score:\s*(\d+(?:\.\d+)?)\/5/)
+    const fitMatch = details.match(/Overall Fit Score:\s*(\d+(?:\.\d+)?)\/5/)
     const noteMatch = details.match(/Strategist's Note:\s*(.*?)(?=\n\d+\.|$)/s)
 
+    // 只有包含评分的才是真正的学校推荐
+    if (!academicMatch && !practicalMatch && !languageMatch && !fitMatch) {
+      continue
+    }
+
     // 推断学校详细信息
-    const schoolInfo = getSchoolInfo(name)
+    const schoolInfo = getSchoolInfo(schoolName)
 
     recommendations.push({
       id,
-      schoolName: name,
-      programName: 'Master of Science in Computer Science',
+      schoolName: schoolName,
+      programName: programName,
       academicScore: academicMatch ? parseFloat(academicMatch[1]) : null,
       practicalScore: practicalMatch ? parseFloat(practicalMatch[1]) : null,
       languageScore: languageMatch ? parseFloat(languageMatch[1]) : null,
@@ -222,7 +237,7 @@ export class ChatController {
   static async sendMessage(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const userId = req.user?.id
-      const { message, sessionId } = req.body
+      let { message, sessionId } = req.body
 
       if (!message) {
         return res.status(400).json({
@@ -230,18 +245,33 @@ export class ChatController {
         })
       }
 
-      // 暂时跳过数据库操作以避免Prisma错误
-      // let userMessage
-      // if (userId) {
-      //   userMessage = await prisma.chat_messages.create({
-      //     data: {
-      //       userId,
-      //       sessionId: sessionId || null,
-      //       content: message,
-      //       type: 'USER'
-      //     }
-      //   })
-      // }
+      // 确保存在有效的聊天会话
+      if (userId && sessionId) {
+        // 检查会话是否存在，如果不存在则创建
+        try {
+          let session = await prisma.chat_sessions.findUnique({
+            where: { id: sessionId }
+          })
+
+          if (!session) {
+            // 创建新会话
+            session = await prisma.chat_sessions.create({
+              data: {
+                id: sessionId,
+                userId,
+                title: '新的咨询',
+                createdAt: new Date(),
+                updatedAt: new Date()
+              }
+            })
+            logger.info('Created new chat session', { sessionId, userId })
+          }
+        } catch (sessionError) {
+          logger.warn('Failed to ensure session exists', sessionError)
+          // 如果会话创建失败，将 sessionId 设置为 null
+          sessionId = null
+        }
+      }
 
       // 提取用户资料信息
       let profileExtraction = null
@@ -611,23 +641,32 @@ export class ChatController {
         return res.status(401).json({ error: 'User not authenticated' })
       }
 
-      // 暂时返回模拟会话，因为chat模型还未实现
-      const mockSession = {
-        id: 'temp-session-' + Date.now(),
-        title: title || '新的咨询',
-        userId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        messageCount: 0
-      }
+      // 创建真实的聊天会话
+      const session = await prisma.chat_sessions.create({
+        data: {
+          id: 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+          userId,
+          title: title || '新的咨询',
+          createdAt: new Date(),
+          updatedAt: new Date()
+        }
+      })
 
-      logger.info('Mock chat session created', { sessionId: mockSession.id })
+      logger.info('Chat session created', { sessionId: session.id, userId })
 
       res.status(201).json({
         message: 'Session created successfully',
-        session: mockSession
+        session: {
+          id: session.id,
+          title: session.title,
+          userId: session.userId,
+          createdAt: session.createdAt.toISOString(),
+          updatedAt: session.updatedAt.toISOString(),
+          messageCount: 0
+        }
       })
     } catch (error) {
+      logger.error('Failed to create chat session', error)
       next(error)
     }
   }
@@ -640,11 +679,31 @@ export class ChatController {
         return res.status(401).json({ error: 'User not authenticated' })
       }
 
-      // 暂时返回空会话列表，因为chat模型还未实现
+      // 从数据库获取用户的聊天会话
+      const sessions = await prisma.chat_sessions.findMany({
+        where: { userId },
+        orderBy: { updatedAt: 'desc' },
+        include: {
+          _count: {
+            select: { chat_messages: true }
+          }
+        }
+      })
+
+      const formattedSessions = sessions.map(session => ({
+        id: session.id,
+        title: session.title,
+        userId: session.userId,
+        createdAt: session.createdAt.toISOString(),
+        updatedAt: session.updatedAt.toISOString(),
+        messageCount: session._count.chat_messages
+      }))
+
       res.json({
-        sessions: []
+        sessions: formattedSessions
       })
     } catch (error) {
+      logger.error('Failed to get chat sessions', error)
       next(error)
     }
   }

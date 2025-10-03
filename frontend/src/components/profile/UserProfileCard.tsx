@@ -5,7 +5,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Edit, Check, X } from 'lucide-react'
 
 interface UserProfileCardProps {
   user: {
@@ -39,7 +38,11 @@ export default function UserProfileCard({
   const maskedEmail = user.email.replace(/(.{3})(.*)(@.*)/, '$1******$3')
   
   // Mask phone for privacy (show first 3 and last 4 digits)
-  const maskedPhone = user.phone ? user.phone.replace(/(\+\d{2}-\d{3})(.*)(\d{4})/, '$1****$3') : ''
+  const maskedPhone = user.phone ?
+    user.phone.length > 7 ?
+      user.phone.substring(0, 3) + '****' + user.phone.substring(user.phone.length - 4)
+      : user.phone
+    : ''
 
   const handleAvatarClick = () => {
     fileInputRef.current?.click()
@@ -99,13 +102,17 @@ export default function UserProfileCard({
                   className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
                   style={{ zIndex: 10, position: 'relative' }}
                   onError={(e) => {
-                    e.currentTarget.style.display = 'none'
+                    const target = e.currentTarget;
+                    target.style.display = 'none';
+                    // Show fallback text
+                    const fallback = target.nextElementSibling as HTMLElement;
+                    if (fallback) fallback.style.zIndex = '10';
                   }}
                 />
               ) : null}
-              <div 
+              <div
                 className="absolute inset-0 flex items-center justify-center text-white text-xl font-semibold pointer-events-none"
-                style={{ zIndex: 5 }}
+                style={{ zIndex: user.avatar ? 5 : 10 }}
               >
                 {user.name ? user.name.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase()}
               </div>
@@ -119,7 +126,7 @@ export default function UserProfileCard({
           <div className="flex-1 flex flex-col gap-3 min-w-0">
             {/* Name and Edit Button */}
             <div className="flex items-center justify-between w-full">
-              <h2 className="text-[20px] font-semibold text-black leading-none font-['PingFang_SC'] truncate">
+              <h2 className="text-[20px] font-semibold text-black leading-none font-['PingFang SC'] truncate">
                 {user.name || 'User'}
               </h2>
               <Button
@@ -131,13 +138,15 @@ export default function UserProfileCard({
                 }}
                 className="text-[#1c5dff] hover:text-blue-700 hover:bg-blue-50 p-1 h-auto font-normal"
               >
-                <Edit className="w-4 h-4 mr-1" />
+                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
                 <span className="font-['Inter']">Edit</span>
               </Button>
             </div>
 
             {/* Contact Info */}
-            <div className="flex flex-col gap-2 text-[14px] text-[#96a3c2] font-['PingFang_SC'] leading-none">
+            <div className="flex flex-col gap-2 text-[14px] text-[#96a3c2] font-['PingFang SC'] leading-none">
               <a 
                 href={`mailto:${user.email}`}
                 className="hover:text-blue-600 transition-colors cursor-pointer truncate"
@@ -159,7 +168,9 @@ export default function UserProfileCard({
                     onClick={handlePhoneSave}
                     className="h-6 w-6 p-0 bg-green-600 hover:bg-green-700"
                   >
-                    <Check className="w-3 h-3" />
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
                   </Button>
                   <Button
                     size="sm"
@@ -167,7 +178,9 @@ export default function UserProfileCard({
                     onClick={handlePhoneCancel}
                     className="h-6 w-6 p-0"
                   >
-                    <X className="w-3 h-3" />
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                   </Button>
                 </div>
               ) : (

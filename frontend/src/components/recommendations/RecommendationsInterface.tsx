@@ -1,8 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CompetitivenessChart from "./CompetitivenessChart";
 import SchoolRecommendationCard from "./SchoolRecommendationCard";
+import { api } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 import "../../styles/recommendations.css";
 
 interface SchoolData {
@@ -19,6 +22,12 @@ interface SchoolData {
   category: "target" | "fit" | "safety";
   employment: string;
   schoolType: string;
+  // Additional fields for AI recommendations
+  academic?: number;
+  practical?: number;
+  language?: number;
+  fit?: number;
+  note?: string;
 }
 
 const mockSchoolData: SchoolData[] = [
@@ -85,12 +94,237 @@ const mockSchoolData: SchoolData[] = [
 ];
 
 export default function RecommendationsInterface() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading, user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
+  const [schoolData, setSchoolData] = useState<SchoolData[]>(mockSchoolData);
+  const [originalQuery, setOriginalQuery] = useState<string>("");
+  const [isAIData, setIsAIData] = useState<boolean>(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
+  const [fullAIResponse, setFullAIResponse] = useState<string>("");
+
+  // Load AI recommendations from database on component mount
+  useEffect(() => {
+    // Wait for auth loading to complete
+    if (isLoading) {
+      return;
+    }
+
+    // Check if user is authenticated
+    if (!isAuthenticated) {
+      console.warn('User not authenticated, redirecting to login');
+      router.push('/auth?redirect=/recommendations');
+      return;
+    }
+
+    console.log('User authenticated:', user?.email);
+
+    // Load current user profile
+    const loadCurrentUserProfile = async () => {
+      try {
+        const profileResponse = await api.getProfile();
+        setCurrentUserProfile(profileResponse);
+      } catch (error) {
+        console.error('Failed to load current user profile:', error);
+      }
+    };
+
+    loadCurrentUserProfile();
+
+    const loadRecommendations = async () => {
+      try {
+        // First try to get the latest AI recommendation from database
+        const dbResponse = await api.getLatestRecommendation()
+
+        if (dbResponse.hasRecommendations && dbResponse.recommendation) {
+          const recommendation = dbResponse.recommendation
+
+          // Convert database data to SchoolData format
+          const convertedData: SchoolData[] = recommendation.schools.map((school: any) => ({
+            id: school.id,
+            name: school.name,
+            program: school.program,
+            location: school.location || getLocationForSchool(school.name),
+            duration: school.duration || "2 years",
+            tuition: school.tuition || getTuitionForSchool(school.name),
+            toefl: school.toefl || getToeflForSchool(school.name),
+            admissionRate: school.admissionRate || `${Math.round(100 - (school.academic || 0) * 5 - (school.fit || 0) * 5)}%`,
+            fitScore: school.fitScore,
+            fitLabel: school.fitLabel,
+            category: school.category as "target" | "fit" | "safety",
+            employment: "High employment rate",
+            schoolType: school.schoolType,
+            academic: school.academic,
+            practical: school.practical,
+            language: school.language,
+            fit: school.fit,
+            note: school.note
+          }))
+
+          setSchoolData(convertedData)
+          setOriginalQuery(recommendation.originalQuery)
+          setFullAIResponse(recommendation.aiResponse)
+          setUserProfile(dbResponse.userProfile)
+          setIsAIData(true)
+
+          console.info(`Loaded AI recommendation from database: ${recommendation.id}`)
+          return // Successfully loaded from database, skip localStorage
+        }
+      } catch (error) {
+        console.warn('Failed to load recommendation from database:', error)
+      }
+
+      // Fallback to localStorage if database load fails
+      const aiRecommendations = localStorage.getItem('aiRecommendations');
+      const query = localStorage.getItem('originalQuery');
+      const profile = localStorage.getItem('userProfile');
+      const aiResponse = localStorage.getItem('fullAIResponse');
+
+      if (aiRecommendations && query) {
+      try {
+        const parsedData = JSON.parse(aiRecommendations);
+
+        // Convert AI data to SchoolData format
+        const convertedData: SchoolData[] = parsedData.map((school: any, index: number) => ({
+          id: school.id || (index + 1).toString(),
+          name: school.name,
+          program: school.program || "Master of Science in Computer Science",
+          location: getLocationForSchool(school.name),
+          duration: "2 years",
+          tuition: getTuitionForSchool(school.name),
+          toefl: getToeflForSchool(school.name),
+          admissionRate: `${Math.round(100 - (school.academic || 0) * 5 - (school.fit || 0) * 5)}%`,
+          fitScore: (school.fit || 0).toString(),
+          fitLabel: getFitLabel(school.fit || 0),
+          category: getCategoryFromScores(school),
+          employment: "High employment rate",
+          schoolType: getSchoolType(school.name),
+          academic: school.academic,
+          practical: school.practical,
+          language: school.language,
+          fit: school.fit,
+          note: school.note
+        }));
+
+        setSchoolData(convertedData);
+        setOriginalQuery(query);
+        setIsAIData(true);
+
+        // Load user profile and AI response if available
+        if (profile) {
+          try {
+            setUserProfile(JSON.parse(profile));
+          } catch (error) {
+            console.error('Failed to parse user profile:', error);
+          }
+        }
+
+        if (aiResponse) {
+          setFullAIResponse(aiResponse);
+        }
+
+          // Clear localStorage after loading
+          localStorage.removeItem('aiRecommendations');
+          localStorage.removeItem('originalQuery');
+          localStorage.removeItem('userProfile');
+          localStorage.removeItem('fullAIResponse');
+        } catch (error) {
+          console.error('Failed to parse AI recommendations:', error);
+          setSchoolData(mockSchoolData);
+        }
+      }
+    }
+
+    loadRecommendations()
+  }, [router, isAuthenticated, isLoading, user]);
+
+  // Helper functions to map AI data to display format
+  const getLocationForSchool = (name: string): string => {
+    const locationMap: { [key: string]: string } = {
+      'Carnegie Mellon': 'Pittsburgh, PA',
+      'UC Berkeley': 'Berkeley, CA',
+      'Stanford': 'Stanford, CA',
+      'University of Washington': 'Seattle, WA',
+      'Georgia Tech': 'Atlanta, GA',
+      'UCLA': 'Los Angeles, CA',
+      'Cornell': 'Ithaca, NY',
+      'USC': 'Los Angeles, CA',
+      'Purdue': 'West Lafayette, IN',
+      'UC Irvine': 'Irvine, CA'
+    };
+
+    for (const [key, location] of Object.entries(locationMap)) {
+      if (name.includes(key)) return location;
+    }
+    return "USA";
+  };
+
+  const getTuitionForSchool = (name: string): string => {
+    const tuitionMap: { [key: string]: string } = {
+      'Carnegie Mellon': '$58,924',
+      'UC Berkeley': '$44,007',
+      'Stanford': '$58,416',
+      'University of Washington': '$36,898',
+      'Georgia Tech': '$29,140',
+      'UCLA': '$44,066',
+      'Cornell': '$60,286',
+      'USC': '$64,726',
+      'Purdue': '$29,132',
+      'UC Irvine': '$44,007'
+    };
+
+    for (const [key, tuition] of Object.entries(tuitionMap)) {
+      if (name.includes(key)) return tuition;
+    }
+    return "$45,000";
+  };
+
+  const getToeflForSchool = (name: string): string => {
+    const toeflMap: { [key: string]: string } = {
+      'Carnegie Mellon': '102',
+      'UC Berkeley': '90',
+      'Stanford': '100',
+      'University of Washington': '92',
+      'Georgia Tech': '100',
+      'UCLA': '96',
+      'Cornell': '100',
+      'USC': '90',
+      'Purdue': '88',
+      'UC Irvine': '80'
+    };
+
+    for (const [key, toefl] of Object.entries(toeflMap)) {
+      if (name.includes(key)) return toefl;
+    }
+    return "90";
+  };
+
+  const getFitLabel = (fitScore: number): string => {
+    if (fitScore >= 5) return "Perfect Fit";
+    if (fitScore >= 4) return "High Fit";
+    if (fitScore >= 3) return "Good Fit";
+    return "Medium Fit";
+  };
+
+  const getCategoryFromScores = (school: any): "target" | "fit" | "safety" => {
+    const avgScore = ((school.academic || 0) + (school.fit || 0)) / 2;
+    if (avgScore >= 4.5) return "target";
+    if (avgScore >= 3.5) return "fit";
+    return "safety";
+  };
+
+  const getSchoolType = (name: string): string => {
+    const prestigeSchools = ['Stanford', 'Carnegie Mellon', 'UC Berkeley', 'Cornell'];
+    for (const school of prestigeSchools) {
+      if (name.includes(school)) return "One Click Apply";
+    }
+    return "iOffer Cooperation";
+  };
 
   const getCategoryCount = (category: string) => {
-    return mockSchoolData.filter((school) => school.category === category)
-      .length;
+    return schoolData.filter((school) => school.category === category).length;
   };
 
   const toggleSidebar = () => {
@@ -99,8 +333,20 @@ export default function RecommendationsInterface() {
 
   const filteredSchools =
     selectedCategory === "all"
-      ? mockSchoolData
-      : mockSchoolData.filter((school) => school.category === selectedCategory);
+      ? schoolData
+      : schoolData.filter((school) => school.category === selectedCategory);
+
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="recommendations-layout">
@@ -587,8 +833,17 @@ export default function RecommendationsInterface() {
                   />
                 </div>
                 <div className="user-details">
-                  <div className="user-name">Nickyouth</div>
-                  <div className="user-badge">iOFFER Pro</div>
+                  <div className="user-name">
+                    {currentUserProfile?.user?.name ||
+                     userProfile?.name ||
+                     currentUserProfile?.user?.email?.split('@')[0] ||
+                     userProfile?.email?.split('@')[0] ||
+                     user?.email?.split('@')[0] ||
+                     'User'}
+                  </div>
+                  <div className="user-badge">
+                    {isAIData ? 'AI Analysis' : 'iOFFER Pro'}
+                  </div>
                 </div>
                 <svg
                   width="16"
@@ -606,35 +861,13 @@ export default function RecommendationsInterface() {
               </div>
             </div>
 
-            {/* Language Selector */}
-            <div className="language-selector">
-              <div className="language-selector-content">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  className="globe-icon"
-                >
-                  <circle cx="10" cy="10" r="9" stroke="currentColor" />
-                  <ellipse
-                    cx="10"
-                    cy="10"
-                    rx="4"
-                    ry="9"
-                    stroke="currentColor"
-                  />
-                  <path d="M1 10H19" stroke="currentColor" />
-                </svg>
-                <span className="nav-text">EN</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="main-content">
+
         {/* Main Header - Contains the report title and info */}
         <div className="main-header">
           <div className="main-header-content">
@@ -655,39 +888,39 @@ export default function RecommendationsInterface() {
                   fill="#1C5DFF"
                 />
                 <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M3.15918 11.3684H36.841C36.841 11.3684 35.5455 26.1053 35.5455 29.8947C35.5455 33.6842 36.841 40 36.841 40H3.15918C3.15918 40 4.45463 33.6842 4.45463 29.8947C4.45463 26.1053 3.15918 11.3684 3.15918 11.3684Z"
                   fill="#1C5DFF"
                 />
                 <path
                   opacity="0.6"
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M9 24C9 24 13.4423 26.0979 20 26.0979C26.5577 26.0979 31 24 31 24L30 40H10.0183L9 24Z"
                   fill="url(#paint0_linear_215_12725)"
                 />
                 <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M15.25 21.8948C12.6266 21.8948 10.5 20.0097 10.5 17.6843C10.5 15.158 13.8749 15.6654 15.6597 14.6958C17.4445 13.7261 17.3751 13.0527 20 13.0527C22.6282 13.0527 22.5617 13.7148 24.3468 14.6812C25.9122 15.5286 29.5 15.158 29.5 17.6843C29.5 20.0097 27.3734 21.8948 24.75 21.8948C22.1266 21.8948 20 21.0624 20 18.7369C19.936 21.0129 17.833 21.8948 15.25 21.8948Z"
                   fill="white"
                 />
                 <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M19.5372 14.6441C19.8144 14.4475 20.1856 14.4475 20.4628 14.6441L22.7016 16.2318C23.3376 16.6828 23.0186 17.6843 22.2389 17.6843H17.7611C16.9814 17.6843 16.6624 16.6828 17.2984 16.2318L19.5372 14.6441Z"
                   fill="black"
                 />
                 <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M7.04545 4.21045C7.04545 4.21045 3.1067 4.50316 1 7.20777C3.1067 7.63596 3.74367 9.26308 3.74367 9.26308L5.78053 7.55794L7.04545 4.21045Z"
                   fill="#1C5DFF"
                 />
                 <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
                   d="M32.9545 4.21045C32.9545 4.21045 36.8933 4.50316 39 7.20777C36.8933 7.63596 36.2563 9.26308 36.2563 9.26308L34.2195 7.55794L32.9545 4.21045Z"
                   fill="#1C5DFF"
                 />
@@ -698,43 +931,43 @@ export default function RecommendationsInterface() {
                 <path
                   d="M11.364 17.0402C11.364 17.0402 9.42081 15.5065 4.88672 16.1638"
                   stroke="white"
-                  stroke-width="0.5"
-                  stroke-linecap="round"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
                 />
                 <path
                   d="M11.364 17.9335C11.364 17.9335 8.77308 17.4952 4.88672 19.2481"
                   stroke="white"
-                  stroke-width="0.5"
-                  stroke-linecap="round"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
                 />
                 <path
                   d="M11.7963 19.2654C11.7963 19.2654 8.55762 19.2654 6.18262 21.8946"
                   stroke="white"
-                  stroke-width="0.5"
-                  stroke-linecap="round"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
                 />
                 <path
                   d="M28.636 17.0402C28.636 17.0402 30.5792 15.5065 35.1133 16.1638"
                   stroke="white"
-                  stroke-width="0.5"
-                  stroke-linecap="round"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
                 />
                 <path
                   d="M28.636 17.9335C28.636 17.9335 31.2269 17.4952 35.1133 19.2481"
                   stroke="white"
-                  stroke-width="0.5"
-                  stroke-linecap="round"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
                 />
                 <path
                   d="M28.2037 19.2654C28.2037 19.2654 31.4424 19.2654 33.8174 21.8946"
                   stroke="white"
-                  stroke-width="0.5"
-                  stroke-linecap="round"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
                 />
                 <g filter="url(#filter0_i_215_12725)">
                   <path
-                    fill-rule="evenodd"
-                    clip-rule="evenodd"
+                    fillRule="evenodd"
+                    clipRule="evenodd"
                     d="M1 10.4688C1 9.48655 1.5954 8.60706 2.52413 8.28738C5.58183 7.23492 12.7909 5.05273 20 5.05273C27.2091 5.05273 34.4182 7.23492 37.4759 8.28738C38.4046 8.60705 39 9.48655 39 10.4688V10.5228C39 11.9369 37.5658 12.9327 36.2188 12.5021C32.7071 11.3793 26.3536 9.68431 20 9.68431C13.6464 9.68431 7.29286 11.3793 3.78118 12.5021C2.43423 12.9327 1 11.9369 1 10.5228V10.4688Z"
                     fill="url(#paint1_linear_215_12725)"
                   />
@@ -743,15 +976,15 @@ export default function RecommendationsInterface() {
                   opacity="0.6"
                   d="M5.53418 8.84235C6.22494 8.44476 7.67543 8.00024 8.12509 8.00024"
                   stroke="white"
-                  stroke-width="0.5"
-                  stroke-linecap="round"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
                 />
                 <path
                   opacity="0.6"
                   d="M9.63672 7.64889C9.90791 7.57893 10.223 7.50898 10.5004 7.50898"
                   stroke="white"
-                  stroke-width="0.5"
-                  stroke-linecap="round"
+                  strokeWidth="0.5"
+                  strokeLinecap="round"
                 />
                 <defs>
                   <filter
@@ -761,9 +994,9 @@ export default function RecommendationsInterface() {
                     width="38"
                     height="7.55054"
                     filterUnits="userSpaceOnUse"
-                    color-interpolation-filters="sRGB"
+                    colorInterpolationFilters="sRGB"
                   >
-                    <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
                     <feBlend
                       mode="normal"
                       in="SourceGraphic"
@@ -802,8 +1035,8 @@ export default function RecommendationsInterface() {
                     y2="36.2155"
                     gradientUnits="userSpaceOnUse"
                   >
-                    <stop stop-color="white" />
-                    <stop offset="1" stop-color="white" stop-opacity="0.01" />
+                    <stop stopColor="white" />
+                    <stop offset="1" stopColor="white" stopOpacity="0.01" />
                   </linearGradient>
                   <linearGradient
                     id="paint1_linear_215_12725"
@@ -813,15 +1046,15 @@ export default function RecommendationsInterface() {
                     y2="12.2753"
                     gradientUnits="userSpaceOnUse"
                   >
-                    <stop stop-color="#A7FFAC" />
-                    <stop offset="1" stop-color="#00BAFF" />
+                    <stop stopColor="#A7FFAC" />
+                    <stop offset="1" stopColor="#00BAFF" />
                   </linearGradient>
                 </defs>
               </svg>
             </div>
             <div>
               <h1 className="chat-title">
-                Nick&apos;s personalized school match report
+                {userProfile?.name || 'Your'}&apos;s personalized school match report
               </h1>
               <p className="chat-subtitle">generated on 2024/04/18</p>
             </div>
@@ -861,17 +1094,66 @@ export default function RecommendationsInterface() {
               <div className="chat-message">
                 <div className="chat-message-content">
                   <p className="chat-message-text">
-                    Hi Nick 🙌 Here&apos;s your personalized school match report
-                    based on the info you provided. I hope it helps you better
-                    understand your competitiveness and the schools that fit you
-                    best!
+                    Hi {userProfile?.name || 'there'} 🙌 Here&apos;s your personalized school match report
+                    {isAIData ? ' generated by AI analysis' : ' based on the info you provided'}.
+                    I hope it helps you better understand your competitiveness and the schools that fit you best!
                   </p>
                 </div>
               </div>
 
+              {/* Profile Summary */}
+              {userProfile && isAIData && (
+                <div className="user-profile-summary-modern">
+                  <h4 className="profile-title">Your Profile Summary</h4>
+                  <div className="profile-stats-grid">
+                    {userProfile.gpa && (
+                      <div className="profile-stat-card">
+                        <div className="stat-label">GPA</div>
+                        <div className="stat-value">{userProfile.gpa}</div>
+                      </div>
+                    )}
+                    {userProfile.major && (
+                      <div className="profile-stat-card">
+                        <div className="stat-label">Major</div>
+                        <div className="stat-value">{userProfile.major}</div>
+                      </div>
+                    )}
+                    {userProfile.toefl && (
+                      <div className="profile-stat-card">
+                        <div className="stat-label">TOEFL</div>
+                        <div className="stat-value">{userProfile.toefl}</div>
+                      </div>
+                    )}
+                    {userProfile.gre && (
+                      <div className="profile-stat-card">
+                        <div className="stat-label">GRE</div>
+                        <div className="stat-value">{userProfile.gre}</div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="profile-bottom-row">
+                    {userProfile.nationality && (
+                      <div className="profile-nationality-card">
+                        <div className="stat-label">Nationality</div>
+                        <div className="stat-value">{userProfile.nationality}</div>
+                      </div>
+                    )}
+                    {userProfile.goals && (
+                      <div className="profile-goals-card">
+                        <div className="stat-label">Goals</div>
+                        <div className="stat-value">
+                          {userProfile.goals.length > 50
+                            ? `${userProfile.goals.substring(0, 50)}...`
+                            : userProfile.goals}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Competitiveness Assessment */}
-              <div className="assessment-card">
-                <div className="assessment-card-inner">
+              <div className="assessment-card-standalone">
                   <div className="assessment-header">
                     <h2 className="assessment-title">
                       Your Competitiveness Assessment
@@ -916,7 +1198,6 @@ export default function RecommendationsInterface() {
                       View All ↓
                     </button>
                   </div>
-                </div>
               </div>
 
               {/* Action Buttons */}
@@ -1070,10 +1351,81 @@ export default function RecommendationsInterface() {
                   <SchoolRecommendationCard key={school.id} school={school} />
                 ))}
               </div>
+
             </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// Helper component to render AI response content
+function AIResponseRenderer({ content }: { content: string }) {
+  // Split content into sections for better readability
+  const sections = content.split(/(?=\d+\.\s+[A-Z])/);
+
+  return (
+    <div className="ai-response-content">
+      {sections.map((section, index) => {
+        if (section.trim().length === 0) return null;
+
+        // Check if this is a university section
+        const isUniversitySection = new RegExp('^\\d+\\.\\s+[A-Z]').test(section.trim());
+
+        if (isUniversitySection) {
+          const lines = section.split('\n');
+          const title = lines[0];
+          const content = lines.slice(1).join('\n');
+
+          return (
+            <div key={index} className="university-analysis">
+              <h4 className="university-title">{title}</h4>
+              <div className="university-content">
+                {content.split('\n').map((line, lineIndex) => {
+                  if (line.trim().length === 0) return null;
+
+                  if (line.includes('Score:')) {
+                    return (
+                      <div key={lineIndex} className="score-line">
+                        {line.trim()}
+                      </div>
+                    );
+                  }
+
+                  if (line.includes("Strategist's Note:")) {
+                    return (
+                      <div key={lineIndex} className="strategist-note">
+                        <strong>💡 {line.trim()}</strong>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <p key={lineIndex} className="analysis-text">
+                      {line.trim()}
+                    </p>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        } else {
+          // General content section
+          return (
+            <div key={index} className="general-analysis">
+              {section.split('\n').map((line, lineIndex) => {
+                if (line.trim().length === 0) return null;
+                return (
+                  <p key={lineIndex} className="analysis-text">
+                    {line.trim()}
+                  </p>
+                );
+              })}
+            </div>
+          );
+        }
+      })}
     </div>
   );
 }

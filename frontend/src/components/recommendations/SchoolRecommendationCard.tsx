@@ -2,6 +2,7 @@
 
 import { RatingHex } from "./RatingHex";
 import { CardBackground } from "./CardBackground";
+import HexagonalRatings from "./HexagonalRatings";
 import "../../styles/recommendations.css";
 
 interface SchoolData {
@@ -18,6 +19,12 @@ interface SchoolData {
   category: "target" | "fit" | "safety";
   employment: string;
   schoolType: string;
+  // AI recommendation scores
+  academic?: number;
+  practical?: number;
+  language?: number;
+  fit?: number;
+  note?: string;
 }
 
 interface SchoolRecommendationCardProps {
@@ -52,45 +59,31 @@ export default function SchoolRecommendationCard({
           </div>
           <h4 className="card-program-title">{school.program}</h4>
           <div className="card-details">
-            {school.location?.trim() && (
-              <span className="card-location">📍 {school.location}</span>
-            )}
-            {school.duration?.trim() && (
-              <span className="pill-bullet pill-outline">
-                {school.duration}
-              </span>
-            )}
-            {school.tuition?.trim() && (
-              <span className="pill-bullet pill-outline">
-                Annual tuition {school.tuition}
-              </span>
-            )}
-            {school.toefl?.trim() && (
-              <span className="pill-bullet pill-outline">
-                TOEFL {school.toefl}
-              </span>
-            )}
-            {school.employment?.trim() && (
-              <span className="pill-bullet pill-blue-text">
-                {school.employment}
-              </span>
-            )}
+            <span className="card-location">📍 {school.location}</span>
+            <span className="pill-bullet pill-outline">{school.duration}</span>
+            <span className="pill-bullet pill-outline">
+              Annual tuition {school.tuition}
+            </span>
+            <span className="pill-bullet pill-outline">
+              TOEFL {school.toefl}
+            </span>
+            <span className="pill-bullet pill-blue-text">
+              {school.employment}
+            </span>
           </div>
         </div>
 
-        <div className="card-ratings">
-          <RatingHex
-            value={school.admissionRate}
-            label="Admission Rate"
-            color={colorKey}
-          />
-          <RatingHex
-            value={school.fitScore}
-            label={school.fitLabel}
-            color={colorKey}
-          />
-        </div>
-        <button className="analysis-button">View Analysis ↓</button>
+
+        {/* AI Rating Scores Section - Hexagonal Design */}
+        <HexagonalRatings
+          academic={school.academic}
+          practical={school.practical}
+          language={school.language}
+          fit={school.fit}
+          cardColor={colorKey}
+        />
+
+
       </div>
     </div>
   );

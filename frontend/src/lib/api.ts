@@ -1,6 +1,6 @@
 import { getToken, getUserIdFromToken } from './auth'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
 
 export interface ApiResponse<T = any> {
   success?: boolean
@@ -25,13 +25,27 @@ export interface ChatMessage {
 
 export interface ChatResponse {
   message: string
+  userMessage?: ChatMessage
+  aiResponse?: {
+    id: string
+    content: string
+    type: string
+    timestamp: string
+    teamUsed?: string
+    confidence?: number
+    thinkingProcess?: string
+    referenceLinks?: string[]
+    strategy?: string
+    source?: string
+    fallback?: boolean
+  }
+  // Legacy format support
   thinking_process?: string
   reference_links?: string[]
   strategy?: string
   source?: string
   rag_similarity?: number
-  team_used: string
-  timestamp: string
+  team_used?: string
   status?: string
   confidence?: number
   fallback?: boolean
@@ -100,8 +114,8 @@ class ApiClient {
 
   // Chat API
   async sendMessage(message: string, sessionId?: string): Promise<ChatResponse> {
-    // 使用正确的聊天端点（不需要 /api 前缀）
-    return this.request<ChatResponse>('/chat/message', {
+    // 使用正确的聊天端点
+    return this.request<ChatResponse>('/api/chat/message', {
       method: 'POST',
       body: JSON.stringify({
         message,
@@ -145,6 +159,19 @@ class ApiClient {
       method: 'PUT',
       body: JSON.stringify(data),
     })
+  }
+
+  // Recommendations API
+  async getLatestRecommendation() {
+    return this.request('/api/recommendations/latest')
+  }
+
+  async getRecommendationHistory(limit = 10, offset = 0) {
+    return this.request(`/api/recommendations/history?limit=${limit}&offset=${offset}`)
+  }
+
+  async getRecommendationById(recommendationId: string) {
+    return this.request(`/api/recommendations/${recommendationId}`)
   }
 
   // Upload API (when fixed)

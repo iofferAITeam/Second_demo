@@ -25,5 +25,5 @@ RUN npx prisma generate
 # 暴露端口
 EXPOSE 8001
 
-# 启动开发服务器
+# 启动开发服务器（跳过迁移直接启动）
 CMD ["npm", "run", "dev"]

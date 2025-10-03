@@ -39,13 +39,14 @@ model chat_messages {
 }
 
 model chat_sessions {
-  id            String          @id
-  userId        String
-  title         String?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime
-  chat_messages chat_messages[]
-  users         users           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String          @id
+  userId            String
+  title             String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime
+  chat_messages     chat_messages[]
+  ai_recommendations ai_recommendations[]
+  users             users           @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model essays {
@@ -241,6 +242,7 @@ model users {
   essays                essays[]
   user_profiles         user_profiles?
   application_history   user_application_history[]
+  ai_recommendations    ai_recommendations[]
 }
 
 enum ApplicationResult {
@@ -294,4 +296,94 @@ model user_application_history {
 
   @@index([userId])
   @@index([applicationYear])
+}
+
+// AI推荐记录表
+model ai_recommendations {
+  id                String    @id @default(uuid())
+  userId            String
+  sessionId         String?   // 关联聊天会话
+
+  // 查询相关
+  originalQuery     String    // 用户原始查询
+  queryType         String    @default("school_recommendation") // 查询类型
+
+  // AI响应数据
+  aiResponse        String    // 完整AI回复内容
+  teamUsed          String?   // 使用的AI团队
+  confidence        Float?    // AI置信度
+  thinkingProcess   String?   // AI思考过程
+  strategy          String?   // AI策略
+  source            String?   // 数据来源
+
+  // 推荐结果结构化数据
+  recommendedSchools Json     // 推荐学校列表 [{name, scores, analysis, etc}]
+  totalSchools      Int       @default(0)
+
+  // 用户资料快照 (推荐时的用户状态)
+  userProfileSnapshot Json?   // 推荐生成时的用户资料
+
+  // 推荐质量评估
+  relevanceScore    Float?    // 推荐相关性评分
+  isActive          Boolean   @default(true) // 是否为有效推荐
+
+  // 时间戳
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @default(now())
+
+  // 关联
+  users             users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat_sessions     chat_sessions? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  recommendation_schools ai_recommendation_schools[]
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([createdAt])
+  @@index([queryType])
+}
+
+// AI推荐学校详情表
+model ai_recommendation_schools {
+  id                   String    @id @default(uuid())
+  recommendationId     String    // 关联ai_recommendations
+
+  // 学校基本信息
+  schoolName           String
+  programName          String    @default("Master of Science in Computer Science")
+
+  // AI评分数据
+  academicScore        Float?    // 学术背景评分 (0-5)
+  practicalScore       Float?    // 实践经验评分 (0-5)
+  languageScore        Float?    // 语言能力评分 (0-5)
+  fitScore             Float?    // 整体匹配度评分 (0-5)
+
+  // 分析内容
+  strategistNote       String?   // 策略师建议
+  analysisContent      String?   // 详细分析内容
+
+  // 学校详细信息 (从AI解析或数据库匹配)
+  location            String?
+  tuition             String?
+  duration            String?
+  toeflRequirement    String?
+  admissionRate       String?
+
+  // 分类
+  category            String    @default("fit") // target, fit, safety
+  schoolType          String    @default("Regular") // One Click Apply, iOffer Cooperation, Regular
+
+  // 排序和显示
+  displayOrder        Int       @default(0)
+  isHighlighted       Boolean   @default(false)
+
+  // 时间戳
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @default(now())
+
+  // 关联
+  ai_recommendations  ai_recommendations @relation(fields: [recommendationId], references: [id], onDelete: Cascade)
+
+  @@index([recommendationId])
+  @@index([category])
+  @@index([fitScore])
 }

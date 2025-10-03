@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后端直接测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        pre {
+            white-space: pre-wrap;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 后端直接测试页面</h1>
+        <p>这个页面直接从后端服务器提供，避免了前端缓存问题。</p>
+
+        <div>
+            <button onclick="testLogin()">测试登录</button>
+            <button onclick="testAPI()">测试 API</button>
+            <button onclick="setToken()">设置令牌</button>
+            <button onclick="goToRecommendations()">访问推荐页面</button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function showResult(content, isSuccess = true) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result ' + (isSuccess ? 'success' : 'error');
+            resultDiv.innerHTML = content;
+        }
+
+        async function testLogin() {
+            showResult('正在测试登录...', true);
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: 'test@example.com',
+                        password: 'password123'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    localStorage.setItem('access_token', data.accessToken);
+                    localStorage.setItem('refresh_token', data.refreshToken);
+                    showResult(`
+                        <h3>✅ 登录成功！</h3>
+                        <p>用户: ${data.user.email}</p>
+                        <p>令牌已保存到 localStorage</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `, true);
+                } else {
+                    showResult(`
+                        <h3>❌ 登录失败</h3>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `, false);
+                }
+            } catch (error) {
+                showResult(`
+                    <h3>❌ 网络错误</h3>
+                    <p>${error.message}</p>
+                `, false);
+            }
+        }
+
+        async function testAPI() {
+            const token = localStorage.getItem('access_token') ||
+                'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItaWQiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU5NDU3NjQ1LCJleHAiOjE3NjAwNjI0NDV9.t8k8SwQia_CNG2AmWf1otS45wOJ0MzH5bvXub-zHlxg';
+
+            showResult('正在测试 API...', true);
+
+            try {
+                const response = await fetch('/api/recommendations/latest', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showResult(`
+                        <h3>✅ API 测试成功！</h3>
+                        <p>获取到 ${data.recommendation.schools.length} 个学校推荐</p>
+                        <p>用户档案: GPA ${data.userProfile.gpa}, TOEFL ${data.userProfile.toefl}</p>
+                        <details>
+                            <summary>查看完整数据</summary>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </details>
+                    `, true);
+                } else {
+                    showResult(`
+                        <h3>❌ API 调用失败</h3>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `, false);
+                }
+            } catch (error) {
+                showResult(`
+                    <h3>❌ API 错误</h3>
+                    <p>${error.message}</p>
+                `, false);
+            }
+        }
+
+        function setToken() {
+            const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItaWQiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU5NDU3NjQ1LCJleHAiOjE3NjAwNjI0NDV9.t8k8SwQia_CNG2AmWf1otS45wOJ0MzH5bvXub-zHlxg';
+            localStorage.setItem('access_token', token);
+            showResult(`
+                <h3>✅ 令牌已设置</h3>
+                <p>测试令牌已保存到 localStorage</p>
+                <p>现在可以访问需要认证的页面了</p>
+            `, true);
+        }
+
+        function goToRecommendations() {
+            window.open('http://localhost:3005/recommendations', '_blank');
+        }
+    </script>
+</body>
+</html>

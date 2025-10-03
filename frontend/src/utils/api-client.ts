@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 interface ApiResponse<T = any> {
   success?: boolean
@@ -70,7 +70,7 @@ class ApiClient {
       const response = await fetch(url, {
         method,
         headers: requestHeaders,
-        body: body ? JSON.stringify(body) : undefined,
+        body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : undefined,
         signal: controller.signal,
       })
 

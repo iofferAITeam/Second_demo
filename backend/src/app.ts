@@ -22,7 +22,7 @@ app.use(helmet({
 
 // 🌐 CORS配置
 app.use(cors({
-  origin: process.env.FRONTEND_URL || ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3007'],
+  origin: process.env.FRONTEND_URL || ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3005', 'http://localhost:3007'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
@@ -76,6 +76,9 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'), {
     }
   }
 }))
+
+// 📁 静态文件服务 - 用于提供测试页面
+app.use('/public', express.static(path.join(process.cwd(), 'public')))
 
 // 🔄 自动 Token 续期中间件
 app.use('/api', autoRefreshToken)

@@ -10,6 +10,11 @@ import { useAuth } from '@/hooks/useAuth'
 
 function Navbar() {
   const { user, isAuthenticated, signOut } = useAuth()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
 
   // 用户菜单配置
@@ -50,14 +55,15 @@ function Navbar() {
         <ul className="nav-links">
           <li><Link href="/home">Home</Link></li>
           <li><Link href="/chat" className="active">Chat</Link></li>
-          <li><a href="#">Features</a></li>
+          <li><Link href="/recommendations">Features</Link></li>
           <li><a href="#">FAQ</a></li>
           <li><a href="#">Contact</a></li>
         </ul>
 
         <div className="nav-right">
-
-          {isAuthenticated ? (
+          {!mounted ? (
+            <Link href="/auth" className="signup-button">Sign up / Log in</Link>
+          ) : isAuthenticated ? (
             <Dropdown
               menu={{ items: menuItems }}
               placement="bottomRight"
@@ -67,23 +73,6 @@ function Navbar() {
                 minWidth: '160px',
               }}
               overlayClassName="user-dropdown"
-              onOpenChange={(open: any) => {
-                if (open) {
-                  // 延迟执行，等待下拉菜单渲染
-                  setTimeout(() => {
-                    const dropdown = document.querySelector('.ant-dropdown:not([style*="display: none"])');
-                    if (dropdown) {
-                      const dropdownElement = dropdown as HTMLElement;
-                      dropdownElement.style.position = 'fixed';
-                      dropdownElement.style.top = '70px';
-                      dropdownElement.style.right = '20px';
-                      dropdownElement.style.left = 'auto';
-                      dropdownElement.style.transform = 'none';
-                      dropdownElement.style.zIndex = '9999';
-                    }
-                  }, 10);
-                }
-              }}
             >
               <div className="flex items-center cursor-pointer hover:opacity-80 transition-opacity" style={{gap: '15px'}}>
                 <Avatar
