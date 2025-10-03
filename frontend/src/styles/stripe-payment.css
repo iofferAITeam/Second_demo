@@ -1,0 +1,166 @@
+/* Stripe Payment Styles */
+.stripe-payment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.payment-element-container {
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+}
+
+.payment-error {
+  padding: 0.75rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.payment-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.payment-button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-width: 120px;
+}
+
+.payment-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.payment-button.primary {
+  background-color: #1C5DFF;
+  color: white;
+}
+
+.payment-button.primary:hover:not(:disabled) {
+  background-color: #1a4ce6;
+}
+
+.payment-button.secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.payment-button.secondary:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.stripe-payment-initializer {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.stripe-payment-container {
+  padding: 1.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+/* Stripe Elements styling */
+.StripeElement {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.StripeElement--focus {
+  border-color: #1C5DFF;
+  box-shadow: 0 0 0 3px rgba(28, 93, 255, 0.1);
+}
+
+.StripeElement--invalid {
+  border-color: #dc2626;
+}
+
+.StripeElement--complete {
+  border-color: #059669;
+}
+
+/* Payment form layout */
+.pricing-modal .stripe-payment-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .payment-actions {
+    flex-direction: column;
+  }
+  
+  .payment-button {
+    width: 100%;
+  }
+  
+  .stripe-payment-container {
+    padding: 1rem;
+  }
+}
+
+/* Loading states */
+.payment-button.processing {
+  position: relative;
+  color: transparent;
+}
+
+.payment-button.processing::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Success and error states */
+.payment-success {
+  color: #059669;
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+.payment-error {
+  color: #dc2626;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 0.75rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+}
+
+

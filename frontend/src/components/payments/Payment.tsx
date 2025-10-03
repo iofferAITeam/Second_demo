@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PricingModal from "./PricingModal";
 import PaymentSuccessModal from "./PaymentSuccessModal";
 import PaymentFailureModal from "./PaymentFailureModal";
@@ -10,6 +10,7 @@ interface PricingModalProps {
   isOpen: boolean;
   onClose: () => void;
   onPayment?: () => void;
+  onPaymentSuccess?: () => void;
   attemptCount?: number;
   onAttemptCountChange?: (count: number) => void;
 }
@@ -20,11 +21,20 @@ export default function PaymentModalContainer({
   isOpen,
   onClose,
   onPayment,
+  onPaymentSuccess,
   attemptCount = 0,
   onAttemptCountChange,
 }: PricingModalProps) {
   const [modalState, setModalState] = useState<ModalState>("pricing");
   const [paymentIntentId, setPaymentIntentId] = useState<string | null>(null);
+
+  // Reset modal state when modal is closed
+  useEffect(() => {
+    if (!isOpen) {
+      setModalState("pricing");
+      setPaymentIntentId(null);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -37,6 +47,7 @@ export default function PaymentModalContainer({
     setPaymentIntentId(intentId);
     setModalState("success");
     onPayment?.();
+    // Don't call onPaymentSuccess here - wait until success modal is closed
   };
 
   const handleStripeError = (error: string) => {
@@ -54,6 +65,14 @@ export default function PaymentModalContainer({
     onClose();
   };
 
+  const handleSuccessClose = () => {
+    // Close the entire modal flow when success modal is closed
+    console.log('Success modal closing - calling onClose()');
+    // Call the payment success handler now that user has seen the success modal
+    onPaymentSuccess?.();
+    onClose();
+  };
+
   const handleTryAgain = () => {
     setModalState("pricing");
   };
@@ -61,7 +80,7 @@ export default function PaymentModalContainer({
   const handleCheckOrder = () => {
     // This would typically navigate to order page or show order details
     console.log("Navigate to order page");
-    handleClose();
+    onClose();
   };
 
   return (
@@ -112,7 +131,7 @@ export default function PaymentModalContainer({
 
       <PaymentSuccessModal
         isOpen={modalState === "success"}
-        onClose={handleClose}
+        onClose={handleSuccessClose}
         onCheckOrder={handleCheckOrder}
       />
 

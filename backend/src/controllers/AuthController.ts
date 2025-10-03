@@ -157,7 +157,21 @@ export class AuthController {
       }
 
       const user = await prisma.users.findUnique({
-        where: { id: decoded.userId }
+        where: { id: decoded.userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          avatar: true,
+          createdAt: true,
+          language: true,
+          notifications: true,
+          theme: true,
+          // Premium subscription fields
+          isPremium: true,
+          subscriptionStatus: true,
+          subscriptionEndDate: true,
+        }
       })
 
       if (!user) {
@@ -176,6 +190,10 @@ export class AuthController {
             notifications: user.notifications,
             theme: user.theme,
           },
+          // Premium subscription fields
+          isPremium: user.isPremium,
+          subscriptionStatus: user.subscriptionStatus,
+          subscriptionEndDate: user.subscriptionEndDate,
         }
       })
     } catch (error) {

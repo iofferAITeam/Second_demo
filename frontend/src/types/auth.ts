@@ -10,6 +10,10 @@ export interface User {
     theme: "light" | "dark"
   }
   profile?: UserProfile
+  // Premium subscription fields
+  isPremium?: boolean
+  subscriptionStatus?: 'INACTIVE' | 'ACTIVE' | 'TRIAL' | 'CANCELLED' | 'EXPIRED' | 'PAST_DUE'
+  subscriptionEndDate?: Date
 }
 
 export interface UserProfile {
