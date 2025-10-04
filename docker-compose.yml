@@ -10,8 +10,7 @@ services:
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ioffer_postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ioffer_user} -d ${POSTGRES_DB:-ioffer_db}"]
@@ -29,18 +28,23 @@ services:
       - mongodb_data:/data/db
     restart: unless-stopped
 
-  # 数据库管理界面
-  adminer:
-    image: adminer:latest
-    container_name: ioffer-adminer
+  # 数据库管理界面 - Prisma Studio
+  prisma-studio:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prisma-studio
+    container_name: ioffer-prisma-studio
     ports:
-      - "8080:8080"
+      - "5556:5555"
     environment:
-      - ADMINER_DEFAULT_SERVER=postgres
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-ioffer_user}:${POSTGRES_PASSWORD:-ioffer_password}@postgres:5432/${POSTGRES_DB:-ioffer_db}
     depends_on:
-      - postgres
-      - mongodb
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
 
   # AI 服务 (Python FastAPI)
   ai-service:
@@ -49,9 +53,9 @@ services:
       dockerfile: Dockerfile
     container_name: ioffer-ai-service
     environment:
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-AIzaSyBFV9S68_FMSjqx6rEqduhrgEzH4YLSzZs}
-      - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY:-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}
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-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}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-your_gemini_api_key}
+      - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY:-your_perplexity_api_key}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-your_openai_api_key}
       - DATABASE_URL=postgresql://${POSTGRES_USER:-ioffer_user}:${POSTGRES_PASSWORD:-ioffer_password}@postgres:5432/${POSTGRES_DB:-ioffer_db}
       - SQL_DATABASE_URI=postgresql://${POSTGRES_USER:-ioffer_user}:${POSTGRES_PASSWORD:-ioffer_password}@postgres:5432/${POSTGRES_DB:-ioffer_db}
       - DATABASE_HOST=mongodb://mongodb:27017
@@ -84,9 +88,9 @@ services:
       - PORT=${BACKEND_PORT:-8001}
       - NODE_ENV=${NODE_ENV:-development}
       - AI_SERVICE_URL=http://ai-service:8000
-      - OPENAI_API_KEY=${OPENAI_API_KEY:-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}
-      - GEMINI_API_KEY=${GEMINI_API_KEY:-AIzaSyBFV9S68_FMSjqx6rEqduhrgEzH4YLSzZs}
-      - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY:-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}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-your_openai_api_key}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-your_gemini_api_key}
+      - PERPLEXITY_API_KEY=${PERPLEXITY_API_KEY:-your_perplexity_api_key}
     ports:
       - "${BACKEND_PORT:-8001}:8001"
     depends_on:
@@ -121,7 +125,7 @@ services:
       - /app/.next
 
 volumes:
-  postgres_data:
-    driver: local
+  ioffer_postgres_data:
+    external: true
   mongodb_data:
     driver: local

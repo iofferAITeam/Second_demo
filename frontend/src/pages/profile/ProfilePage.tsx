@@ -13,7 +13,7 @@ export default function ProfilePage() {
   const [avatarCacheBuster, setAvatarCacheBuster] = useState(0)
   const { user, formData, isLoading, error, saveProfile, uploadAvatar } = useProfile()
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8002'
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'
   const avatarUrl = user?.avatar ? `${API_BASE_URL}${user.avatar}?v=${avatarCacheBuster}&t=${Date.now()}&bust=${Math.random()}` : undefined
 
   const handleEdit = () => {

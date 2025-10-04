@@ -26,4 +26,7 @@ router.get('/preferences', authenticateToken, UserController.getPreferences)
 // 更新用户偏好设置
 router.put('/preferences', authenticateToken, UserController.updatePreferences)
 
+// 获取用户竞争力评估
+router.get('/competitiveness', authenticateToken, UserController.getCompetitiveness)
+
 export default router

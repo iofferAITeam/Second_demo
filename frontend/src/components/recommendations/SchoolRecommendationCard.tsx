@@ -59,19 +59,23 @@ export default function SchoolRecommendationCard({
   ];
 
   const getTabContent = (tab: string) => {
+    if (!school.analysisContent) {
+      return `Detailed ${tab.toLowerCase()} analysis for ${school.name} program.`;
+    }
+
     switch (tab) {
       case "Match Analysis":
-        return school.analysisContent.matchAnalysis;
+        return school.analysisContent.matchAnalysis || `Match analysis for ${school.name} program.`;
       case "Academic":
-        return school.analysisContent.academic;
+        return school.analysisContent.academic || `Academic assessment for ${school.name} program.`;
       case "Language":
-        return school.analysisContent.language;
+        return school.analysisContent.language || `Language requirements assessment for ${school.name} program.`;
       case "Specialization":
-        return school.analysisContent.specialization;
+        return school.analysisContent.specialization || `Specialization analysis for ${school.name} program.`;
       case "Professional Experience":
-        return school.analysisContent.professionalExperience;
+        return school.analysisContent.professionalExperience || `Professional experience evaluation for ${school.name} program.`;
       case "Preference & Other Advice":
-        return school.analysisContent.preferenceAdvice;
+        return school.analysisContent.preferenceAdvice || `Preference and advice for ${school.name} program.`;
       default:
         return `Detailed analysis for ${school.name} program.`;
     }
@@ -136,11 +140,6 @@ export default function SchoolRecommendationCard({
           </div>
 
           <div className="card-ratings">
-            <RatingHex
-              value={school.admissionRate}
-              label="Admission Rate"
-              color={colorKey}
-            />
             <RatingHex
               value={school.fitScore}
               label={school.fitLabel}

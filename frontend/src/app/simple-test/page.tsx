@@ -13,7 +13,7 @@ export default function SimpleTestPage() {
     try {
       console.log('🔍 Testing direct fetch to backend...')
 
-      const response = await fetch('http://localhost:8000/api/auth/login', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +51,7 @@ export default function SimpleTestPage() {
     try {
       console.log('🔍 Testing basic API connection...')
 
-      const response = await fetch('http://localhost:8000/api/recommendations/latest', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/api/recommendations/latest`, {
         method: 'GET',
         headers: {
           'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItaWQiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU5NDU3NjQ1LCJleHAiOjE3NjAwNjI0NDV9.t8k8SwQia_CNG2AmWf1otS45wOJ0MzH5bvXub-zHlxg',

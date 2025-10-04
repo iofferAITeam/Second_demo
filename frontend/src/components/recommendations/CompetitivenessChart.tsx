@@ -8,16 +8,20 @@ interface ChartData {
   color: string;
 }
 
-const chartData: ChartData[] = [
-  { label: "Academic Performance", value: 85, color: "#1890ff" },
-  { label: "Research Experience", value: 75, color: "#52c41a" },
-  { label: "Internship & Work Experience", value: 90, color: "#faad14" },
-  { label: "Extracurriculars", value: 70, color: "#f5222d" },
-  { label: "Standardized Test Score", value: 80, color: "#722ed1" },
-  { label: "Recommendation letters", value: 85, color: "#13c2c2" },
+interface CompetitivenessChartProps {
+  chartData?: ChartData[];
+}
+
+const defaultChartData: ChartData[] = [
+  { label: "Academic Performance", value: 95, color: "#1890ff" },
+  { label: "Research Experience", value: 50, color: "#52c41a" },
+  { label: "Internship & Work Experience", value: 50, color: "#faad14" },
+  { label: "Extracurriculars", value: 50, color: "#f5222d" },
+  { label: "Standardized Test Score", value: 75, color: "#722ed1" },
+  { label: "Recommendation letters", value: 60, color: "#13c2c2" },
 ];
 
-export default function CompetitivenessChart() {
+export default function CompetitivenessChart({ chartData = defaultChartData }: CompetitivenessChartProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {

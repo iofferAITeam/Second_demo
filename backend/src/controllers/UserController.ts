@@ -317,4 +317,238 @@ export class UserController {
       next(error)
     }
   }
+
+  static async getCompetitiveness(req: AuthRequest, res: Response, next: NextFunction) {
+    try {
+      const userId = req.userId
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' })
+      }
+
+      // Get user profile data
+      const profile = await prisma.user_profiles.findUnique({
+        where: { userId },
+        select: {
+          gpa: true,
+          toefl: true,
+          ielts: true,
+          gre: true,
+          gmat: true,
+          researchExperience: true,
+          workExperiences: true,
+          internshipExperiences: true,
+          extracurricularActivities: true,
+          awards: true,
+          recommendationLetters: true,
+          publications: true,
+          totalWorkMonths: true,
+          leadershipScore: true,
+          publicationCount: true,
+          hasResearchExperience: true,
+          gpaTag: true,
+          paperTag: true,
+          toeflTag: true,
+          greTag: true,
+          researchTag: true,
+          collegeTypeTag: true,
+          recommendationTag: true,
+          networkingTag: true
+        }
+      })
+
+      if (!profile) {
+        return res.status(404).json({ error: 'User profile not found' })
+      }
+
+      // Calculate competitiveness scores for each dimension
+      const scores = calculateCompetitivenessScores(profile)
+
+      res.json({
+        overallScore: scores.overallScore,
+        chartData: scores.chartData,
+        breakdown: scores.breakdown
+      })
+    } catch (error) {
+      logger.error('Get competitiveness error:', error)
+      next(error)
+    }
+  }
+}
+
+// Helper function to calculate competitiveness scores
+function calculateCompetitivenessScores(profile: any) {
+  // Academic Performance (GPA)
+  const academicScore = calculateAcademicScore(profile.gpa)
+
+  // Research Experience
+  const researchScore = calculateResearchScore(
+    profile.hasResearchExperience,
+    profile.publicationCount,
+    profile.researchExperience
+  )
+
+  // Work & Internship Experience
+  const workScore = calculateWorkScore(
+    profile.totalWorkMonths,
+    profile.workExperiences,
+    profile.internshipExperiences
+  )
+
+  // Extracurricular Activities
+  const extracurricularScore = calculateExtracurricularScore(
+    profile.extracurricularActivities,
+    profile.awards,
+    profile.leadershipScore
+  )
+
+  // Standardized Test Scores
+  const testScore = calculateTestScore(
+    profile.toefl,
+    profile.ielts,
+    profile.gre,
+    profile.gmat
+  )
+
+  // Recommendation Letters
+  const recommendationScore = calculateRecommendationScore(
+    profile.recommendationLetters
+  )
+
+  const chartData = [
+    { label: "Academic Performance", value: academicScore, color: "#1890ff" },
+    { label: "Research Experience", value: researchScore, color: "#52c41a" },
+    { label: "Internship & Work Experience", value: workScore, color: "#faad14" },
+    { label: "Extracurriculars", value: extracurricularScore, color: "#f5222d" },
+    { label: "Standardized Test Score", value: testScore, color: "#722ed1" },
+    { label: "Recommendation letters", value: recommendationScore, color: "#13c2c2" }
+  ]
+
+  // Calculate overall score (weighted average)
+  const overallScore = Math.round(
+    (academicScore * 0.25 +
+     researchScore * 0.20 +
+     workScore * 0.20 +
+     extracurricularScore * 0.15 +
+     testScore * 0.15 +
+     recommendationScore * 0.05)
+  )
+
+  return {
+    overallScore,
+    chartData,
+    breakdown: {
+      academic: academicScore,
+      research: researchScore,
+      work: workScore,
+      extracurricular: extracurricularScore,
+      test: testScore,
+      recommendation: recommendationScore
+    }
+  }
+}
+
+function calculateAcademicScore(gpa: number | null): number {
+  if (!gpa) return 50
+
+  // Convert GPA to 0-100 scale
+  if (gpa >= 3.8) return 95
+  if (gpa >= 3.5) return 85
+  if (gpa >= 3.2) return 75
+  if (gpa >= 3.0) return 65
+  if (gpa >= 2.7) return 55
+  return 45
+}
+
+function calculateResearchScore(hasResearch: boolean | null, publicationCount: number | null, researchExp: string | null): number {
+  let score = 50
+
+  if (hasResearch) score += 20
+  if (publicationCount && publicationCount > 0) score += publicationCount * 10
+  if (researchExp && researchExp.trim().length > 0) score += 15
+
+  return Math.min(score, 100)
+}
+
+function calculateWorkScore(totalMonths: number | null, workExp: any, internshipExp: any): number {
+  let score = 50
+
+  if (totalMonths && totalMonths > 0) {
+    score += Math.min(totalMonths * 2, 30)
+  }
+
+  if (workExp && Array.isArray(workExp) && workExp.length > 0) {
+    score += workExp.length * 5
+  }
+
+  if (internshipExp && Array.isArray(internshipExp) && internshipExp.length > 0) {
+    score += internshipExp.length * 3
+  }
+
+  return Math.min(score, 100)
+}
+
+function calculateExtracurricularScore(activities: any, awards: any, leadershipScore: number | null): number {
+  let score = 50
+
+  if (activities && Array.isArray(activities) && activities.length > 0) {
+    score += activities.length * 5
+  }
+
+  if (awards && Array.isArray(awards) && awards.length > 0) {
+    score += awards.length * 8
+  }
+
+  if (leadershipScore && leadershipScore > 0) {
+    score += leadershipScore * 10
+  }
+
+  return Math.min(score, 100)
+}
+
+function calculateTestScore(toefl: number | null, ielts: number | null, gre: number | null, gmat: number | null): number {
+  let score = 50
+
+  // TOEFL scoring
+  if (toefl) {
+    if (toefl >= 110) score += 25
+    else if (toefl >= 100) score += 20
+    else if (toefl >= 90) score += 15
+    else if (toefl >= 80) score += 10
+  }
+
+  // IELTS scoring
+  if (ielts) {
+    if (ielts >= 8.0) score += 25
+    else if (ielts >= 7.5) score += 20
+    else if (ielts >= 7.0) score += 15
+    else if (ielts >= 6.5) score += 10
+  }
+
+  // GRE scoring
+  if (gre) {
+    if (gre >= 330) score += 20
+    else if (gre >= 320) score += 15
+    else if (gre >= 310) score += 10
+    else if (gre >= 300) score += 5
+  }
+
+  // GMAT scoring
+  if (gmat) {
+    if (gmat >= 700) score += 20
+    else if (gmat >= 650) score += 15
+    else if (gmat >= 600) score += 10
+    else if (gmat >= 550) score += 5
+  }
+
+  return Math.min(score, 100)
+}
+
+function calculateRecommendationScore(recommendations: any): number {
+  if (!recommendations || !Array.isArray(recommendations)) return 60
+
+  let score = 60
+  score += recommendations.length * 10
+
+  return Math.min(score, 100)
 }

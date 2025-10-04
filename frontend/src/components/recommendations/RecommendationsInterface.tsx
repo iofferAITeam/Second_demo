@@ -6,6 +6,7 @@ import SchoolRecommendationCard from "./SchoolRecommendationCard";
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
+import { useCompetitiveness } from "@/hooks/useCompetitiveness";
 import "../../styles/recommendations.css";
 
 interface SchoolData {
@@ -122,23 +123,23 @@ const mockSchoolData: SchoolData[] = [
   },
   {
     id: "4",
-    name: "Stanford University",
+    name: "University of Washington",
     program: "Master of Science in Computer Science",
-    location: "Stanford, CA",
+    location: "Seattle, WA",
     duration: "2 years",
-    tuition: "$58,416",
+    tuition: "$42,000",
     toefl: "100",
     admissionRate: "89%",
     fitScore: "1.5",
-    fitLabel: "Perfect Fit",
+    fitLabel: "Good Fit",
     category: "safety",
     employment: "High employment rate",
     schoolType: "One Click Apply",
     analysisContent: {
       matchAnalysis:
-        "This Stanford University program shows excellent alignment with your academic background and career goals. The program's curriculum and research opportunities match well with your interests and qualifications.",
+        "This University of Washington program shows excellent alignment with your academic background and career goals. The program's curriculum and research opportunities match well with your interests and qualifications.",
       academic:
-        "Your academic credentials align well with Stanford University's admission standards. The program's rigorous curriculum will challenge you while building upon your existing knowledge base.",
+        "Your academic credentials align well with University of Washington's admission standards. The program's rigorous curriculum will challenge you while building upon your existing knowledge base.",
       language:
         "The TOEFL requirement of 100 matches your proficiency level. The university offers excellent language support services to help international students succeed.",
       specialization:
@@ -154,7 +155,8 @@ const mockSchoolData: SchoolData[] = [
 export default function RecommendationsInterface() {
   const router = useRouter();
   const { isAuthenticated, isLoading, user } = useAuth();
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const { data: competitivenessData, isLoading: competitivenessLoading } = useCompetitiveness();
+  const [selectedCategory, setSelectedCategory] = useState<string>("target");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(false);
   const [schoolData, setSchoolData] = useState<SchoolData[]>(mockSchoolData);
   const [originalQuery, setOriginalQuery] = useState<string>("");
@@ -185,7 +187,13 @@ export default function RecommendationsInterface() {
         const profileResponse = await api.getProfile();
         setCurrentUserProfile(profileResponse);
       } catch (error) {
-        console.error('Failed to load current user profile:', error);
+        console.warn('Failed to load current user profile, using default data:', error);
+        // 设置一个默认的用户profile，避免影响推荐功能
+        setCurrentUserProfile({
+          id: 'test-user-id',
+          email: user?.email || 'test@example.com',
+          name: user?.name || 'Test User'
+        });
       }
     };
 
@@ -202,23 +210,31 @@ export default function RecommendationsInterface() {
           // Convert database data to SchoolData format
           const convertedData: SchoolData[] = recommendation.schools.map((school: any) => ({
             id: school.id,
-            name: school.name,
-            program: school.program,
+            name: school.schoolName || school.name,
+            program: school.programName || school.program,
             location: school.location || getLocationForSchool(school.name),
             duration: school.duration || "2 years",
             tuition: school.tuition || getTuitionForSchool(school.name),
-            toefl: school.toefl || getToeflForSchool(school.name),
-            admissionRate: school.admissionRate || `${Math.round(100 - (school.academic || 0) * 5 - (school.fit || 0) * 5)}%`,
-            fitScore: school.fitScore,
-            fitLabel: school.fitLabel,
+            toefl: school.toeflRequirement || school.toefl || getToeflForSchool(school.schoolName || school.name),
+            admissionRate: school.admissionRate || `${Math.round(100 - (school.academicScore || school.academic || 0) * 5 - (school.fitScore || school.fit || 0) * 5)}%`,
+            fitScore: school.fitScore ? school.fitScore.toString() : "3.0",
+            fitLabel: school.fitLabel || (school.fitScore >= 4 ? "High Fit" : school.fitScore >= 3 ? "Medium Fit" : "Good Fit"),
             category: school.category as "target" | "fit" | "safety",
             employment: "High employment rate",
             schoolType: school.schoolType,
-            academic: school.academic,
-            practical: school.practical,
-            language: school.language,
-            fit: school.fit,
-            note: school.note
+            academic: school.academicScore || school.academic,
+            practical: school.practicalScore || school.practical,
+            language: school.languageScore || school.language,
+            fit: school.fitScore || school.fit,
+            note: school.strategistNote || school.note,
+            analysisContent: {
+              matchAnalysis: school.analysisContent || `Match analysis for ${school.schoolName || school.name} program.`,
+              academic: `Academic assessment for ${school.schoolName || school.name} program.`,
+              language: `Language requirements assessment for ${school.schoolName || school.name} program.`,
+              specialization: `Specialization analysis for ${school.schoolName || school.name} program.`,
+              professionalExperience: `Professional experience evaluation for ${school.schoolName || school.name} program.`,
+              preferenceAdvice: `Preference and advice for ${school.schoolName || school.name} program.`
+            }
           }))
 
           setSchoolData(convertedData)
@@ -292,6 +308,10 @@ export default function RecommendationsInterface() {
           console.error('Failed to parse AI recommendations:', error);
           setSchoolData(mockSchoolData);
         }
+      } else {
+        // No data in localStorage either, use mock data
+        console.info('No AI recommendations found, using mock data');
+        setSchoolData(mockSchoolData);
       }
     }
 
@@ -1161,51 +1181,35 @@ export default function RecommendationsInterface() {
 
               {/* Profile Summary */}
               {userProfile && isAIData && (
-                <div className="user-profile-summary-modern">
-                  <h4 className="profile-title">Your Profile Summary</h4>
-                  <div className="profile-stats-grid">
-                    {userProfile.gpa && (
-                      <div className="profile-stat-card">
-                        <div className="stat-label">GPA</div>
-                        <div className="stat-value">{userProfile.gpa}</div>
-                      </div>
-                    )}
-                    {userProfile.major && (
-                      <div className="profile-stat-card">
-                        <div className="stat-label">Major</div>
-                        <div className="stat-value">{userProfile.major}</div>
-                      </div>
-                    )}
-                    {userProfile.toefl && (
-                      <div className="profile-stat-card">
-                        <div className="stat-label">TOEFL</div>
-                        <div className="stat-value">{userProfile.toefl}</div>
-                      </div>
-                    )}
-                    {userProfile.gre && (
-                      <div className="profile-stat-card">
-                        <div className="stat-label">GRE</div>
-                        <div className="stat-value">{userProfile.gre}</div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="profile-bottom-row">
-                    {userProfile.nationality && (
-                      <div className="profile-nationality-card">
-                        <div className="stat-label">Nationality</div>
-                        <div className="stat-value">{userProfile.nationality}</div>
-                      </div>
-                    )}
-                    {userProfile.goals && (
-                      <div className="profile-goals-card">
-                        <div className="stat-label">Goals</div>
-                        <div className="stat-value">
-                          {userProfile.goals.length > 50
-                            ? `${userProfile.goals.substring(0, 50)}...`
-                            : userProfile.goals}
+                <div className="profile-summary-container">
+                  <h4 className="profile-summary-title">Your Profile Summary</h4>
+                  <div className="profile-summary-card">
+                    <div className="profile-stats-row">
+                      {userProfile.gpa && (
+                        <div className="profile-stat-item">
+                          <span className="stat-label">GPA</span>
+                          <span className="stat-value">{userProfile.gpa}</span>
                         </div>
-                      </div>
-                    )}
+                      )}
+                      {userProfile.major && (
+                        <div className="profile-stat-item">
+                          <span className="stat-label">Major</span>
+                          <span className="stat-value">{userProfile.major}</span>
+                        </div>
+                      )}
+                      {userProfile.toefl && (
+                        <div className="profile-stat-item">
+                          <span className="stat-label">TOEFL</span>
+                          <span className="stat-value">{userProfile.toefl}</span>
+                        </div>
+                      )}
+                      {userProfile.nationality && (
+                        <div className="profile-stat-item">
+                          <span className="stat-label">Nationality</span>
+                          <span className="stat-value">{userProfile.nationality}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -1223,10 +1227,17 @@ export default function RecommendationsInterface() {
                     <div className="assessment-score-section">
                       <div className="assessment-score-container">
                         <div className="assessment-score-display">
-                          <span className="assessment-score-number">85</span>
+                          <span className="assessment-score-number">
+                            {competitivenessLoading ? "..." : competitivenessData?.overallScore || 85}
+                          </span>
                           <div className="assessment-score-details">
                             <span className="assessment-score-badge">
-                              Highly Competitive
+                              {competitivenessData?.overallScore ?
+                                (competitivenessData.overallScore >= 80 ? "Highly Competitive" :
+                                 competitivenessData.overallScore >= 65 ? "Competitive" :
+                                 competitivenessData.overallScore >= 50 ? "Moderately Competitive" : "Needs Improvement") :
+                                "Highly Competitive"
+                              }
                             </span>
                             <span className="assessment-score-total">/100</span>
                           </div>
@@ -1236,7 +1247,9 @@ export default function RecommendationsInterface() {
 
                     {/* Chart */}
                     <div className="assessment-chart">
-                      <CompetitivenessChart />
+                      <CompetitivenessChart
+                        chartData={competitivenessData?.chartData}
+                      />
                     </div>
                   </div>
 
@@ -1321,11 +1334,7 @@ export default function RecommendationsInterface() {
                         ? "pill-active"
                         : "pill-outline"
                     }`}
-                    onClick={() =>
-                      setSelectedCategory(
-                        selectedCategory === "target" ? "all" : "target"
-                      )
-                    }
+                    onClick={() => setSelectedCategory("target")}
                   >
                     Target Schools: {getCategoryCount("target")}
                   </button>
@@ -1335,11 +1344,7 @@ export default function RecommendationsInterface() {
                         ? "pill-active"
                         : "pill-outline"
                     }`}
-                    onClick={() =>
-                      setSelectedCategory(
-                        selectedCategory === "fit" ? "all" : "fit"
-                      )
-                    }
+                    onClick={() => setSelectedCategory("fit")}
                   >
                     Fit Schools: {getCategoryCount("fit")}
                   </button>
@@ -1349,11 +1354,7 @@ export default function RecommendationsInterface() {
                         ? "pill-active"
                         : "pill-outline"
                     }`}
-                    onClick={() =>
-                      setSelectedCategory(
-                        selectedCategory === "safety" ? "all" : "safety"
-                      )
-                    }
+                    onClick={() => setSelectedCategory("safety")}
                   >
                     Safety Schools: {getCategoryCount("safety")}
                   </button>
@@ -1383,7 +1384,7 @@ export default function RecommendationsInterface() {
                   </svg>
                   <h3 className="summary-title">
                     {selectedCategory === "all"
-                      ? `${mockSchoolData.length} Schools Total`
+                      ? `${schoolData.length} Schools Total`
                       : selectedCategory === "target"
                       ? `${getCategoryCount("target")} Target Schools`
                       : selectedCategory === "fit"

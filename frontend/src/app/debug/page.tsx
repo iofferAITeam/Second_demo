@@ -12,7 +12,7 @@ export default function DebugPage() {
       const apiClient = module.apiClient
       setApiConfig({
         isAuthenticated: apiClient.isAuthenticated(),
-        baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+        baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001',
         accessToken: typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
       })
     })
@@ -24,7 +24,7 @@ export default function DebugPage() {
     try {
       console.log('🔍 Starting basic fetch test...')
 
-      const response = await fetch('http://localhost:8000/health')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/health`)
       console.log('🔍 Health check response:', response)
 
       if (response.ok) {
@@ -46,7 +46,7 @@ export default function DebugPage() {
     try {
       console.log('🔍 Testing login API...')
 
-      const response = await fetch('http://localhost:8000/api/auth/login', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -137,7 +137,7 @@ export default function DebugPage() {
         <p><strong>调试说明:</strong></p>
         <ul>
           <li>检查浏览器开发者工具的 Console 和 Network 标签</li>
-          <li>确认后端服务运行在 http://localhost:8000</li>
+          <li>确认后端服务运行在 http://localhost:8001</li>
           <li>确认前端服务运行在 http://localhost:3005</li>
           <li>检查 CORS 配置是否正确</li>
         </ul>

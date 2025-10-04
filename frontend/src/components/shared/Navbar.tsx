@@ -55,7 +55,8 @@ function Navbar() {
         <ul className="nav-links">
           <li><Link href="/home">Home</Link></li>
           <li><Link href="/chat" className="active">Chat</Link></li>
-          <li><Link href="/recommendations">Features</Link></li>
+          <li><Link href="/profile">Features</Link></li>
+          <li><Link href="/recommendations">Recommendation</Link></li>
           <li><a href="#">FAQ</a></li>
           <li><a href="#">Contact</a></li>
         </ul>

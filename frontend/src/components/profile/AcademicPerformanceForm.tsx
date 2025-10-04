@@ -184,7 +184,7 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
             <input
               type="text"
               placeholder="Name of Institution"
-              value={data.graduatedInstitution}
+              value={data.graduatedInstitution || ''}
               onChange={(e) => handleInputChange('graduatedInstitution', e.target.value)}
               className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
             />

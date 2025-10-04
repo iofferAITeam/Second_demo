@@ -15,7 +15,7 @@ export default function TestApiPage() {
       // 使用测试token
       const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJ0ZXN0LXVzZXItaWQiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzU5NDU1MDQyLCJleHAiOjE3NjAwNTk4NDJ9.LB-jMlnLQcdsNhAzz8YX_bPf3YxZdoST7pJsyJxCxyg'
 
-      const response = await fetch('http://localhost:8000/api/recommendations/latest', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'}/api/recommendations/latest`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

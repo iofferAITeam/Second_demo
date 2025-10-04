@@ -1,0 +1,24 @@
+FROM node:18-alpine
+
+# 安装必要的包
+RUN apk add --no-cache openssl openssl-dev libc6-compat
+
+WORKDIR /app
+
+# 复制package文件
+COPY package*.json ./
+
+# 安装依赖
+RUN npm install
+
+# 复制项目文件
+COPY . .
+
+# 生成Prisma客户端
+RUN npx prisma generate
+
+# 暴露Prisma Studio端口
+EXPOSE 5555
+
+# 启动Prisma Studio
+CMD ["npx", "prisma", "studio", "--hostname", "0.0.0.0", "--port", "5555"]
