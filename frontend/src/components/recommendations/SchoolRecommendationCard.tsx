@@ -19,6 +19,14 @@ interface SchoolData {
   category: "target" | "fit" | "safety";
   employment: string;
   schoolType: string;
+  analysisContent: {
+    matchAnalysis: string;
+    academic: string;
+    language: string;
+    specialization: string;
+    professionalExperience: string;
+    preferenceAdvice: string;
+  };
 }
 
 interface SchoolRecommendationCardProps {
@@ -53,17 +61,17 @@ export default function SchoolRecommendationCard({
   const getTabContent = (tab: string) => {
     switch (tab) {
       case "Match Analysis":
-        return `This ${school.name} program shows excellent alignment with your academic background and career goals. The program's curriculum and research opportunities match well with your interests and qualifications.`;
+        return school.analysisContent.matchAnalysis;
       case "Academic":
-        return `Your academic credentials align well with ${school.name}'s admission standards. The program's rigorous curriculum will challenge you while building upon your existing knowledge base.`;
+        return school.analysisContent.academic;
       case "Language":
-        return `The TOEFL requirement of ${school.toefl} matches your proficiency level. The university offers excellent language support services to help international students succeed.`;
+        return school.analysisContent.language;
       case "Specialization":
-        return `The ${school.program} program offers specialized tracks that align with your career interests and academic background.`;
+        return school.analysisContent.specialization;
       case "Professional Experience":
-        return `Your professional background complements this program well. The university's industry connections will help you leverage your experience for career advancement.`;
+        return school.analysisContent.professionalExperience;
       case "Preference & Other Advice":
-        return `Based on your preferences for location and program type, this university offers an ideal environment for your studies and career development.`;
+        return school.analysisContent.preferenceAdvice;
       default:
         return `Detailed analysis for ${school.name} program.`;
     }

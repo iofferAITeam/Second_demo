@@ -19,6 +19,14 @@ interface SchoolData {
   category: "target" | "fit" | "safety";
   employment: string;
   schoolType: string;
+  analysisContent: {
+    matchAnalysis: string;
+    academic: string;
+    language: string;
+    specialization: string;
+    professionalExperience: string;
+    preferenceAdvice: string;
+  };
 }
 
 const mockSchoolData: SchoolData[] = [
@@ -36,6 +44,20 @@ const mockSchoolData: SchoolData[] = [
     category: "target",
     employment: "",
     schoolType: "One Click Apply",
+    analysisContent: {
+      matchAnalysis:
+        "This Stanford University program shows excellent alignment with your academic background and career goals. The program's curriculum and research opportunities match well with your interests and qualifications.",
+      academic:
+        "Your academic credentials align well with Stanford University's admission standards. The program's rigorous curriculum will challenge you while building upon your existing knowledge base.",
+      language:
+        "The TOEFL requirement matches your proficiency level. The university offers excellent language support services to help international students succeed.",
+      specialization:
+        "The Master of Science in Computer Science program offers specialized tracks that align with your career interests and academic background.",
+      professionalExperience:
+        "Your professional background complements this program well. The university's industry connections will help you leverage your experience for career advancement.",
+      preferenceAdvice:
+        "Based on your preferences for location and program type, this university offers an ideal environment for your studies and career development.",
+    },
   },
   {
     id: "2",
@@ -51,6 +73,20 @@ const mockSchoolData: SchoolData[] = [
     category: "fit",
     employment: "High employment rate",
     schoolType: "iOffer Cooperation",
+    analysisContent: {
+      matchAnalysis:
+        "This University of California, Berkeley program shows excellent alignment with your academic background and career goals. The program's curriculum and research opportunities match well with your interests and qualifications.",
+      academic:
+        "Your academic credentials align well with University of California, Berkeley's admission standards. The program's rigorous curriculum will challenge you while building upon your existing knowledge base.",
+      language:
+        "The TOEFL requirement of 90 matches your proficiency level. The university offers excellent language support services to help international students succeed.",
+      specialization:
+        "The Master of Engineering in Data Science program offers specialized tracks that align with your career interests and academic background.",
+      professionalExperience:
+        "Your professional background complements this program well. The university's industry connections will help you leverage your experience for career advancement.",
+      preferenceAdvice:
+        "Based on your preferences for location and program type, this university offers an ideal environment for your studies and career development.",
+    },
   },
   {
     id: "3",
@@ -66,6 +102,20 @@ const mockSchoolData: SchoolData[] = [
     category: "target",
     employment: "High employment rate",
     schoolType: "iOffer Cooperation",
+    analysisContent: {
+      matchAnalysis:
+        "This Carnegie Mellon University program shows excellent alignment with your academic background and career goals. The program's curriculum and research opportunities match well with your interests and qualifications.",
+      academic:
+        "Your academic credentials align well with Carnegie Mellon University's admission standards. The program's rigorous curriculum will challenge you while building upon your existing knowledge base.",
+      language:
+        "The TOEFL requirement of 102 matches your proficiency level. The university offers excellent language support services to help international students succeed.",
+      specialization:
+        "The Master of Science in Machine Learning program offers specialized tracks that align with your career interests and academic background.",
+      professionalExperience:
+        "Your professional background complements this program well. The university's industry connections will help you leverage your experience for career advancement.",
+      preferenceAdvice:
+        "Based on your preferences for location and program type, this university offers an ideal environment for your studies and career development.",
+    },
   },
   {
     id: "4",
@@ -81,6 +131,20 @@ const mockSchoolData: SchoolData[] = [
     category: "safety",
     employment: "High employment rate",
     schoolType: "One Click Apply",
+    analysisContent: {
+      matchAnalysis:
+        "This Stanford University program shows excellent alignment with your academic background and career goals. The program's curriculum and research opportunities match well with your interests and qualifications.",
+      academic:
+        "Your academic credentials align well with Stanford University's admission standards. The program's rigorous curriculum will challenge you while building upon your existing knowledge base.",
+      language:
+        "The TOEFL requirement of 100 matches your proficiency level. The university offers excellent language support services to help international students succeed.",
+      specialization:
+        "The Master of Science in Computer Science program offers specialized tracks that align with your career interests and academic background.",
+      professionalExperience:
+        "Your professional background complements this program well. The university's industry connections will help you leverage your experience for career advancement.",
+      preferenceAdvice:
+        "Based on your preferences for location and program type, this university offers an ideal environment for your studies and career development.",
+    },
   },
 ];
 
