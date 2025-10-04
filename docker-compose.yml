@@ -29,6 +29,19 @@ services:
       - mongodb_data:/data/db
     restart: unless-stopped
 
+  # 数据库管理界面
+  adminer:
+    image: adminer:latest
+    container_name: ioffer-adminer
+    ports:
+      - "8080:8080"
+    environment:
+      - ADMINER_DEFAULT_SERVER=postgres
+    depends_on:
+      - postgres
+      - mongodb
+    restart: unless-stopped
+
   # AI 服务 (Python FastAPI)
   ai-service:
     build:
