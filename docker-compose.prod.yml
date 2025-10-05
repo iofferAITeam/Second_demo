@@ -32,7 +32,7 @@ services:
   ai-service:
     build:
       context: ./ai-service
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     container_name: ioffer-ai-service
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY:-AIzaSyBFV9S68_FMSjqx6rEqduhrgEzH4YLSzZs}
@@ -60,7 +60,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
     container_name: ioffer-backend
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-ioffer_user}:${POSTGRES_PASSWORD:-ioffer_password_prod_2024}@postgres:5432/${POSTGRES_DB:-ioffer_db}
@@ -84,13 +84,14 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.prod
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://ec2-3-145-150-161.us-east-2.compute.amazonaws.com:8001}
+        - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME:-iOffer College Recommendation System}
+        - NEXT_PUBLIC_APP_VERSION=${NEXT_PUBLIC_APP_VERSION:-1.0.0}
     container_name: ioffer-frontend
     environment:
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://ec2-3-145-150-161.us-east-2.compute.amazonaws.com:8001}
-      - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME:-iOffer College Recommendation System}
-      - NEXT_PUBLIC_APP_VERSION=${NEXT_PUBLIC_APP_VERSION:-1.0.0}
-      - NODE_ENV=development
+      - NODE_ENV=production
     ports:
       - "3005:3000"
     depends_on:

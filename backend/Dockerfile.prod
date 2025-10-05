@@ -1,0 +1,58 @@
+# Multi-stage build for production
+FROM node:18-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache openssl openssl-dev libc6-compat
+WORKDIR /app
+
+# Install dependencies based on the preferred package manager
+COPY package*.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Build the application
+RUN npm run build
+
+# Production image, copy all the files and run the app
+FROM base AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# Install only necessary system dependencies
+RUN apk add --no-cache openssl openssl-dev libc6-compat
+
+# Create app user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
+
+# Copy the build output and dependencies
+COPY --from=deps --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
+COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
+
+# Copy the start script
+COPY --from=builder --chown=nodejs:nodejs /app/scripts ./scripts
+RUN chmod +x /app/scripts/*.sh
+
+USER nodejs
+
+EXPOSE 8001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8001/health || exit 1
+
+# Use the production start command
+CMD ["/app/scripts/start-prod.sh"]
