@@ -31,7 +31,7 @@ services:
 
   # 数据库管理界面
   adminer:
-    image: adminer:latest
+    image: adminer:4.8.1
     container_name: ioffer-adminer
     ports:
       - "8080:8080"

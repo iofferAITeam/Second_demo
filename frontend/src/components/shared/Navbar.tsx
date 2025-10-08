@@ -6,16 +6,24 @@ import { useState, useEffect, useRef, memo } from 'react'
 import { Dropdown, Avatar, Space } from 'antd'
 import { UserOutlined, SettingOutlined, LogoutOutlined, DownOutlined } from '@ant-design/icons'
 import type { MenuProps } from 'antd'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth } from '@/contexts/AuthContext'
+import { useRouter } from 'next/navigation'
 
 function Navbar() {
-  const { user, isAuthenticated, signOut } = useAuth()
+  const { user, isAuthenticated, logout } = useAuth()
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+
+  // 处理登出
+  const handleSignOut = () => {
+    logout()
+    router.push('/auth')
+  }
 
   // 用户菜单配置
   const menuItems: MenuProps['items'] = [
@@ -39,7 +47,7 @@ function Navbar() {
         </span>
       ),
       icon: <LogoutOutlined />,
-      onClick: signOut,
+      onClick: handleSignOut,
     },
   ]
 
@@ -63,7 +71,8 @@ function Navbar() {
 
         <div className="nav-right">
           {!mounted ? (
-            <Link href="/auth" className="signup-button">Sign up / Log in</Link>
+            // During SSR hydration, show nothing briefly
+            <div style={{ width: '120px', height: '40px' }}></div>
           ) : isAuthenticated ? (
             <Dropdown
               menu={{ items: menuItems }}

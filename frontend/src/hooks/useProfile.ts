@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { StructuredProfileData, UpdateProfileRequest, ProfileResponse, ProfileCompletion } from '@/types/profile'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth } from '@/contexts/AuthContext'
 import { apiClient } from '@/utils/api-client'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001'

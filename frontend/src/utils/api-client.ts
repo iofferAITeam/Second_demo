@@ -13,6 +13,13 @@ interface ApiResponse<T = any> {
     accessToken: string
     refreshToken: string
   }
+  // Chat response fields
+  session?: any
+  // Recommendations response fields
+  hasRecommendations?: boolean
+  recommendation?: any
+  userProfile?: any
+  [key: string]: any // Allow additional fields
 }
 
 interface RequestConfig {
@@ -313,6 +320,37 @@ class ApiClient {
       ...config,
       method: 'POST',
       body: formData
+    })
+  }
+
+  // ==================== Chat API Methods ====================
+  async sendChatMessage(message: string, sessionId?: string) {
+    return this.request('/api/chat/message', {
+      method: 'POST',
+      body: { message, sessionId },
+      timeout: 360000  // 6 minutes for AI responses (can take up to 5 min)
+    })
+  }
+
+  async createChatSession(title?: string) {
+    return this.request('/api/chat/session', {
+      method: 'POST',
+      body: { title }
+    })
+  }
+
+  // ==================== User Profile API ====================
+  async getUserProfile() {
+    return this.request('/api/user/profile', {
+      method: 'GET'
+    })
+  }
+
+  // ==================== Recommendations API ====================
+  async getLatestRecommendation() {
+    return this.request('/api/recommendations/latest', {
+      method: 'GET',
+      timeout: 360000  // 6 minutes - recommendations can take time
     })
   }
 }
