@@ -32,9 +32,13 @@ echo ""
 echo "✅ Dependencies installed successfully!"
 echo ""
 
-# Check API keys
+# Check API keys (flexible for Docker and local environments)
 echo "🔑 Checking API keys..."
-if grep -q "OPENAI_API_KEY=" .env 2>/dev/null; then
+
+# Check OPENAI_API_KEY (from .env file or environment)
+if [ -n "$OPENAI_API_KEY" ]; then
+    echo "✅ OPENAI_API_KEY found in environment"
+elif grep -q "OPENAI_API_KEY=" .env 2>/dev/null; then
     echo "✅ OPENAI_API_KEY found in .env"
 else
     echo "❌ OPENAI_API_KEY not found in .env file"
@@ -42,12 +46,16 @@ else
     exit 1
 fi
 
-if grep -q "PERPLEXITY_API_KEY=" .env 2>/dev/null; then
+# Check PERPLEXITY_API_KEY (from .env file or environment) - optional
+if [ -n "$PERPLEXITY_API_KEY" ]; then
+    echo "✅ PERPLEXITY_API_KEY found in environment"
+elif grep -q "PERPLEXITY_API_KEY=" .env 2>/dev/null; then
     echo "✅ PERPLEXITY_API_KEY found in .env"
 else
     echo "❌ PERPLEXITY_API_KEY not found in .env file"
     echo "Please add: PERPLEXITY_API_KEY=pplx-your-key-here"
-    exit 1
+    # Don't exit for PERPLEXITY_API_KEY as it's not critical for basic RAG setup
+    echo "⚠️ Continuing without PERPLEXITY_API_KEY (some features may be limited)"
 fi
 
 # Check if CSV file exists

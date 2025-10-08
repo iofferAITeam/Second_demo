@@ -4,7 +4,11 @@ from src.model_client.gemini_client import get_gemini_model_client
 from src.tools.school_rec_tools import get_preplexity_tool
 from src.tools.school_rec_tools import get_qs_ranking_tool
 from src.settings import settings
-from src.tools.school_rec_tools import get_complete_user_profile_tool, get_prediction_tool, get_user_application_details_tool
+from src.tools.school_rec_tools import (
+    get_complete_user_profile_tool,
+    get_prediction_tool,
+    get_user_application_details_tool,
+)
 from src.domain.students_prediction import StudentTagInfo
 
 from autogen_agentchat.ui import Console
@@ -20,13 +24,15 @@ def get_preplexity_agent():
     preplexity_tool = get_preplexity_tool()
 
     # Create the AssistantAgent
-    preplexity_agent = AssistantAgent("PreplexityAgent",
-                             description="A specialized agent that uses perplexity to answer questions about university admission requirements, application deadlines, GPA requirements, test scores, program rankings, and acceptance rates",
-                             tools=[preplexity_tool], 
-                             model_client=model_client,
-                             system_message="""You are a specialized assistant that uses perplexity to answer questions about university admission requirements and academic programs. 
+    preplexity_agent = AssistantAgent(
+        "PreplexityAgent",
+        description="A specialized agent that uses perplexity to answer questions about university admission requirements, application deadlines, GPA requirements, test scores, program rankings, and acceptance rates",
+        tools=[preplexity_tool],
+        model_client=model_client,
+        system_message="""
+   Please uses perplexity to answer questions about university admission requirements and academic programs. 
 
-    Your expertise includes:
+    Your abilities includes:
     - University admission requirements and deadlines
     - GPA requirements and grade conversions
     - Standardized test scores (SAT, ACT, GRE, GMAT, etc.)
@@ -36,11 +42,10 @@ def get_preplexity_agent():
 
     Use the perplexity tool to get accurate, up-to-date information. Provide comprehensive yet concise answers.
     When you have fully answered the user's question, end your response with 'APPROVE' to indicate completion.""",
-                             model_client_stream=True
+        model_client_stream=True,
     )
-    
-    return preplexity_agent
 
+    return preplexity_agent
 
 
 def get_conversation_agent():
@@ -49,12 +54,14 @@ def get_conversation_agent():
     """
     # Configuration for the Gemini Pro model
     model_client = get_gemini_model_client()
-    conversation_agent = AssistantAgent("ConversationAgent",
-                                        description="A general conversation agent that handles greetings, personal advice, clarifications, and non-academic topics outside of admission requirements",
-                                        model_client=model_client,
-                                        system_message="""You are a helpful and friendly assistant that handles general conversation topics. 
+    conversation_agent = AssistantAgent(
+        "ConversationAgent",
+        description="A general conversation agent that handles greetings, personal advice, clarifications, and non-academic topics outside of admission requirements",
+        model_client=model_client,
+        system_message="""
+   Please be helpful and friendly to handles general conversation topics. 
 
-    Your role includes:
+    Your tasks includes:
     - Greeting users and making them feel welcome
     - Providing general guidance and personal advice
     - Handling clarifications and follow-up questions
@@ -63,8 +70,8 @@ def get_conversation_agent():
 
     Be conversational, empathetic, and helpful. Keep responses appropriate for a school recommendation context.
     When you have fully addressed the user's message, end your response with 'APPROVE' to indicate completion.""",
-                                        model_client_stream=True
-                                        )
+        model_client_stream=True,
+    )
 
     return conversation_agent
 
@@ -72,12 +79,13 @@ def get_conversation_agent():
 def get_qs_agent():
     model_client = get_gemini_model_client()
 
-    qs_agent = AssistantAgent("QSAgent",
-                              description="A specialized agent that uses QS ranking to answer questions about university QS ranking",
-                              tools=[get_qs_ranking_tool()],
-                              model_client=model_client,
-                              system_message="""You are a agent that uses SQL tool to answer questions about university QS ranking"""
-                              )
+    qs_agent = AssistantAgent(
+        "QSAgent",
+        description="A specialized agent that uses QS ranking to answer questions about university QS ranking",
+        tools=[get_qs_ranking_tool()],
+        model_client=model_client,
+        system_message="""A agent that uses SQL tool to answer questions about university QS ranking""",
+    )
 
     return qs_agent
 
@@ -85,23 +93,25 @@ def get_qs_agent():
 async def get_user_memory():
     user_info = open("data/pdf/20250415_132926.txt", "r").read()
     model_client = get_gemini_model_client()
-    student_profile_summary_agent =  AssistantAgent("StudentProfileSummaryAgent",
-                              description="A specialized that summarizes the student's profile",
-                              model_client=model_client,
-                              system_message="""You are a agent that summarizes the student's profile and asks if the student want
-                                                to correct any information or add any information"""
-                              )
-    
+    student_profile_summary_agent = AssistantAgent(
+        "StudentProfileSummaryAgent",
+        description="A specialized that summarizes the student's profile",
+        model_client=model_client,
+        system_message="""
+                              A agent that summarizes the student's profile and asks if the student want
+                                                to correct any information or add any information""",
+    )
+
     user_info = await student_profile_summary_agent.run(task=user_info)
     print(user_info.messages[-1].content)
 
     user_memory = ListMemory()
-    await user_memory.add(MemoryContent(
-        content=user_info.messages[-1].content,
-        mime_type=MemoryMimeType.TEXT
-    ))
+    await user_memory.add(
+        MemoryContent(
+            content=user_info.messages[-1].content, mime_type=MemoryMimeType.TEXT
+        )
+    )
     return user_memory
-
 
 
 def get_summary_agent():
@@ -110,9 +120,13 @@ def get_summary_agent():
         "summary_agent",
         model_client=model_client,
         tools=[get_complete_user_profile_tool()],
-        handoffs=["graduate_school_research_agent", "undergraduate_school_research_agent"],
+        handoffs=[
+            "graduate_school_research_agent",
+            "undergraduate_school_research_agent",
+        ],
         system_message="""
-        You are a student profile analyzer. Your task is to:
+        Please provide a detailed analysis of the following student profile. 
+        Your tasks is to:
 
         1. **ONCE ONLY** - Use the get_complete_user_profile tool to retrieve student information
         2. **ANALYZE** the student's degree type/level from their profile:
@@ -136,17 +150,18 @@ def get_summary_agent():
         "Based on the student profile: [2-3 sentence summary]. The student is applying for [graduate/undergraduate] programs. Handing off to [agent_name]."
 
         Then immediately perform the handoff.
-        """
+        """,
     )
     return summary_agent
+
 
 def get_graduate_school_research_agent():
     # Build the prompt first
     model_client = get_gemini_model_client()
     options = StudentTagInfo.get_all_options_for_llm()
-    
+
     prompt = "Please select the appropriate level for each category:\n\n"
-    
+
     for category, category_options in options.items():
         prompt += f"{category.replace('_options', '').upper()}:\n"
         for key, option in category_options.items():
@@ -158,7 +173,7 @@ def get_graduate_school_research_agent():
         model_client=model_client,
         tools=[get_complete_user_profile_tool(), get_prediction_tool()],
         handoffs=["final_recommendation_agent"],
-        system_message=f"""Your role is to analyze a student's profile and generate a list of recommended universities.
+        system_message=f"""Your need to analyze a student's profile and generate a list of recommended universities.
 
         **Workflow:**
 
@@ -178,10 +193,11 @@ def get_graduate_school_research_agent():
         "I have retrieved the student profile and generated university recommendations using the prediction tool. Handing off to final_recommendation_agent to select and analyze the best matches."
 
         Then immediately perform the handoff.
-        """
+        """,
     )
 
     return graduate_school_research_agent
+
 
 def get_undergraduate_school_research_agent():
     model_client = get_gemini_model_client()
@@ -199,10 +215,11 @@ def get_undergraduate_school_research_agent():
         The schools should be in the same country as the student's target country.
 
         handoff to final_school_analysis_agent when you have finished the task.
-        """
+        """,
     )
 
     return undergraduate_school_research_agent
+
 
 def get_final_recommendation_agent():
     model_client = get_gemini_model_client()
@@ -213,11 +230,11 @@ def get_final_recommendation_agent():
         handoffs=["final_school_analysis_agent", "program_recommendation_agent"],
         system_message="""
         
-        You are an expert graduate school advisor specializing in matching students with realistic academic programs.
+        Please act as a specialist in matching students with realistic academic programs.
 
         IMPORTANT: You will receive a list of recommended universities from the school_research_agent. From this list, you must SELECT EXACTLY 10 universities (no more, no less) to create a balanced recommendation.
 
-        TASK:
+        TASKS:
         1. Review the full list of universities provided by the school_research_agent
         2. From this list, SELECT EXACTLY 10 universities that create the best balanced mix
         3. Organize these 10 selected universities into a BALANCED MIX including:
@@ -252,13 +269,13 @@ def get_final_recommendation_agent():
         IMPORTANT: Do NOT recommend top-20 ranked programs for students with below-average metrics unless they have truly exceptional other qualifications
         handoff to program_recommendation_agent when you have finished the task and the user is applying for graduate school.
         handoff to final_school_analysis_agent when you have finished the task and the user is not applying for graduate school.
-        """
+        """,
     )
     return final_recommendation_agent
 
+
 def get_program_recommendation_agent():
     model_client = get_gemini_model_client()
-
 
     program_recommendation_agent = AssistantAgent(
         "program_recommendation_agent",
@@ -277,7 +294,7 @@ def get_program_recommendation_agent():
         7) Do the student's have any GMAT or GRE scores? What is the score? 
 
 
-        You are an admission eligibility evaluator with expertise in graduate program requirements.
+        Please act as a admission eligibility evaluator with expertise in graduate program requirements.
         
         IMPORTANT: You will receive EXACTLY 10 universities from the final_recommendation_agent. Work with only these 10 universities.
 
@@ -305,10 +322,11 @@ def get_program_recommendation_agent():
 
         Use only official university websites for your research.
         handoff to final_school_analysis_agent when you have finished the task.
-        """
+        """,
     )
 
     return program_recommendation_agent
+
 
 def get_common_admission_urls():
     """
@@ -319,54 +337,55 @@ def get_common_admission_urls():
         "Columbia University": {
             "Computer Science": "https://www.cs.columbia.edu/education/admissions/",
             "Data Science": "https://datascience.columbia.edu/academics/ms-in-data-science/admissions/",
-            "Business": "https://www8.gsb.columbia.edu/programs/masters/admissions"
+            "Business": "https://www8.gsb.columbia.edu/programs/masters/admissions",
         },
         "Stanford University": {
             "Computer Science": "https://cs.stanford.edu/admissions/",
             "Data Science": "https://datascience.stanford.edu/admissions/",
-            "Business": "https://www.gsb.stanford.edu/programs/mba/admissions"
+            "Business": "https://www.gsb.stanford.edu/programs/mba/admissions",
         },
         "MIT": {
             "Computer Science": "https://www.eecs.mit.edu/academics-admissions/",
             "Data Science": "https://idss.mit.edu/academics/degree-programs/",
-            "Business": "https://mitsloan.mit.edu/mba/admissions"
+            "Business": "https://mitsloan.mit.edu/mba/admissions",
         },
         "UC Berkeley": {
             "Computer Science": "https://eecs.berkeley.edu/academics/graduate/",
             "Data Science": "https://datascience.berkeley.edu/academics/",
-            "Business": "https://haas.berkeley.edu/mba/admissions/"
+            "Business": "https://haas.berkeley.edu/mba/admissions/",
         },
         "Harvard University": {
             "Computer Science": "https://seas.harvard.edu/computer-science/graduate",
             "Data Science": "https://datascience.harvard.edu/admissions/",
-            "Business": "https://www.hbs.edu/mba/admissions/"
+            "Business": "https://www.hbs.edu/mba/admissions/",
         },
         "Carnegie Mellon University": {
             "Computer Science": "https://www.cs.cmu.edu/academics/graduate/",
             "Data Science": "https://www.cmu.edu/dietrich/statistics-datascience/",
-            "Business": "https://www.tepper.cmu.edu/programs/mba/admissions"
+            "Business": "https://www.tepper.cmu.edu/programs/mba/admissions",
         },
         "University of Pennsylvania": {
             "Computer Science": "https://www.cis.upenn.edu/graduate/",
             "Data Science": "https://www.seas.upenn.edu/departments/computer-and-information-science/",
-            "Business": "https://www.wharton.upenn.edu/programs/mba/admissions/"
+            "Business": "https://www.wharton.upenn.edu/programs/mba/admissions/",
         },
         "University of Michigan": {
             "Computer Science": "https://cse.umich.edu/graduate/",
             "Data Science": "https://datascience.umich.edu/",
-            "Business": "https://michiganross.umich.edu/graduate/mba/admissions"
+            "Business": "https://michiganross.umich.edu/graduate/mba/admissions",
         },
         "University of California, Los Angeles": {
             "Computer Science": "https://www.cs.ucla.edu/graduate/",
             "Data Science": "https://www.stat.ucla.edu/graduate",
-            "Business": "https://www.anderson.ucla.edu/degrees/mba/admissions"
+            "Business": "https://www.anderson.ucla.edu/degrees/mba/admissions",
         },
         "New York University": {
             "Computer Science": "https://cs.nyu.edu/home/graduate/",
             "Data Science": "https://cds.nyu.edu/admissions/",
-            "Business": "https://www.stern.nyu.edu/programs-admissions/mba/admissions"
-        }
+            "Business": "https://www.stern.nyu.edu/programs-admissions/mba/admissions",
+        },
     }
+
 
 def get_final_school_analysis_agent():
     model_client = get_gemini_model_client()
@@ -378,7 +397,9 @@ def get_final_school_analysis_agent():
         system_message="""
         
 
-        You are an expert AI Admissions Strategist. Your primary function is to conduct a holistic evaluation of a single graduate applicant's profile against a provided list of 
+        You task is to do AI Admissions Strategy analysis. 
+        Your primary function is to conduct a holistic evaluation of 
+        a single graduate applicant's profile against a provided list of 
         10 target programs.
 
         Core Task:
@@ -556,19 +577,25 @@ def get_final_school_analysis_agent():
 
         TERMINATE
 
-        """
+        """,
     )
-    
+
     return final_school_analysis_agent
 
 
 async def main():
     student_profile_summary_agent = await get_program_matching_agent()
-    await Console(student_profile_summary_agent.run_stream(task="I am interested in Master of Computer Science at Columbia University"))
+    await Console(
+        student_profile_summary_agent.run_stream(
+            task="I am interested in Master of Computer Science at Columbia University"
+        )
+    )
+
 
 if __name__ == "__main__":
     # Demonstrate text to numerical conversion
     from src.tools.school_rec_tools import init_session
+
     profile = init_session("hanyu_liu_003")
     print(profile)
 

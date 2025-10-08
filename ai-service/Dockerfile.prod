@@ -1,15 +1,17 @@
 # Multi-stage build for production
 FROM python:3.12-slim AS base
 
-# Install system dependencies
+# Install system dependencies (including ChromaDB requirements)
 RUN apt-get update && apt-get install -y \
-    build-essential \
-    libomp-dev \
-    libgomp1 \
-    curl \
-    wget \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+  build-essential \
+  libomp-dev \
+  libgomp1 \
+  curl \
+  wget \
+  sqlite3 \
+  libsqlite3-dev \
+  && rm -rf /var/lib/apt/lists/* \
+  && apt-get clean
 
 # Production build stage
 FROM base AS builder
@@ -36,7 +38,7 @@ ENV OMP_NUM_THREADS=4
 
 # Create app user
 RUN groupadd --gid 1001 appuser && \
-    useradd --uid 1001 --gid appuser --shell /bin/bash --create-home appuser
+  useradd --uid 1001 --gid appuser --shell /bin/bash --create-home appuser
 
 # Copy Python environment from builder
 COPY --from=builder --chown=appuser:appuser /app/.venv /app/.venv

@@ -1,670 +1,743 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>iOffer AI - Manual Test</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .chat-container {
-            height: 600px;
-            border: 1px solid #ddd;
-            padding: 10px;
-            overflow-y: auto;
-            background-color: #fafafa;
-            margin-bottom: 20px;
-            border-radius: 5px;
-        }
-        .message {
-            margin: 10px 0;
-            padding: 8px 12px;
-            border-radius: 8px;
-        }
-        .user-message {
-            background-color: #007bff;
-            color: white;
-            text-align: right;
-        }
-        .status-message {
-            background-color: #e9ecef;
-            color: #6c757d;
-            font-style: italic;
-        }
-        .result-message {
-            background-color: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-        .error-message {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-        .input-container {
-            display: flex;
-            gap: 10px;
-        }
-        input[type="text"] {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        button:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-        }
-        .connection-status {
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .connected {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .disconnected {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .preset-buttons {
-            margin-bottom: 15px;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      .chat-container {
+        height: 600px;
+        border: 1px solid #ddd;
+        padding: 10px;
+        overflow-y: auto;
+        background-color: #fafafa;
+        margin-bottom: 20px;
+        border-radius: 5px;
+      }
+      .message {
+        margin: 10px 0;
+        padding: 8px 12px;
+        border-radius: 8px;
+      }
+      .user-message {
+        background-color: #007bff;
+        color: white;
+        text-align: right;
+      }
+      .status-message {
+        background-color: #e9ecef;
+        color: #6c757d;
+        font-style: italic;
+      }
+      .result-message {
+        background-color: #d4edda;
+        color: #155724;
+        border-left: 4px solid #28a745;
+      }
+      .error-message {
+        background-color: #f8d7da;
+        color: #721c24;
+        border-left: 4px solid #dc3545;
+      }
+      .input-container {
+        display: flex;
+        gap: 10px;
+      }
+      input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      button:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+      }
+      .connection-status {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: bold;
+      }
+      .connected {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .disconnected {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .preset-buttons {
+        margin-bottom: 15px;
+      }
 
-        /* Styling for thinking process and reference links */
-        .thinking-process {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-left: 4px solid #007bff;
-            border-radius: 4px;
-            font-size: 0.95em;
-        }
-        
-        .thinking-process.school-rec {
-            background-color: #fff3cd;
-            border-left-color: #ffc107;
-        }
-        
-        .thinking-process.student-info {
-            background-color: #ffffff;
-            border-left-color: #007bff;
-        }
-        
-        .result-section {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #ffffff;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            font-size: 0.95em;
-        }
-        
-        .result-section.school-rec {
-            background-color: #d1ecf1;
-            border-color: #17a2b8;
-        }
-        
-        .result-section.student-info {
-            background-color: #ffffff;
-            border-color: #ffffff;
-        }
-        
-        .reference-links {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #e8f5e8;
-            border-left: 4px solid #28a745;
-            border-radius: 4px;
-            font-size: 0.95em;
-        }
-        
-        .reference-links.school-rec {
-            background-color: #e2f3f5;
-            border-left-color: #17a2b8;
-        }
-        
-        .source-link {
-            color: #007bff;
-            text-decoration: none;
-        }
-        
-        .source-link:hover {
-            text-decoration: underline;
-        }
-        
-        .json-response {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-        }
-        
-        .json-response strong {
-            color: #495057;
-            font-size: 14px;
-        }
-        
-        .json-response pre {
-            background-color: #ffffff;
-            padding: 10px;
-            border-radius: 3px;
-            font-family: 'Courier New', monospace;
-            font-size: 11px;
-            max-height: 300px;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            border: 1px solid #e9ecef;
-        }
+      /* Styling for thinking process and reference links */
+      .thinking-process {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-left: 4px solid #007bff;
+        border-radius: 4px;
+        font-size: 0.95em;
+      }
+
+      .thinking-process.school-rec {
+        background-color: #fff3cd;
+        border-left-color: #ffc107;
+      }
+
+      .thinking-process.student-info {
+        background-color: #ffffff;
+        border-left-color: #007bff;
+      }
+
+      .result-section {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        font-size: 0.95em;
+      }
+
+      .result-section.school-rec {
+        background-color: #d1ecf1;
+        border-color: #17a2b8;
+      }
+
+      .result-section.student-info {
+        background-color: #ffffff;
+        border-color: #ffffff;
+      }
+
+      .reference-links {
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #e8f5e8;
+        border-left: 4px solid #28a745;
+        border-radius: 4px;
+        font-size: 0.95em;
+      }
+
+      .reference-links.school-rec {
+        background-color: #e2f3f5;
+        border-left-color: #17a2b8;
+      }
+
+      .source-link {
+        color: #007bff;
+        text-decoration: none;
+      }
+
+      .source-link:hover {
+        text-decoration: underline;
+      }
+
+      .json-response {
+        margin-top: 20px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+      }
+
+      .json-response strong {
+        color: #495057;
+        font-size: 14px;
+      }
+
+      .json-response pre {
+        background-color: #ffffff;
+        padding: 10px;
+        border-radius: 3px;
+        font-family: "Courier New", monospace;
+        font-size: 11px;
+        max-height: 300px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        border: 1px solid #e9ecef;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>🎓 iOffer AI - Manual Test</h1>
-        
-        <div id="connectionStatus" class="connection-status disconnected">
-            未连接到服务器
-        </div>
+      <h1>🎓 iOffer AI - Manual Test</h1>
 
-        <div class="preset-buttons">
-            <h3>用户选择:</h3>
-            <label>
-                <input type="radio" name="user" value="hanyu_liu_003" checked> hanyu_liu_003 (测试用户)
-            </label>
-            <label style="margin-left: 20px;">
-                <input type="radio" name="user" value="hanyuliu"> hanyuliu (有完整profile)
-            </label>
-        </div>
+      <div id="connectionStatus" class="connection-status disconnected">
+        未连接到服务器
+      </div>
 
-        <div id="chatContainer" class="chat-container">
-            <div class="message status-message">
-                📱 点击 "连接" 开始测试...
-            </div>
-        </div>
+      <div class="preset-buttons">
+        <h3>用户选择:</h3>
+        <label>
+          <input type="radio" name="user" value="hanyu_liu_003" checked />
+          hanyu_liu_003 (测试用户)
+        </label>
+        <label style="margin-left: 20px">
+          <input type="radio" name="user" value="hanyuliu" /> hanyuliu
+          (有完整profile)
+        </label>
+      </div>
 
-        <div class="input-container">
-            <input type="text" id="messageInput" placeholder="输入你的消息..." disabled>
-            <button id="sendButton" onclick="sendMessage()" disabled>发送</button>
-            <button id="connectButton" onclick="connect()">连接</button>
-            <button id="disconnectButton" onclick="disconnect()" disabled>断开</button>
-        </div>
+      <div id="chatContainer" class="chat-container">
+        <div class="message status-message">📱 点击 "连接" 开始测试...</div>
+      </div>
 
-        <!-- 文件上传区域 -->
-        <div class="file-upload-container" style="margin-top: 15px; padding: 15px; border: 2px dashed #ddd; border-radius: 8px; background-color: #f8f9fa;">
-            <h4 style="margin: 0 0 10px 0; color: #495057;">📁 文件上传</h4>
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                <input type="file" id="fileUpload" accept=".pdf,.jpg,.jpeg,.png" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                <button id="uploadBtn" onclick="uploadFile()" disabled style="padding: 8px 16px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">上传文件</button>
-                <span id="uploadStatus" style="color: #6c757d; font-size: 14px;">未选择文件</span>
-            </div>
-            <div style="margin-top: 10px; font-size: 12px; color: #6c757d;">
-                💡 支持格式: PDF, JPG, JPEG, PNG | 最大大小: 10MB | 拖拽文件到此处也可上传
-            </div>
-        </div>
+      <div class="input-container">
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="输入你的消息..."
+          disabled
+        />
+        <button id="sendButton" onclick="sendMessage()" disabled>发送</button>
+        <button id="connectButton" onclick="connect()">连接</button>
+        <button id="disconnectButton" onclick="disconnect()" disabled>
+          断开
+        </button>
+      </div>
 
-        <div style="margin-top: 20px;">
-            <h3>📋 使用说明:</h3>
-            <ul>
-                <li><strong>文件上传:</strong> 支持PDF、JPG、PNG格式，最大10MB，拖拽上传</li>
-                <li><strong>状态消息:</strong> 灰色消息显示处理进度</li>
-                <li><strong>最终结果:</strong> 绿色消息显示完整回答</li>
-                <li><strong>错误信息:</strong> 红色消息显示错误</li>
-                <li><strong>调试信息:</strong> 按F12打开控制台查看详细日志</li>
-            </ul>
+      <!-- 文件上传区域 -->
+      <div
+        class="file-upload-container"
+        style="
+          margin-top: 15px;
+          padding: 15px;
+          border: 2px dashed #ddd;
+          border-radius: 8px;
+          background-color: #f8f9fa;
+        "
+      >
+        <h4 style="margin: 0 0 10px 0; color: #495057">📁 文件上传</h4>
+        <div
+          style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap"
+        >
+          <input
+            type="file"
+            id="fileUpload"
+            accept=".pdf,.jpg,.jpeg,.png"
+            style="
+              flex: 1;
+              padding: 8px;
+              border: 1px solid #ddd;
+              border-radius: 4px;
+            "
+          />
+          <button
+            id="uploadBtn"
+            onclick="uploadFile()"
+            disabled
+            style="
+              padding: 8px 16px;
+              background-color: #28a745;
+              color: white;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+            "
+          >
+            上传文件
+          </button>
+          <span id="uploadStatus" style="color: #6c757d; font-size: 14px"
+            >未选择文件</span
+          >
         </div>
+        <div style="margin-top: 10px; font-size: 12px; color: #6c757d">
+          💡 支持格式: PDF, JPG, JPEG, PNG | 最大大小: 10MB |
+          拖拽文件到此处也可上传
+        </div>
+      </div>
+
+      <div style="margin-top: 20px">
+        <h3>📋 使用说明:</h3>
+        <ul>
+          <li>
+            <strong>文件上传:</strong> 支持PDF、JPG、PNG格式，最大10MB，拖拽上传
+          </li>
+          <li><strong>状态消息:</strong> 灰色消息显示处理进度</li>
+          <li><strong>最终结果:</strong> 绿色消息显示完整回答</li>
+          <li><strong>错误信息:</strong> 红色消息显示错误</li>
+          <li><strong>调试信息:</strong> 按F12打开控制台查看详细日志</li>
+        </ul>
+      </div>
     </div>
 
     <script>
-        let ws = null;
-        let isConnected = false;
+      let ws = null;
+      let isConnected = false;
 
-        function updateConnectionStatus(connected) {
-            const statusEl = document.getElementById('connectionStatus');
-            const connectBtn = document.getElementById('connectButton');
-            const disconnectBtn = document.getElementById('disconnectButton');
-            const sendBtn = document.getElementById('sendButton');
-            const messageInput = document.getElementById('messageInput');
+      function updateConnectionStatus(connected) {
+        const statusEl = document.getElementById("connectionStatus");
+        const connectBtn = document.getElementById("connectButton");
+        const disconnectBtn = document.getElementById("disconnectButton");
+        const sendBtn = document.getElementById("sendButton");
+        const messageInput = document.getElementById("messageInput");
 
-            isConnected = connected;
-            
-            if (connected) {
-                statusEl.textContent = '✅ 已连接到服务器';
-                statusEl.className = 'connection-status connected';
-                connectBtn.disabled = true;
-                disconnectBtn.disabled = false;
-                sendBtn.disabled = false;
-                messageInput.disabled = false;
-            } else {
-                statusEl.textContent = '❌ 未连接到服务器';
-                statusEl.className = 'connection-status disconnected';
-                connectBtn.disabled = false;
-                disconnectBtn.disabled = true;
-                sendBtn.disabled = true;
-                messageInput.disabled = true;
-            }
+        isConnected = connected;
+
+        if (connected) {
+          statusEl.textContent = "✅ 已连接到服务器";
+          statusEl.className = "connection-status connected";
+          connectBtn.disabled = true;
+          disconnectBtn.disabled = false;
+          sendBtn.disabled = false;
+          messageInput.disabled = false;
+        } else {
+          statusEl.textContent = "❌ 未连接到服务器";
+          statusEl.className = "connection-status disconnected";
+          connectBtn.disabled = false;
+          disconnectBtn.disabled = true;
+          sendBtn.disabled = true;
+          messageInput.disabled = true;
         }
+      }
 
-        function addMessage(content, type = 'status') {
-            const chatContainer = document.getElementById('chatContainer');
-            const messageEl = document.createElement('div');
-            messageEl.className = `message ${type}-message`;
-            messageEl.innerHTML = content;
-            chatContainer.appendChild(messageEl);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
-        }
+      function addMessage(content, type = "status") {
+        const chatContainer = document.getElementById("chatContainer");
+        const messageEl = document.createElement("div");
+        messageEl.className = `message ${type}-message`;
+        messageEl.innerHTML = content;
+        chatContainer.appendChild(messageEl);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
 
-        function connect() {
+      function connect() {
+        try {
+          // Get selected user
+          const selectedUser = document.querySelector(
+            'input[name="user"]:checked'
+          ).value;
+          ws = new WebSocket(`ws://127.0.0.1:5555/ws/${selectedUser}`);
+
+          ws.onopen = function (event) {
+            console.log("WebSocket connected");
+            updateConnectionStatus(true);
+            addMessage("🔗 WebSocket连接已建立", "status");
+          };
+
+          ws.onmessage = function (event) {
             try {
-                // Get selected user
-                const selectedUser = document.querySelector('input[name="user"]:checked').value;
-                ws = new WebSocket(`ws://127.0.0.1:8010/ws/${selectedUser}`);
-                
-                
-                ws.onopen = function(event) {
-                    console.log('WebSocket connected');
-                    updateConnectionStatus(true);
-                    addMessage('🔗 WebSocket连接已建立', 'status');
-                };
+              const data = JSON.parse(event.data);
+              console.log("Received:", data);
 
-                ws.onmessage = function(event) {
-                    try {
-                        const data = JSON.parse(event.data);
-                        console.log('Received:', data);
-                        
-                        if (data.type === 'system') {
-                            addMessage(`📱 ${data.message}`, 'status');
-                        } else if (data.type === 'status') {
-                            const statusData = data.data;
-                            const step = statusData.details?.step || 'unknown';
-                            const team = statusData.details?.team || '';
-                            const teamInfo = team ? ` [${team}]` : '';
-                            
-                            if (statusData.status === 'thinking') {
-                                addMessage(`⏳ ${statusData.message}${teamInfo} (${step})`, 'status');
-                            } else if (statusData.status === 'error') {
-                                addMessage(`❌ 错误: ${statusData.message}`, 'error');
-                            }
-                        } else if (data.type === 'result') {
-                            const resultData = data.data;
-                            const teamUsed = resultData.meta?.team_used || 'Unknown';
-                            
-                            addMessage(`✅ 完成! (团队: ${teamUsed})`, 'status');
-                            
-                            // Build the complete result display
-                            let resultHTML = '';
-                            
-                            // Debug: Log the data structure
-                            console.log('Result data received:', resultData);
-                            console.log('Message field:', resultData.message);
-                            console.log('Answer field:', resultData.answer);
-                            console.log('Thinking process:', resultData.thinking_process);
-                            console.log('Reference links:', resultData.reference_links);
-                            console.log('Team used:', resultData.meta?.team_used);
-                            console.log('Strategy:', resultData.meta?.strategy);
-                            console.log('Source:', resultData.meta?.source);
-                            
-                            // Add thinking process if available (display first for all teams)
-                            if (resultData.thinking_process) {
-                                let thinkingTitle = "🤔 思考过程:";
-                                let thinkingClass = "thinking-process";
-                                
-                                // Customize title and styling for different teams
-                                if (resultData.meta?.team_used === "SCHOOL_RECOMMENDATION") {
-                                    thinkingTitle = "🧠 分析思路:";
-                                    thinkingClass = "thinking-process school-rec";
-                                } else if (resultData.meta?.team_used === "STUDENT_INFO") {
-                                    thinkingTitle = "💭 分析思路:";
-                                    thinkingClass = "thinking-process student-info";
-                                }
-                                
-                                resultHTML += `<div class="${thinkingClass}">
+              if (data.type === "system") {
+                addMessage(`📱 ${data.message}`, "status");
+              } else if (data.type === "status") {
+                const statusData = data.data;
+                const step = statusData.details?.step || "unknown";
+                const team = statusData.details?.team || "";
+                const teamInfo = team ? ` [${team}]` : "";
+
+                if (statusData.status === "thinking") {
+                  addMessage(
+                    `⏳ ${statusData.message}${teamInfo} (${step})`,
+                    "status"
+                  );
+                } else if (statusData.status === "error") {
+                  addMessage(`❌ 错误: ${statusData.message}`, "error");
+                }
+              } else if (data.type === "result") {
+                const resultData = data.data;
+                const teamUsed = resultData.meta?.team_used || "Unknown";
+
+                addMessage(`✅ 完成! (团队: ${teamUsed})`, "status");
+
+                // Build the complete result display
+                let resultHTML = "";
+
+                // Debug: Log the data structure
+                console.log("Result data received:", resultData);
+                console.log("Message field:", resultData.message);
+                console.log("Answer field:", resultData.answer);
+                console.log("Thinking process:", resultData.thinking_process);
+                console.log("Reference links:", resultData.reference_links);
+                console.log("Team used:", resultData.meta?.team_used);
+                console.log("Strategy:", resultData.meta?.strategy);
+                console.log("Source:", resultData.meta?.source);
+
+                // Add thinking process if available (display first for all teams)
+                if (resultData.thinking_process) {
+                  let thinkingTitle = "🤔 思考过程:";
+                  let thinkingClass = "thinking-process";
+
+                  // Customize title and styling for different teams
+                  if (resultData.meta?.team_used === "SCHOOL_RECOMMENDATION") {
+                    thinkingTitle = "🧠 分析思路:";
+                    thinkingClass = "thinking-process school-rec";
+                  } else if (resultData.meta?.team_used === "STUDENT_INFO") {
+                    thinkingTitle = "💭 分析思路:";
+                    thinkingClass = "thinking-process student-info";
+                  }
+
+                  resultHTML += `<div class="${thinkingClass}">
                                     <strong>${thinkingTitle}</strong><br>
                                     <div style="white-space: pre-wrap; font-family: inherit; max-height: 300px; overflow-y: auto; font-size: 12px;">
                                         ${resultData.thinking_process}
                                     </div>
                                 </div>`;
-                            } else {
-                                console.log('No thinking process found in resultData');
-                            }
-                            
-                            // Add the main result section - Extract clean content from different possible fields
-                            let resultTitle = "📄 结果:";
-                            let resultClass = "result-section";
-                            let cleanContent = "";
-                            
-                            // Customize title for different teams
-                            if (resultData.meta?.team_used === "SCHOOL_RECOMMENDATION") {
-                                resultTitle = "🎓 学校推荐分析:";
-                                resultClass = "result-section school-rec";
-                            } else if (resultData.meta?.team_used === "STUDENT_INFO") {
-                                resultTitle = "👤 个人资料:";
-                                resultClass = "result-section student-info";
-                            }
-                            
-                            // Try to get clean content from different possible fields
-                            if (resultData.answer) {
-                                // If answer field exists, use it (this is usually the clean TextMessage content)
-                                cleanContent = resultData.answer;
-                            } else if (resultData.message) {
-                                // If no answer field, try to clean up the message field
-                                cleanContent = resultData.message;
-                                
-                                // Only remove citation markers like [1], [2], [3] - keep everything else
-                                cleanContent = cleanContent.replace(/\[\d+\]/g, '');
-                                
-                                // Clean up extra whitespace and newlines
-                                cleanContent = cleanContent.replace(/\n\s*\n\s*\n/g, '\n\n');
-                                cleanContent = cleanContent.trim();
-                            }
-                            
-                            // For school recommendations, show full content
-                            const isSchoolRec = resultData.meta?.team_used === 'SCHOOL_RECOMMENDATION';
-                            
-                            if (!isSchoolRec && cleanContent.length > 2000) {
-                                cleanContent = cleanContent.substring(0, 2000) + '...\n\n[消息已截断，完整内容请查看控制台]';
-                                console.log('Full result:', cleanContent);
-                            } else if (isSchoolRec) {
-                                // Always log full school recommendation to console for reference
-                                console.log('Full School Recommendation:', cleanContent);
-                            }
-                            
-                            resultHTML += `<div class="${resultClass}">
+                } else {
+                  console.log("No thinking process found in resultData");
+                }
+
+                // Add the main result section - Extract clean content from different possible fields
+                let resultTitle = "📄 结果:";
+                let resultClass = "result-section";
+                let cleanContent = "";
+
+                // Customize title for different teams
+                if (resultData.meta?.team_used === "SCHOOL_RECOMMENDATION") {
+                  resultTitle = "🎓 学校推荐分析:";
+                  resultClass = "result-section school-rec";
+                } else if (resultData.meta?.team_used === "STUDENT_INFO") {
+                  resultTitle = "👤 个人资料:";
+                  resultClass = "result-section student-info";
+                }
+
+                // Try to get clean content from different possible fields
+                if (resultData.answer) {
+                  // If answer field exists, use it (this is usually the clean TextMessage content)
+                  cleanContent = resultData.answer;
+                } else if (resultData.message) {
+                  // If no answer field, try to clean up the message field
+                  cleanContent = resultData.message;
+
+                  // Only remove citation markers like [1], [2], [3] - keep everything else
+                  cleanContent = cleanContent.replace(/\[\d+\]/g, "");
+
+                  // Clean up extra whitespace and newlines
+                  cleanContent = cleanContent.replace(/\n\s*\n\s*\n/g, "\n\n");
+                  cleanContent = cleanContent.trim();
+                }
+
+                // For school recommendations, show full content
+                const isSchoolRec =
+                  resultData.meta?.team_used === "SCHOOL_RECOMMENDATION";
+
+                if (!isSchoolRec && cleanContent.length > 2000) {
+                  cleanContent =
+                    cleanContent.substring(0, 2000) +
+                    "...\n\n[消息已截断，完整内容请查看控制台]";
+                  console.log("Full result:", cleanContent);
+                } else if (isSchoolRec) {
+                  // Always log full school recommendation to console for reference
+                  console.log("Full School Recommendation:", cleanContent);
+                }
+
+                resultHTML += `<div class="${resultClass}">
                                 <strong>${resultTitle}</strong><br>
-                                <div style="white-space: pre-wrap; font-family: inherit; max-height: ${isSchoolRec ? '800px' : '400px'}; overflow-y: auto; font-size: 14px; line-height: 1.5;">${cleanContent}</div>
+                                <div style="white-space: pre-wrap; font-family: inherit; max-height: ${
+                                  isSchoolRec ? "800px" : "400px"
+                                }; overflow-y: auto; font-size: 14px; line-height: 1.5;">${cleanContent}</div>
                             </div>`;
-                            
-                            // Add reference links section (for General QA and School Recommendation teams)
-                            if (resultData.reference_links && resultData.reference_links.length > 0) {
-                                let linksTitle = "🔗 参考链接:";
-                                let linksClass = "reference-links";
-                                
-                                // Customize title and styling for school recommendations
-                                if (resultData.meta?.team_used === "SCHOOL_RECOMMENDATION") {
-                                    linksTitle = "🎓 申请链接:";
-                                    linksClass = "reference-links school-rec";
-                                }
-                                
-                                resultHTML += `<div class="${linksClass}">
+
+                // Add reference links section (for General QA and School Recommendation teams)
+                if (
+                  resultData.reference_links &&
+                  resultData.reference_links.length > 0
+                ) {
+                  let linksTitle = "🔗 参考链接:";
+                  let linksClass = "reference-links";
+
+                  // Customize title and styling for school recommendations
+                  if (resultData.meta?.team_used === "SCHOOL_RECOMMENDATION") {
+                    linksTitle = "🎓 申请链接:";
+                    linksClass = "reference-links school-rec";
+                  }
+
+                  resultHTML += `<div class="${linksClass}">
                                     <strong>${linksTitle}</strong><br>
                                     <div style="margin-top: 10px;">`;
-                                
-                                resultData.reference_links.forEach((link, index) => {
-                                    // Extract domain name for display
-                                    let displayName = "Source";
-                                    try {
-                                        const url = new URL(link);
-                                        displayName = url.hostname.replace('www.', '');
-                                    } catch (e) {
-                                        displayName = link.substring(0, 30) + (link.length > 30 ? '...' : '');
-                                    }
-                                    
-                                    resultHTML += `<div style="margin-bottom: 8px;">
+
+                  resultData.reference_links.forEach((link, index) => {
+                    // Extract domain name for display
+                    let displayName = "Source";
+                    try {
+                      const url = new URL(link);
+                      displayName = url.hostname.replace("www.", "");
+                    } catch (e) {
+                      displayName =
+                        link.substring(0, 30) + (link.length > 30 ? "..." : "");
+                    }
+
+                    resultHTML += `<div style="margin-bottom: 8px;">
                                         <a href="${link}" target="_blank" class="source-link" style="color: #007bff; text-decoration: none;">
                                             ${index + 1}. ${displayName}
                                         </a>
                                         <span style="color: #666; font-size: 11px; margin-left: 10px;">${link}</span>
                                     </div>`;
-                                });
-                                
-                                resultHTML += `</div></div>`;
-                            }
-                            
-                            // Add JSON response section for development teams (for STUDENT_INFO team)
-                            if (resultData.json_response && resultData.meta?.team_used === "STUDENT_INFO") {
-                                resultHTML += `<div class="json-response">
-                                    <strong>🔧 开发团队数据 (JSON):</strong><br>
-                                    <pre>${JSON.stringify(resultData.json_response, null, 2)}</pre>
-                                </div>`;
-                                
-                                // Log JSON response to console for development team use
-                                console.log('🔧 STUDENT_INFO JSON Response for Development Team:', resultData.json_response);
-                            }
-                            
-                            addMessage(resultHTML, 'result');
-                            
-                            if (resultData.payload) {
-                                console.log('Payload:', resultData.payload);
-                                addMessage(`📊 结构化数据已输出到控制台`, 'status');
-                            }
-                        }
-                    } catch (e) {
-                        console.error('Error parsing message:', e);
-                        addMessage(`❌ 解析消息失败: ${e.message}`, 'error');
-                    }
-                };
+                  });
 
-                ws.onclose = function(event) {
-                    console.log('WebSocket closed:', event);
-                    updateConnectionStatus(false);
-                    addMessage(`🔌 连接已关闭 (代码: ${event.code})`, 'status');
-                };
-
-                ws.onerror = function(error) {
-                    console.error('WebSocket error:', error);
-                    addMessage('❌ WebSocket连接错误', 'error');
-                };
-
-            } catch (e) {
-                console.error('Connection error:', e);
-                addMessage(`❌ 连接失败: ${e.message}`, 'error');
-            }
-        }
-
-        function disconnect() {
-            if (ws) {
-                ws.close();
-                ws = null;
-            }
-            updateConnectionStatus(false);
-        }
-
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            
-            if (!message || !isConnected) return;
-
-            const messageData = {
-                type: 'user_message',
-                data: {
-                    message: message
+                  resultHTML += `</div></div>`;
                 }
+
+                // Add JSON response section for development teams (for STUDENT_INFO team)
+                if (
+                  resultData.json_response &&
+                  resultData.meta?.team_used === "STUDENT_INFO"
+                ) {
+                  resultHTML += `<div class="json-response">
+                                    <strong>🔧 开发团队数据 (JSON):</strong><br>
+                                    <pre>${JSON.stringify(
+                                      resultData.json_response,
+                                      null,
+                                      2
+                                    )}</pre>
+                                </div>`;
+
+                  // Log JSON response to console for development team use
+                  console.log(
+                    "🔧 STUDENT_INFO JSON Response for Development Team:",
+                    resultData.json_response
+                  );
+                }
+
+                addMessage(resultHTML, "result");
+
+                if (resultData.payload) {
+                  console.log("Payload:", resultData.payload);
+                  addMessage(`📊 结构化数据已输出到控制台`, "status");
+                }
+              }
+            } catch (e) {
+              console.error("Error parsing message:", e);
+              addMessage(`❌ 解析消息失败: ${e.message}`, "error");
+            }
+          };
+
+          ws.onclose = function (event) {
+            console.log("WebSocket closed:", event);
+            updateConnectionStatus(false);
+            addMessage(`🔌 连接已关闭 (代码: ${event.code})`, "status");
+          };
+
+          ws.onerror = function (error) {
+            console.error("WebSocket error:", error);
+            addMessage("❌ WebSocket连接错误", "error");
+          };
+        } catch (e) {
+          console.error("Connection error:", e);
+          addMessage(`❌ 连接失败: ${e.message}`, "error");
+        }
+      }
+
+      function disconnect() {
+        if (ws) {
+          ws.close();
+          ws = null;
+        }
+        updateConnectionStatus(false);
+      }
+
+      function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const message = input.value.trim();
+
+        if (!message || !isConnected) return;
+
+        const messageData = {
+          type: "user_message",
+          data: {
+            message: message,
+          },
+        };
+
+        try {
+          ws.send(JSON.stringify(messageData));
+          addMessage(`👤 ${message}`, "user");
+          input.value = "";
+        } catch (e) {
+          console.error("Send error:", e);
+          addMessage(`❌ 发送失败: ${e.message}`, "error");
+        }
+      }
+
+      // Allow Enter key to send message
+      document
+        .getElementById("messageInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendMessage();
+          }
+        });
+
+      // 文件上传相关功能
+      let selectedFile = null;
+      const fileUpload = document.getElementById("fileUpload");
+      const uploadBtn = document.getElementById("uploadBtn");
+      const uploadStatus = document.getElementById("uploadStatus");
+
+      // 文件选择处理
+      fileUpload.addEventListener("change", function (e) {
+        selectedFile = e.target.files[0];
+        if (selectedFile) {
+          // 验证文件类型和大小
+          if (validateFile(selectedFile)) {
+            uploadStatus.textContent = `已选择: ${selectedFile.name}`;
+            uploadBtn.disabled = false;
+          } else {
+            selectedFile = null;
+            fileUpload.value = "";
+            uploadBtn.disabled = true;
+          }
+        } else {
+          uploadStatus.textContent = "未选择文件";
+          uploadBtn.disabled = true;
+        }
+      });
+
+      // 文件验证
+      function validateFile(file) {
+        const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+        const maxSize = 10 * 1024 * 1024; // 10MB
+
+        if (!allowedTypes.includes(file.type)) {
+          alert("❌ 不支持的文件类型。只支持 PDF、JPG 和 PNG 文件。");
+          return false;
+        }
+
+        if (file.size > maxSize) {
+          alert("❌ 文件过大。最大支持 10MB。");
+          return false;
+        }
+
+        return true;
+      }
+
+      // 文件上传处理
+      async function uploadFile() {
+        if (!selectedFile || !isConnected) {
+          alert("请先选择文件并连接到服务器！");
+          return;
+        }
+
+        try {
+          addMessage(`📤 正在处理文件: ${selectedFile.name}...`, "status");
+
+          // 读取文件内容并通过WebSocket发送
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            const fileContent = e.target.result;
+
+            // 通过WebSocket发送文件信息
+            const fileMessageData = {
+              type: "user_message",
+              data: {
+                message: `Please process and extract information from this file: ${selectedFile.name}`,
+                file_info: {
+                  filename: selectedFile.name,
+                  fileType: selectedFile.type,
+                  fileSize: selectedFile.size,
+                  content: fileContent,
+                },
+              },
             };
 
-            try {
-                ws.send(JSON.stringify(messageData));
-                addMessage(`👤 ${message}`, 'user');
-                input.value = '';
-            } catch (e) {
-                console.error('Send error:', e);
-                addMessage(`❌ 发送失败: ${e.message}`, 'error');
-            }
+            ws.send(JSON.stringify(fileMessageData));
+            addMessage(
+              `👤 通过WebSocket发送文件: ${selectedFile.name}`,
+              "user"
+            );
+
+            // 重置文件选择
+            selectedFile = null;
+            fileUpload.value = "";
+            uploadBtn.disabled = true;
+            uploadStatus.textContent = "未选择文件";
+          };
+
+          reader.onerror = function () {
+            throw new Error("文件读取失败");
+          };
+
+          // 读取文件为Data URL
+          reader.readAsDataURL(selectedFile);
+        } catch (error) {
+          console.error("Upload error:", error);
+          addMessage(`❌ 文件处理失败: ${error.message}`, "error");
         }
+      }
 
+      // 拖拽上传支持
+      const fileUploadContainer = document.querySelector(
+        ".file-upload-container"
+      );
+      const messageInput = document.getElementById("messageInput");
 
+      // 为文件上传区域添加拖拽支持
+      fileUploadContainer.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        fileUploadContainer.style.borderColor = "#28a745";
+        fileUploadContainer.style.backgroundColor = "#e8f5e8";
+      });
 
-        // Allow Enter key to send message
-        document.getElementById('messageInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
+      fileUploadContainer.addEventListener("dragleave", function (e) {
+        e.preventDefault();
+        fileUploadContainer.style.borderColor = "#ddd";
+        fileUploadContainer.style.backgroundColor = "#f8f9fa";
+      });
 
-        // 文件上传相关功能
-        let selectedFile = null;
-        const fileUpload = document.getElementById('fileUpload');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const uploadStatus = document.getElementById('uploadStatus');
+      fileUploadContainer.addEventListener("drop", function (e) {
+        e.preventDefault();
+        fileUploadContainer.style.borderColor = "#ddd";
+        fileUploadContainer.style.backgroundColor = "#f8f9fa";
 
-        // 文件选择处理
-        fileUpload.addEventListener('change', function(e) {
-            selectedFile = e.target.files[0];
-            if (selectedFile) {
-                // 验证文件类型和大小
-                if (validateFile(selectedFile)) {
-                    uploadStatus.textContent = `已选择: ${selectedFile.name}`;
-                    uploadBtn.disabled = false;
-                } else {
-                    selectedFile = null;
-                    fileUpload.value = '';
-                    uploadBtn.disabled = true;
-                }
-            } else {
-                uploadStatus.textContent = '未选择文件';
-                uploadBtn.disabled = true;
-            }
-        });
-
-        // 文件验证
-        function validateFile(file) {
-            const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
-            const maxSize = 10 * 1024 * 1024; // 10MB
-            
-            if (!allowedTypes.includes(file.type)) {
-                alert('❌ 不支持的文件类型。只支持 PDF、JPG 和 PNG 文件。');
-                return false;
-            }
-            
-            if (file.size > maxSize) {
-                alert('❌ 文件过大。最大支持 10MB。');
-                return false;
-            }
-            
-            return true;
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          fileUpload.files = files;
+          fileUpload.dispatchEvent(new Event("change")); // 触发change事件
         }
+      });
 
-        // 文件上传处理
-        async function uploadFile() {
-            if (!selectedFile || !isConnected) {
-                alert('请先选择文件并连接到服务器！');
-                return;
-            }
+      // 为消息输入框添加拖拽支持
+      messageInput.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        messageInput.style.borderColor = "#28a745";
+      });
 
-            try {
-                addMessage(`📤 正在处理文件: ${selectedFile.name}...`, 'status');
-                
-                // 读取文件内容并通过WebSocket发送
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const fileContent = e.target.result;
-                    
-                    // 通过WebSocket发送文件信息
-                    const fileMessageData = {
-                        type: 'user_message',
-                        data: {
-                            message: `Please process and extract information from this file: ${selectedFile.name}`,
-                            file_info: {
-                                filename: selectedFile.name,
-                                fileType: selectedFile.type,
-                                fileSize: selectedFile.size,
-                                content: fileContent
-                            }
-                        }
-                    };
-                    
-                    ws.send(JSON.stringify(fileMessageData));
-                    addMessage(`👤 通过WebSocket发送文件: ${selectedFile.name}`, 'user');
-                    
-                    // 重置文件选择
-                    selectedFile = null;
-                    fileUpload.value = '';
-                    uploadBtn.disabled = true;
-                    uploadStatus.textContent = '未选择文件';
-                };
-                
-                reader.onerror = function() {
-                    throw new Error('文件读取失败');
-                };
-                
-                // 读取文件为Data URL
-                reader.readAsDataURL(selectedFile);
-                
-            } catch (error) {
-                console.error('Upload error:', error);
-                addMessage(`❌ 文件处理失败: ${error.message}`, 'error');
-            }
+      messageInput.addEventListener("dragleave", function (e) {
+        e.preventDefault();
+        messageInput.style.borderColor = "#ddd";
+      });
+
+      messageInput.addEventListener("drop", function (e) {
+        e.preventDefault();
+        messageInput.style.borderColor = "#ddd";
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          fileUpload.files = files;
+          fileUpload.dispatchEvent(new Event("change")); // 触发change事件
+          addMessage(`📁 文件已选择: ${files[0].name}`, "status");
         }
+      });
 
-        // 拖拽上传支持
-        const fileUploadContainer = document.querySelector('.file-upload-container');
-        const messageInput = document.getElementById('messageInput');
-
-        // 为文件上传区域添加拖拽支持
-        fileUploadContainer.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            fileUploadContainer.style.borderColor = '#28a745';
-            fileUploadContainer.style.backgroundColor = '#e8f5e8';
-        });
-
-        fileUploadContainer.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            fileUploadContainer.style.borderColor = '#ddd';
-            fileUploadContainer.style.backgroundColor = '#f8f9fa';
-        });
-
-        fileUploadContainer.addEventListener('drop', function(e) {
-            e.preventDefault();
-            fileUploadContainer.style.borderColor = '#ddd';
-            fileUploadContainer.style.backgroundColor = '#f8f9fa';
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileUpload.files = files;
-                fileUpload.dispatchEvent(new Event('change')); // 触发change事件
-            }
-        });
-
-        // 为消息输入框添加拖拽支持
-        messageInput.addEventListener('dragover', function(e) {
-            e.preventDefault();
-            messageInput.style.borderColor = '#28a745';
-        });
-
-        messageInput.addEventListener('dragleave', function(e) {
-            e.preventDefault();
-            messageInput.style.borderColor = '#ddd';
-        });
-
-        messageInput.addEventListener('drop', function(e) {
-            e.preventDefault();
-            messageInput.style.borderColor = '#ddd';
-            
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                fileUpload.files = files;
-                fileUpload.dispatchEvent(new Event('change')); // 触发change事件
-                addMessage(`📁 文件已选择: ${files[0].name}`, 'status');
-            }
-        });
-
-        // Initial state
-        updateConnectionStatus(false);
+      // Initial state
+      updateConnectionStatus(false);
     </script>
-</body>
+  </body>
 </html>

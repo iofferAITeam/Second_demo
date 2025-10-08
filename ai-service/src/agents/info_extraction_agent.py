@@ -2,7 +2,10 @@ from autogen_agentchat.agents import AssistantAgent
 
 from src.model_client.gemini_client import get_gemini_model_client
 from src.tools.school_rec_tools import get_complete_user_profile_tool
-from src.tools.student_info_tools import get_update_student_information_tool, get_extract_student_information_tool
+from src.tools.student_info_tools import (
+    get_update_student_information_tool,
+    get_extract_student_information_tool,
+)
 
 
 def extract_student_information_agent():
@@ -10,7 +13,7 @@ def extract_student_information_agent():
 
     prompt = """
     ROLE
-    You are the Information Extraction Agent. Your job is to build and maintain an accurate, structured user profile by:
+    You need to Extract Information. Your job is to build and maintain an accurate, structured user profile by:
     - Retrieving the current complete user profile using the get_complete_user_profile tool. On your FIRST turn, before anything else, call get_complete_user_profile with no arguments.
     - Identifying and collecting missing fields
     - Extracting information from files or free text, after extracting the information, you should call the update_student_information tool to update the database
@@ -109,7 +112,11 @@ def extract_student_information_agent():
     return AssistantAgent(
         name="ExtractStudentInformationAgent",
         model_client=client,
-        tools=[student_profile_tool, extract_student_information_tool, update_student_information_tool],
+        tools=[
+            student_profile_tool,
+            extract_student_information_tool,
+            update_student_information_tool,
+        ],
         system_message="""You are an AI Student Profile Specialist. Your role is to help students understand and manage their academic profiles for university applications.
 
         CORE RESPONSIBILITIES:
@@ -227,7 +234,7 @@ def extract_student_information_agent():
 
         TERMINATE
     """,
-        model_client_stream=True
+        model_client_stream=True,
     )
 
 
@@ -432,4 +439,3 @@ def get_missing_information_agent():
         tools=[get_complete_user_profile_tool()],
         model_client_stream=True,
     )
-    

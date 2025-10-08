@@ -18,10 +18,7 @@ wheels/
 # DS_Store
 .DS_Store
 
-# Generated data files (large embeddings, FAISS index, etc.)
-data/
-!data/                 # re-allow the directory itself
-!data/qa_pairs.csv     # re-allow this specific file
+
 
 # Log files
 *.log

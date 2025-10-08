@@ -5,7 +5,7 @@ from src.model_client.gemini_client import get_gemini_model_client
 
 # TODO: add more routing decisions and signals
 orchestrating_agent_system_message = """
-You are the main college consultant coordinator. You should encourage the student to upload information about themselves first. 
+You need to coordinate all the college consultants. You should encourage the student to upload information about themselves first. 
 Route students to the right team/specialist:
 
 ROUTING DECISIONS:
@@ -109,12 +109,13 @@ WHEN YOU HAVE IDENTIFIED THE TEAM, TRANSFER THE TASK TO THE TEAM WITH THE SIGNAL
 - "我想更新我的成绩" → 包含"更新" → TRANSFER_TO_STUDENT_INFO
 """
 
+
 def get_orchestrating_agent():
     # Use Gemini model client instead
     model_client = get_gemini_model_client()
     selector = AssistantAgent(
-            name="team_selector",
-            model_client=model_client,
-            system_message=orchestrating_agent_system_message
-        )
+        name="team_selector",
+        model_client=model_client,
+        system_message=orchestrating_agent_system_message,
+    )
     return selector

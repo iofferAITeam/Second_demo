@@ -1,0 +1,700 @@
+2025,2024,Institution,Country / Territory,Academic,AR rank,Employer,ER Rank,Citations,CPP Rank,H,H Rank,IRN,IRN Rank,Score
+1,1,Harvard University,United States of America,98.1,2,100.0,1,97.5,11,87.5,18,80.9,27,95.1
+2,2,Massachusetts Institute of Technology (MIT),United States of America,100.0,1,99.0,2,97.4,12,88.4,14,71.2,96,94.8
+3,3,University of Cambridge,United Kingdom,97.9,3,97.0,4,95.6,21,86.5,21,83.5,20,94.2
+4,4,Stanford University,United States of America,96.8,5=,96.0,5,99.4,3=,87.3,19,71.5,89=,93.1
+5,5,University of Oxford,United Kingdom,97.6,4,97.3,3,90.9,94=,80.9,50,84.2,16=,92.7
+6,6,"University of California, Berkeley (UCB)",United States of America,96.8,5=,89.9,9,96.7,16,83.9,32,62.8,201+,90.1
+7,7,National University of Singapore (NUS),Singapore,91.4,12,92.2,7,98.0,10,90.3,10,66.3,151=,89.9
+8,10,"Nanyang Technological University, Singapore (NTU)",Singapore,91.8,9,89.2,10,99.4,3=,92.1,5,65.1,173=,89.8
+9,8,ETH Zurich - Swiss Federal Institute of Technology,Switzerland,92.4,8,95.9,6,90.4,101=,81.2,45=,68.7,124=,88.8
+10,9,EPFL,Switzerland,91.7,10=,90.1,8,94.8,27=,84.0,30=,72.1,84=,88.7
+11,11,Imperial College London,United Kingdom,89.2,16,88.1,12,91.8,76,80.6,54=,94.5,3,88.6
+12,14,Peking University,China (Mainland),89.9,14,84.0,22,93.8,43,95.2,2,54.8,201+,86.6
+13,13,Tsinghua University,China (Mainland),89.3,15,84.8,19,94.0,39=,94.8,3,55.3,201+,86.5
+14,12,California Institute of Technology (Caltech),United States of America,93.1,7,88.4,11,96.3,17,75.5,89,49.3,201+,85.6
+=15,16,Northwestern University,United States of America,90.4,13,76.4,68,97.0,13=,84.0,30=,64.2,185=,85.0
+=15,17,"University of California, Los Angeles (UCLA)",United States of America,87.2,18,86.5,15,95.2,24=,79.7,60=,66.1,155=,85.0
+=17,15,The University of Tokyo,Japan,91.7,10=,86.9,14,85.5,201+,79.7,60=,58.3,201+,84.7
+=17,18,University of Toronto,Canada,84.4,26=,86.4,16,92.0,70=,79.9,59,78.4,39=,84.7
+19,34,Zhejiang University,China (Mainland),83.5,30=,79.7,41,89.2,137=,91.3,7=,69.0,118=,83.3
+20,31,Seoul National University,Republic of Korea,87.8,17,85.2,18,88.4,166=,77.3,75,58.5,201+,82.9
+21,=36,Shanghai Jiao Tong University,China (Mainland),84.8,23,80.5,33=,89.9,113=,88.5,13,60.2,201+,82.8
+=22,20,Technical University of Munich,Germany,85.9,21,79.2,46,87.7,189=,77.5,72=,74.9,62,82.5
+=22,19,The University of Manchester,United Kingdom,84.6,24,81.4,28,88.9,147=,75.9,85=,77.0,46,82.5
+24,21,UCL,United Kingdom,80.7,38,81.9,26,89.9,113=,77.5,72=,84.9,15,82.3
+25,=53,Nanjing University,China (Mainland),84.5,25,70.6,127=,94.6,29=,91.7,6,58.5,201+,81.7
+26,=32,Fudan University,China (Mainland),83.4,32,77.0,64=,92.6,56=,87.8,15=,57.9,201+,81.6
+=27,30,Cornell University,United States of America,80.1,39=,80.2,38,93.4,47,77.6,69=,75.3,59,81.3
+=27,28,KU Leuven,Belgium,77.3,54,78.7,47,88.6,156=,76.0,83=,99.6,2,81.3
+29,=53,University of Science and Technology of China,China (Mainland),81.6,36,69.9,138=,93.6,45=,94.3,4,62.7,201+,81.1
+30,35,KAIST - Korea Advanced Institute of Science & Technology,Republic of Korea,86.3,20,84.3,20=,89.8,118=,73.6,111,50.0,201+,80.9
+31,22,Yale University,United States of America,81.4,37,87.7,13,95.4,22=,73.8,109=,50.6,201+,80.5
+32,=24,Université de Strasbourg,France,87.0,19,62.4,201+,86.0,201+,73.0,115=,92.9,5,80.4
+33,27,Kyoto University,Japan,85.4,22,78.3,48,85.1,201+,79.3,63=,56.0,201+,80.1
+34,=51,University of Chicago,United States of America,84.4,26=,77.8,56,92.4,63=,70.5,152=,61.3,201+,79.9
+35,=32,Princeton University,United States of America,83.5,30=,84.3,20=,95.1,26,73.4,112=,41.9,201+,79.7
+36,55,University of Pennsylvania,United States of America,78.6,47=,80.5,33=,90.9,94=,74.8,94,71.3,94=,79.5
+=37,=36,Delft University of Technology,Netherlands,78.7,45=,83.0,23,91.7,77,70.1,156=,70.3,103,79.4
+=37,29,"University of California, San Diego (UCSD)",United States of America,77.4,52=,76.8,66,96.2,18,80.6,54=,65.5,165=,79.4
+39,=24,University of Texas at Austin,United States of America,78.6,47=,74.9,79=,96.9,15,82.4,41,59.5,201+,79.3
+40,=48,Columbia University,United States of America,80.0,41,79.4,43=,93.2,52=,74.0,105=,61.4,201+,79.1
+41,45,Georgia Institute of Technology,United States of America,78.7,45=,77.0,64=,97.0,13=,81.4,43=,52.7,201+,78.9
+42,23,RUDN University,Russian Federation,82.7,34,80.1,39,83.8,201+,62.4,201+,73.2,76,78.4
+43,26,University of Illinois at Urbana-Champaign,United States of America,79.6,43,78.2,49=,90.6,100,76.0,83=,58.2,201+,78.3
+=44,=64,The University of Hong Kong,"Hong Kong SAR, China",80.1,39=,80.6,31=,94.4,32=,77.2,76,42.6,201+,78.2
+=44,=71,University of Chinese Academy of Sciences,China (Mainland),75.2,68=,57.0,201+,91.3,84=,100.0,1,80.1,31=,78.2
+=46,46,The University of Queensland,Australia,73.9,77=,72.8,104=,92.5,58=,81.0,47=,79.1,37,78.1
+=46,=38,University of British Columbia,Canada,77.4,52=,82.7,24,89.0,143=,74.3,99=,60.7,201+,78.1
+48,=89,Pohang University of Science And Technology (POSTECH),Republic of Korea,83.7,29,81.2,29,87.5,198=,69.7,162=,46.7,201+,78.0
+=49,=51,The Hong Kong University of Science and Technology,"Hong Kong SAR, China",76.9,55,75.1,78,98.3,7=,80.7,51=,51.2,201+,77.8
+=49,56,The University of New South Wales (UNSW Sydney),Australia,76.2,61,78.2,49=,92.5,58=,77.6,69=,61.6,201+,77.8
+=51,=42,King Abdulaziz University (KAU),Saudi Arabia,71.6,100=,70.4,132=,90.2,108,80.6,54=,93.1,4,77.7
+=51,=38,University of Michigan-Ann Arbor,United States of America,74.7,71=,79.4,43=,90.7,98=,75.9,85=,69.9,106=,77.7
+53,=48,Ludwig-Maximilians-Universität München,Germany,82.4,35,67.6,176=,87.3,201+,70.7,149=,73.7,70=,77.6
+54,41,McGill University,Canada,76.3,60,80.6,31=,89.5,124=,72.5,121=,65.6,163=,77.5
+=55,47,"KIT, Karlsruhe Institute of Technology",Germany,76.1,62,74.7,83=,83.4,201+,74.1,102=,84.1,18=,77.4
+=55,=75,Yonsei University,Republic of Korea,78.8,44,77.9,54=,87.6,192=,75.0,91=,58.9,201+,77.4
+=57,40,Monash University,Australia,76.4,59,74.5,87,89.7,120=,76.5,80,69.0,118=,77.3
+=57,=42,The University of Melbourne,Australia,75.5,66,79.6,42,87.5,198=,71.5,131=,72.9,77=,77.3
+59,=42,Sorbonne University,France,73.0,89=,77.1,62=,83.7,201+,75.0,91=,87.5,12,77.2
+60,=97,Korea University,Republic of Korea,76.6,58,76.1,69=,91.5,79=,77.6,69=,58.3,201+,77.1
+61,=71,King Abdullah University of Science & Technology (KAUST),Saudi Arabia,75.3,67,65.1,201+,98.3,7=,82.6,38=,63.9,189=,76.7
+62,=48,Tokyo Institute of Technology (Tokyo Tech),Japan,84.2,28,77.2,59=,79.1,201+,68.9,175=,52.2,201+,76.5
+63,=64,The University of Sydney,Australia,74.7,71=,77.2,59=,91.4,83,73.8,109=,62.5,201+,76.4
+64,=60,The University of Edinburgh,United Kingdom,75.8,63=,76.0,72,88.1,176=,69.3,167=,71.5,89=,76.3
+65,63,Johns Hopkins University,United States of America,72.7,91,80.7,30,88.8,150=,71.5,131=,68.1,130=,76.1
+66,=78,Technical University of Denmark,Denmark,74.2,74,74.0,91=,89.4,128=,72.5,121=,72.1,84=,76.0
+67,=71,Uppsala University,Sweden,76.7,57,68.2,165,86.6,201+,71.7,127=,76.9,47=,75.8
+68,=78,Texas A&M University,United States of America,73.9,77=,70.6,127=,88.8,150=,73.4,112=,76.7,49,75.7
+69,=60,National Taiwan University (NTU),Taiwan,77.9,51,78.2,49=,83.5,201+,70.3,155,57.4,201+,75.6
+=70,66,RWTH Aachen University,Germany,73.1,87=,73.5,95=,86.9,201+,74.3,99=,73.5,72=,75.5
+=70,=87,Tianjin University,China (Mainland),72.1,97=,69.4,151=,91.3,84=,91.3,7=,54.3,201+,75.5
+=72,58,The University of Osaka,Japan,79.9,42,73.6,93=,78.3,201+,70.9,144=,63.4,196=,75.4
+=72,=60,University of Wisconsin-Madison,United States of America,72.5,92,73.5,95=,93.6,45=,79.2,65,57.8,201+,75.4
+74,=75,Université Paris-Saclay,France,70.9,105=,74.8,81=,79.6,201+,72.7,119=,88.3,11,75.0
+75,81,"University of North Carolina, Chapel Hill",United States of America,73.2,82=,69.6,146=,94.1,37=,71.7,127=,67.3,141,74.8
+76,57,Purdue University,United States of America,71.5,103,80.3,35=,86.8,201+,74.7,95=,58.4,201+,74.7
+=77,=139,Sungkyunkwan University (SKKU),Republic of Korea,76.8,56,72.7,106,87.4,201+,73.0,115=,52.8,201+,74.6
+=77,86,"Trinity College Dublin, The University of Dublin",Ireland,75.6,65,77.3,58,89.1,142,63.2,201+,60.5,201+,74.6
+79,=99,Université PSL,France,67.4,145=,74.8,81=,86.7,201+,74.5,98,83.0,22,74.4
+=80,=87,KTH Royal Institute of Technology,Sweden,70.5,111=,74.6,85=,87.3,201+,70.9,144=,74.7,64,74.3
+=80,=82,University of Glasgow,United Kingdom,73.2,82=,71.3,116=,87.5,198=,68.4,181=,74.2,67,74.3
+=82,=123,Hanyang University,Republic of Korea,72.4,93=,73.4,97,88.2,172=,71.1,141=,65.5,165=,74.1
+=82,=89,King's College London,United Kingdom,69.0,127=,77.2,59=,89.2,137=,69.7,162=,72.3,83,74.1
+=82,67,Technische Universität Berlin (TU Berlin),Germany,73.1,87=,70.5,131,89.9,113=,71.3,138=,66.1,155=,74.1
+85,=101,University of Copenhagen,Denmark,72.3,95,67.6,176=,87.3,201+,70.9,144=,77.8,43,74.0
+=86,=82,Pennsylvania State University,United States of America,69.0,127=,75.4,77,90.4,101=,74.0,105=,64.9,178=,73.8
+=86,59,"University of California, Santa Barbara (UCSB)",United States of America,73.2,82=,67.4,182=,96.1,19,75.7,88,52.5,201+,73.8
+=88,74,Freie Universitaet Berlin,Germany,78.0,50,62.5,201+,83.9,201+,66.9,201+,73.5,72=,73.7
+=88,=84,University of Minnesota Twin Cities,United States of America,72.1,97=,70.8,125,87.8,188,74.7,95=,63.2,199=,73.7
+90,=106,King Saud University,Saudi Arabia,66.7,153=,67.5,178=,82.2,201+,74.0,105=,100.0,1,73.6
+91,=75,University of Groningen,Netherlands,73.0,89=,62.9,201+,91.3,84=,71.5,131=,72.4,81=,73.4
+92,=93,University of Nottingham,United Kingdom,70.9,105=,71.3,116=,86.0,201+,67.1,201+,75.8,56=,73.2
+=93,=101,Duke University,United States of America,67.2,147,77.7,57,92.5,58=,68.9,175=,64.5,181=,73.1
+=93,=106,Technische Universität Dresden,Germany,70.4,113=,66.6,197=,87.2,201+,71.1,141=,78.3,42,73.1
+=93,151-200,Xiamen University,China (Mainland),70.7,109=,58.0,201+,92.4,63=,85.1,26=,66.0,159=,73.1
+=96,=68,Lomonosov Moscow State University,Russian Federation,70.9,105=,85.5,17,66.5,201+,65.0,201+,77.7,44,73.0
+=96,=78,University of Bristol,United Kingdom,74.0,76,70.9,122=,87.1,201+,67.8,189=,59.9,201+,73.0
+=96,=133,Wuhan University,China (Mainland),70.4,113=,63.6,201+,94.3,34=,86.3,23,50.0,201+,73.0
+=99,=84,Eindhoven University of Technology,Netherlands,74.9,70,70.6,127=,88.6,156=,67.1,201+,55.0,201+,72.9
+=99,=129,King Fahd University of Petroleum & Minerals,Saudi Arabia,65.9,164,74.1,90,89.3,132=,70.7,149=,77.1,45,72.9
+=99,91,The Australian National University,Australia,69.5,124,75.7,73,88.3,169=,67.8,189=,65.1,173=,72.9
+=102,=148,The Chinese University of Hong Kong (CUHK),"Hong Kong SAR, China",74.1,75,74.9,79=,94.0,39=,74.3,99=,29.4,201+,72.8
+=102,=101,Universitat de Barcelona,Spain,70.5,111=,69.7,142=,81.6,201+,66.6,201+,84.2,16=,72.8
+=104,=95,Hokkaido University,Japan,74.3,73,67.4,182=,82.7,201+,71.3,138=,64.0,187=,72.7
+=104,=68,Ruprecht-Karls-Universität Heidelberg,Germany,73.5,81,69.7,142=,85.6,201+,66.9,201+,65.1,173=,72.7
+=104,=110,University of Birmingham,United Kingdom,72.2,96,72.5,109,85.6,201+,64.5,201+,67.9,133=,72.7
+=107,=95,Indian Institute of Technology Bombay (IITB),India,78.2,49,81.6,27,79.7,201+,64.0,201+,34.5,201+,72.6
+=107,70,Universidade de São Paulo,Brazil,67.8,139=,79.4,43=,78.3,201+,71.5,131=,71.0,98=,72.6
+109,=143,Nankai University,China (Mainland),70.2,117=,55.0,201+,95.4,22=,90.6,9,55.5,201+,72.5
+110,=97,Lund University,Sweden,73.2,82=,66.9,190=,82.4,201+,64.7,201+,75.8,56=,72.3
+111,128,University of Liverpool,United Kingdom,70.4,113=,68.9,156=,91.3,84=,68.0,185=,62.9,201+,72.1
+112,=120,University of Alberta,Canada,71.6,100=,69.3,153=,85.7,201+,71.5,131=,59.5,201+,72.0
+113,=99,Ghent University,Belgium,66.7,153=,68.4,163,85.6,201+,71.1,141=,80.5,29,71.9
+=114,=101,Nagoya University,Japan,75.8,63=,69.9,138=,80.1,201+,67.3,199=,53.4,201+,71.8
+=114,151-200,Sichuan University,China (Mainland),69.3,125,65.9,201+,87.3,201+,86.4,22,48.3,201+,71.8
+116,151-200,Jilin University,China (Mainland),70.7,109=,61.7,201+,88.5,160=,85.3,25,50.2,201+,71.7
+117,151-200,Huazhong University of Science and Technology,China (Mainland),65.4,167=,63.7,201+,90.9,94=,85.1,26=,62.9,201+,71.6
+=118,151-200,Sun Yat-sen University,China (Mainland),66.2,159=,59.5,201+,92.3,67,87.2,20,62.1,201+,71.5
+=118,=123,The Scripps Research Institute (TSRI),United States of America,83.0,33,51.8,201+,91.5,79=,68.0,185=,40.1,201+,71.5
+=118,=133,University of Waterloo,Canada,64.0,188=,75.6,74,92.0,70=,72.3,123,61.0,201+,71.5
+121,151-200,City University of Hong Kong,"Hong Kong SAR, China",68.7,131,63.3,201+,95.7,20,81.0,47=,47.4,201+,71.4
+=122,151-200,Harbin Institute of Technology,China (Mainland),68.2,134=,66.3,200=,89.5,124=,82.5,40,49.8,201+,71.3
+=122,=110,Kyushu University,Japan,71.1,104,69.7,142=,82.0,201+,70.5,152=,60.7,201+,71.3
+=122,151-200,University of Zurich,Switzerland,70.0,120=,69.5,149=,86.9,201+,64.2,201+,67.2,142=,71.3
+=125,=115,Alma Mater Studiorum - University of Bologna,Italy,70.2,117=,74.2,88=,81.4,201+,67.3,199=,59.7,201+,71.2
+=125,=137,University of Leeds,United Kingdom,67.8,139=,70.9,122=,84.7,201+,65.0,201+,74.3,66,71.2
+=127,=120,Carnegie Mellon University,United States of America,65.3,170=,75.5,75=,92.8,54,66.9,201+,58.1,201+,71.0
+=127,=108,Indian Institute of Science,India,73.8,79,73.6,93=,81.6,201+,64.2,201+,48.6,201+,71.0
+=127,=110,University of Basel,Switzerland,70.0,120=,65.7,201+,88.3,169=,66.4,201+,66.4,149=,71.0
+=130,=108,Humboldt-Universität zu Berlin,Germany,75.2,68=,65.8,201+,83.9,201+,59.8,201+,61.2,201+,70.9
+=130,=115,The University of Adelaide,Australia,65.5,166,65.6,201+,100.0,1=,71.5,131=,58.4,201+,70.9
+=130,=93,University of Washington,United States of America,64.6,181=,68.7,160=,92.6,56=,76.7,79,59.6,201+,70.9
+=133,=117,Universidade Estadual de Campinas (Unicamp),Brazil,68.0,137=,77.1,62=,80.6,201+,67.6,198,59.9,201+,70.8
+=133,113,Utrecht University,Netherlands,68.1,136,66.3,200=,91.5,79=,68.9,175=,62.2,201+,70.8
+135,=141,Rice University,United States of America,71.9,99,60.5,201+,92.2,68=,69.1,172=,56.6,201+,70.7
+136,135,Indian Institute of Technology Delhi (IITD),India,73.6,80,77.9,54=,77.1,201+,58.3,201+,52.5,201+,70.6
+137,=150,Indian Institute of Technology Madras (IITM),India,71.6,100=,76.6,67,78.4,201+,61.6,201+,54.9,201+,70.5
+=138,=123,Stockholm University,Sweden,67.4,145=,61.3,201+,89.3,132=,71.7,127=,69.6,112=,70.3
+=138,114,Universidad Autónoma de Madrid,Spain,66.7,153=,64.6,201+,86.2,201+,71.9,124=,69.6,112=,70.3
+=138,=139,University of Göttingen,Germany,66.7,153=,59.1,201+,92.5,58=,71.7,127=,71.9,87,70.3
+=138,151-200,Xi’an Jiaotong University,China (Mainland),62.8,201+,64.8,201+,89.0,143=,83.0,35=,64.5,181=,70.3
+=142,92,Universidad Nacional Autónoma de México (UNAM),Mexico,68.4,132,80.3,35=,73.3,201+,61.0,201+,66.2,154,70.2
+=142,=137,University of Vienna,Austria,66.9,150=,60.3,201+,87.0,201+,68.0,185=,81.5,26,70.2
+=144,=123,"University of California, Davis",United States of America,64.9,174=,70.4,132=,86.1,201+,69.3,167=,67.0,145=,70.1
+=144,147,University of Florida,United States of America,60.3,201+,65.4,201+,89.7,120=,76.2,82,79.8,33,70.1
+=146,=117,The University of Warwick,United Kingdom,65.6,165,69.6,146=,88.4,166=,68.2,183=,63.1,201+,70.0
+=146,=101,Tohoku University,Japan,72.4,93=,73.0,99=,75.7,201+,65.4,201+,52.3,201+,70.0
+=146,=129,Universiti Malaya (UM),Malaysia,69.8,123,69.9,138=,81.4,201+,61.8,201+,66.3,151=,70.0
+=146,=117,University of Bath,United Kingdom,63.1,199=,70.4,132=,94.6,29=,69.5,165=,60.5,201+,70.0
+150,=123,University of Amsterdam,Netherlands,66.8,152,71.8,113,88.6,156=,66.9,201+,54.0,201+,69.8
+151,151-200,Beijing Institute of Technology,China (Mainland),64.9,174=,65.0,201+,90.3,105=,84.3,29,45.7,201+,69.7
+152,=120,Université de Montréal,Canada,70.1,119,69.3,153=,82.0,201+,62.9,201+,59.4,201+,69.6
+=153,201-250,Ulsan National Institute of Science and Technology (UNIST),Republic of Korea,70.4,113=,64.9,201+,92.5,58=,69.9,160=,40.2,201+,69.5
+=153,=131,University of Helsinki,Finland,67.5,142=,63.1,201+,86.0,201+,63.2,201+,75.2,60=,69.5
+=155,=143,The Ohio State University,United States of America,63.7,192,69.5,149=,86.8,201+,69.9,160=,65.6,163=,69.4
+=155,=150,University of Bordeaux,France,69.1,126,53.2,201+,87.7,189=,69.3,167=,75.6,58,69.4
+=157,=150,Sapienza University of Rome,Italy,63.4,194=,72.6,107=,80.5,201+,65.2,201+,76.1,53=,69.3
+=157,=131,The University of Sheffield,United Kingdom,62.5,201+,71.7,114,86.6,201+,64.0,201+,73.3,75,69.3
+=159,=150,The University of Auckland,New Zealand,64.9,174=,71.9,111=,88.7,153=,65.4,201+,57.6,201+,69.2
+=159,151-200,Université de Montpellier,France,67.5,142=,52.6,201+,81.9,201+,68.0,185=,91.8,6,69.2
+=159,151-200,University of St Andrews,United Kingdom,70.8,108,63.2,201+,84.5,201+,62.1,201+,62.4,201+,69.2
+=162,151-200,Aarhus University,Denmark,68.8,130,64.5,201+,84.5,201+,65.0,201+,60.9,201+,68.9
+=162,151-200,Westfälische Wilhelms-Universität Münster,Germany,68.0,137=,55.4,201+,88.1,176=,70.7,149=,67.7,136=,68.9
+=164,136,Chalmers University of Technology,Sweden,65.4,167=,66.9,190=,87.2,201+,66.2,201+,62.8,201+,68.8
+=164,=143,Leiden University,Netherlands,68.9,129,62.5,201+,87.3,201+,65.9,201+,57.4,201+,68.8
+=166,151-200,National Tsing Hua University,Taiwan,66.2,159=,72.9,102=,82.0,201+,65.2,201+,55.5,201+,68.7
+=166,151-200,University of Massachusetts Amherst,United States of America,68.2,134=,63.1,201+,92.4,63=,65.7,201+,50.4,201+,68.7
+168,151-200,Indian Institute of Technology Kanpur (IITK),India,73.2,82=,74.0,91=,80.3,201+,58.9,201+,36.0,201+,68.6
+169,151-200,Friedrich-Alexander-Universität Erlangen-Nürnberg,Germany,66.0,163,62.1,201+,83.3,201+,70.5,152=,65.2,171=,68.4
+=170,201-250,East China University of Science and Technology,China (Mainland),67.5,142=,49.1,201+,87.6,192=,83.0,35=,58.8,201+,68.3
+=170,151-200,Universiti Sains Malaysia (USM),Malaysia,65.1,172,64.2,201+,82.7,201+,65.7,201+,71.4,91=,68.3
+=170,=148,University of Southampton,United Kingdom,64.1,185=,65.2,201+,85.8,201+,63.7,201+,71.8,88,68.3
+=173,151-200,Boston University,United States of America,66.3,158,72.6,107=,83.6,201+,58.6,201+,57.5,201+,68.1
+=173,201-250,Cairo University,Egypt,62.8,201+,74.7,83=,77.1,201+,62.6,201+,70.9,100=,68.1
+=175,=150,Durham University,United Kingdom,64.0,188=,66.3,200=,85.5,201+,61.8,201+,70.2,104,68.0
+=175,151-200,Indian Institute of Technology Kharagpur (IIT-KGP),India,67.1,148,73.0,99=,80.1,201+,61.8,201+,52.8,201+,68.0
+=175,201-250,Shanghai University,China (Mainland),63.4,194=,59.1,201+,89.8,118=,81.2,45=,51.8,201+,68.0
+=178,151-200,The Hong Kong Polytechnic University,"Hong Kong SAR, China",62.3,201+,64.2,201+,95.2,24=,77.5,72=,41.7,201+,67.8
+=178,151-200,Universitat Autònoma de Barcelona,Spain,64.5,183,63.0,201+,86.8,201+,65.0,201+,66.1,155=,67.8
+=178,151-200,Université Paul Sabatier Toulouse III,France,69.9,122,41.2,201+,85.3,201+,67.8,189=,86.6,14,67.8
+181,151-200,"University of California, Irvine",United States of America,63.9,190,59.9,201+,91.5,79=,73.2,114,54.9,201+,67.7
+=182,151-200,Cardiff University,United Kingdom,61.1,201+,68.3,164,88.8,150=,65.2,201+,63.5,193=,67.6
+=182,151-200,South China University of Technology,China (Mainland),67.8,139=,39.9,201+,92.2,68=,87.8,15=,55.3,201+,67.6
+184,151-200,University of Strathclyde,United Kingdom,60.7,201+,64.5,201+,88.0,179=,66.9,201+,70.9,100=,67.5
+=185,151-200,Technische Universität Wien,Austria,63.6,193,68.7,160=,83.5,201+,58.0,201+,69.6,112=,67.4
+=185,151-200,University of Illinois at Chicago (UIC),United States of America,63.8,191,65.5,201+,87.3,201+,63.4,201+,62.2,201+,67.4
+=187,201-250,New York University (NYU),United States of America,61.2,201+,72.9,102=,91.9,72=,64.7,201+,47.7,201+,67.3
+=187,151-200,Universiti Putra Malaysia (UPM),Malaysia,63.2,197=,63.2,201+,83.5,201+,65.0,201+,71.4,91=,67.3
+=187,151-200,University of Geneva,Switzerland,64.8,178=,62.9,201+,87.6,192=,67.8,189=,55.0,201+,67.3
+=190,201-250,Queen's University Belfast,United Kingdom,59.2,201+,66.7,196,88.5,160=,62.9,201+,73.7,70=,67.1
+=190,151-200,Université Grenoble Alpes,France,61.5,201+,64.5,201+,81.5,201+,66.9,201+,72.9,77=,67.1
+=190,151-200,University of Lisbon,Portugal,61.9,201+,60.4,201+,81.8,201+,67.1,201+,79.7,34,67.1
+193,151-200,Universidad de Buenos Aires (UBA),Argentina,65.4,167=,80.3,35=,74.4,201+,52.4,201+,58.0,201+,67.0
+=194,151-200,Michigan State University,United States of America,59.9,201+,70.7,126,86.4,201+,64.5,201+,61.0,201+,66.8
+=194,151-200,Universitat de Valencia,Spain,60.1,201+,57.1,201+,84.7,201+,69.3,167=,82.5,24=,66.8
+=194,201-250,University of Calgary,Canada,61.7,201+,67.5,178=,87.9,182=,62.4,201+,60.5,201+,66.8
+=194,201-250,University of Southern California,United States of America,61.1,201+,67.7,173=,88.0,179=,65.0,201+,58.8,201+,66.8
+=198,201-250,Complutense University of Madrid,Spain,64.8,178=,62.8,201+,83.6,201+,65.0,201+,59.3,201+,66.7
+=198,201-250,Universiti Teknologi Malaysia,Malaysia,64.2,184,62.2,201+,81.6,201+,62.9,201+,69.0,118=,66.7
+=198,151-200,University of Wollongong,Australia,57.4,201+,60.5,201+,98.2,9,75.9,85=,55.0,201+,66.7
+201-250,251-300,Aalto University,Finland,59.9,201+,59.0,201+,84.5,201+,60.1,201+,73.8,69,
+201-250,201-250,Aix-Marseille University,France,60.8,201+,52.8,201+,84.0,201+,68.9,175=,87.1,13,
+201-250,251-300,Arizona State University,United States of America,55.4,201+,65.6,201+,86.8,201+,65.2,201+,67.9,133=,
+201-250,251-300,Beijing University of Chemical Technology,China (Mainland),66.1,162,37.9,201+,90.4,101=,83.5,33,53.8,201+,
+201-250,201-250,Chulalongkorn University,Thailand,64.1,185=,60.8,201+,83.6,201+,63.7,201+,45.9,201+,
+201-250,201-250,Curtin University,Australia,59.2,201+,60.2,201+,91.1,91=,65.4,201+,62.8,201+,
+201-250,201-250,Deakin University,Australia,60.4,201+,55.5,201+,90.7,98=,68.2,183=,56.2,201+,
+201-250,251-300,Emory University,United States of America,58.0,201+,56.7,201+,94.4,32=,66.9,201+,58.0,201+,
+201-250,251-300,Ewha Womans University,Republic of Korea,65.0,173,54.3,201+,98.7,5,72.9,117=,33.3,201+,
+201-250,251-300,Indian Institute of Technology Guwahati (IITG),India,67.0,149,63.8,201+,81.5,201+,63.7,201+,34.6,201+,
+201-250,201-250,Institut Polytechnique de Paris,France,60.4,201+,74.6,85=,84.9,201+,57.3,201+,57.8,201+,
+201-250,201-250,McMaster University,Canada,59.6,201+,70.9,122=,82.5,201+,58.3,201+,55.6,201+,
+201-250,251-300,National Cheng Kung University (NCKU),Taiwan,60.9,201+,71.2,118=,80.8,201+,58.3,201+,48.9,201+,
+201-250,151-200,Newcastle University,United Kingdom,57.7,201+,69.8,141,86.2,201+,60.4,201+,65.0,176=,
+201-250,201-250,North Carolina State University,United States of America,54.6,201+,70.0,135=,89.0,143=,71.9,124=,58.9,201+,
+201-250,351-400,Northwestern Polytechnical University,China (Mainland),58.1,201+,45.8,201+,91.1,91=,82.6,38=,61.0,201+,
+201-250,201-250,Novosibirsk State University,Russian Federation,62.0,201+,72.8,104=,68.6,201+,56.4,201+,61.5,201+,
+201-250,201-250,Pontificia Universidad Católica de Chile (UC),Chile,62.9,201+,82.6,25,71.5,201+,49.1,201+,56.0,201+,
+201-250,201-250,Qatar University,Qatar,55.5,201+,60.4,201+,88.7,153=,62.6,201+,79.3,35=,
+201-250,251-300,Queen's University at Kingston,Canada,63.1,199=,70.6,127=,81.4,201+,57.0,201+,47.6,201+,
+201-250,151-200,Queensland University of Technology (QUT),Australia,58.5,201+,59.3,201+,93.3,48=,69.7,162=,61.7,201+,
+201-250,201-250,RMIT University,Australia,55.9,201+,60.3,201+,90.0,112,71.5,131=,58.0,201+,
+201-250,201-250,Rutgers University–New Brunswick,United States of America,57.3,201+,65.9,201+,89.7,120=,65.2,201+,51.4,201+,
+201-250,=143,Saint Petersburg State University,Russian Federation,60.7,201+,72.2,110,70.4,201+,60.4,201+,80.4,30,
+201-250,301-350,Shandong University,China (Mainland),55.9,201+,60.8,201+,86.9,201+,80.7,51=,52.8,201+,
+201-250,201-250,Technion - Israel Institute of Technology,Israel,66.2,159=,58.4,201+,85.9,201+,65.0,201+,45.9,201+,
+201-250,201-250,The Hebrew University of Jerusalem,Israel,68.3,133,53.1,201+,84.8,201+,63.4,201+,52.7,201+,
+201-250,301-350,Tongji University,China (Mainland),61.6,201+,55.7,201+,91.3,84=,80.7,51=,44.1,201+,
+201-250,151-200,Universidade Federal do Rio de Janeiro,Brazil,62.1,201+,68.9,156=,75.7,201+,61.0,201+,63.5,193=,
+201-250,201-250,Università di Padova,Italy,57.3,201+,71.0,120=,81.0,201+,61.0,201+,68.1,130=,
+201-250,201-250,Universität Hamburg,Germany,60.5,201+,66.2,201+,83.4,201+,61.3,201+,72.7,80,
+201-250,201-250,Universitat Politècnica de València,Spain,57.8,201+,58.8,201+,90.3,105=,66.9,201+,68.6,126,
+201-250,201-250,Université catholique de Louvain (UCLouvain),Belgium,63.4,194=,67.0,188=,82.7,201+,55.3,201+,63.3,198,
+201-250,151-200,Université Claude Bernard Lyon 1,France,64.8,178=,55.5,201+,78.6,201+,65.7,201+,73.5,72=,
+201-250,201-250,Université de Lille,France,63.2,197=,57.2,201+,79.5,201+,63.2,201+,80.7,28,
+201-250,251-300,Université de Rennes 1 (University of Rennes),France,64.6,181=,42.7,201+,82.9,201+,65.7,201+,76.3,52,
+201-250,201-250,Universiti Kebangsaan Malaysia (UKM),Malaysia,61.0,201+,63.7,201+,80.2,201+,56.7,201+,69.0,118=,
+201-250,201-250,University College Dublin,Ireland,56.6,201+,68.0,167=,86.7,201+,63.4,201+,60.3,201+,
+201-250,151-200,University of Colorado Boulder,United States of America,60.6,201+,63.4,201+,88.5,160=,66.6,201+,54.0,201+,
+201-250,201-250,University of Florence,Italy,64.1,185=,50.1,201+,79.9,201+,61.3,201+,76.1,53=,
+201-250,201-250,"University of Maryland, College Park",United States of America,56.0,201+,68.0,167=,92.7,55,72.7,119=,50.8,201+,
+201-250,151-200,University of Milan,Italy,62.0,201+,67.3,184,79.3,201+,62.4,201+,68.4,127,
+201-250,251-300,University of Naples - Federico II,Italy,55.0,201+,63.4,201+,82.2,201+,65.9,201+,74.5,65,
+201-250,201-250,University of Ottawa,Canada,59.2,201+,57.2,201+,87.1,201+,64.0,201+,71.0,98=,
+201-250,201-250,University of Pisa,Italy,60.6,201+,65.8,201+,81.4,201+,61.0,201+,61.6,201+,
+201-250,201-250,University of Porto,Portugal,58.8,201+,59.7,201+,82.6,201+,65.9,201+,75.9,55,
+201-250,251-300,University of Science and Technology Beijing,China (Mainland),59.4,201+,53.7,201+,88.2,172=,80.6,54=,46.6,201+,
+201-250,201-250,University of Technology Sydney,Australia,56.5,201+,61.6,201+,94.0,39=,68.4,181=,65.9,161,
+201-250,151-200,University of Twente,Netherlands,61.4,201+,62.5,201+,84.6,201+,57.7,201+,60.1,201+,
+201-250,151-200,University of York,United Kingdom,61.0,201+,62.8,201+,85.7,201+,61.0,201+,56.4,201+,
+201-250,251-300,Washington University in St. Louis,United States of America,59.6,201+,58.1,201+,89.9,113=,64.2,201+,59.4,201+,
+251-300,301-350,Academy of Sciences of the Czech Republic,Czechia,56.0,201+,50.5,201+,76.4,201+,67.3,199=,84.1,18=,
+251-300,201-250,Albert-Ludwigs-Universitaet Freiburg,Germany,61.5,201+,59.3,201+,81.9,201+,61.3,201+,60.1,201+,
+251-300,301-350,Beijing Normal University,China (Mainland),57.7,201+,54.3,201+,89.2,137=,72.9,117=,50.0,201+,
+251-300,251-300,Brown University,United States of America,56.4,201+,71.0,120=,84.6,201+,61.0,201+,38.0,201+,
+251-300,251-300,Charles University,Czechia,60.2,201+,62.5,201+,76.1,201+,61.8,201+,64.4,184,
+251-300,251-300,COMSATS University Islamabad,Pakistan,49.8,201+,57.9,201+,81.9,201+,63.2,201+,88.4,10,
+251-300,351-400,Daegu Gyeongbuk Institute of Science and Technology (DGIST),Republic of Korea,62.1,201+,76.1,69=,76.9,201+,53.9,201+,41.7,201+,
+251-300,251-300,Dalian University of Technology,China (Mainland),57.9,201+,49.9,201+,87.2,201+,80.2,58,43.8,201+,
+251-300,251-300,École Normale Supérieure de Lyon,France,58.4,201+,63.0,201+,81.0,201+,57.0,201+,55.0,201+,
+251-300,201-250,Goethe-University Frankfurt am Main,Germany,54.9,201+,64.7,201+,83.6,201+,57.3,201+,67.7,136=,
+251-300,351-400,Gwangju Institute of Science and Technology (GIST),Republic of Korea,64.9,174=,59.7,201+,84.3,201+,58.6,201+,29.1,201+,
+251-300,251-300,Iowa State University,United States of America,60.5,201+,62.1,201+,84.6,201+,63.7,201+,40.5,201+,
+251-300,251-300,Istanbul Technical University,Türkiye,62.2,201+,71.9,111=,74.1,201+,50.0,201+,55.7,201+,
+251-300,201-250,Johannes Gutenberg Universität Mainz,Germany,59.8,201+,52.6,201+,85.4,201+,64.5,201+,67.4,139=,
+251-300,251-300,Julius-Maximilians-Universität Würzburg,Germany,61.1,201+,48.2,201+,85.1,201+,67.1,201+,65.7,162,
+251-300,301-350,Keio University,Japan,61.2,201+,66.2,201+,77.1,201+,56.7,201+,43.0,201+,
+251-300,251-300,Khalifa University of Science and Technology,United Arab Emirates,57.8,201+,59.2,201+,87.6,192=,60.1,201+,69.7,108=,
+251-300,301-350,Kyung Hee University,Republic of Korea,53.9,201+,58.9,201+,87.0,201+,69.5,165=,54.5,201+,
+251-300,201-250,Linköping University,Sweden,55.0,201+,58.1,201+,93.2,52=,63.2,201+,67.8,135,
+251-300,251-300,National Taiwan University of Science and Technology (Taiwan Tech),Taiwan,60.0,201+,63.4,201+,82.4,201+,57.7,201+,49.2,201+,
+251-300,301-350,National University of Sciences And Technology (NUST) Islamabad,Pakistan,61.1,201+,67.2,185=,80.0,201+,55.0,201+,55.4,201+,
+251-300,251-300,Norwegian University of Science And Technology,Norway,58.4,201+,62.2,201+,83.1,201+,58.0,201+,69.0,118=,
+251-300,251-300,Quaid-i-Azam University,Pakistan,56.5,201+,61.2,201+,82.0,201+,59.5,201+,66.4,149=,
+251-300,201-250,Queen Mary University of London,United Kingdom,50.7,201+,68.1,166,89.2,137=,64.2,201+,62.1,201+,
+251-300,201-250,Ruhr-Universität Bochum,Germany,58.6,201+,52.8,201+,88.5,160=,67.8,189=,65.2,171=,
+251-300,351-400,Soochow University,China (Mainland),58.7,201+,40.3,201+,94.8,27=,87.8,15=,46.1,201+,
+251-300,351-400,Southeast University,China (Mainland),59.1,201+,49.3,201+,89.4,128=,79.3,63=,48.1,201+,
+251-300,401-450,Southern University of Science and Technology,China (Mainland),60.5,201+,35.9,201+,93.7,44,81.7,42,46.0,201+,
+251-300,251-300,Technical University of Darmstadt,Germany,58.3,201+,60.2,201+,78.0,201+,57.3,201+,67.2,142=,
+251-300,251-300,"The University of Newcastle, Australia (UON)",Australia,56.5,201+,64.8,201+,88.9,147=,59.8,201+,51.2,201+,
+251-300,251-300,The University of Western Australia,Australia,57.9,201+,60.6,201+,84.2,201+,58.3,201+,69.7,108=,
+251-300,201-250,Universidad de Chile,Chile,61.4,201+,76.1,69=,76.0,201+,51.6,201+,52.1,201+,
+251-300,301-350,Universidad de Córdoba - España,Spain,62.7,201+,45.5,201+,86.4,201+,62.4,201+,56.4,201+,
+251-300,201-250,Universitat Politècnica de Catalunya · BarcelonaTech (UPC),Spain,61.1,201+,65.6,201+,79.6,201+,52.8,201+,62.5,201+,
+251-300,251-300,Universität Stuttgart,Germany,57.2,201+,63.4,201+,77.8,201+,58.6,201+,62.3,201+,
+251-300,201-250,Université Paris Cité,France,58.8,201+,49.0,201+,84.0,201+,69.3,167=,76.9,47=,
+251-300,251-300,University of Aveiro,Portugal,55.0,201+,48.1,201+,83.3,201+,64.7,201+,82.6,23,
+251-300,251-300,University of Bern,Switzerland,61.1,201+,61.0,201+,84.4,201+,59.5,201+,53.9,201+,
+251-300,251-300,"University of Chemistry and Technology, Prague",Czechia,63.1,199=,54.9,201+,79.3,201+,61.8,201+,61.4,201+,
+251-300,301-350,University of Delhi,India,61.1,201+,63.2,201+,78.3,201+,60.4,201+,48.3,201+,
+251-300,251-300,University of Granada,Spain,58.0,201+,57.5,201+,81.4,201+,62.1,201+,70.6,102,
+251-300,251-300,University of Oslo,Norway,59.7,201+,53.4,201+,83.2,201+,59.5,201+,67.0,145=,
+251-300,201-250,University of Pittsburgh,United States of America,53.2,201+,60.5,201+,89.7,120=,67.8,189=,59.3,201+,
+251-300,301-350,University of the Basque Country,Spain,53.8,201+,48.7,201+,84.1,201+,69.1,172=,79.3,35=,
+251-300,251-300,University of Turin,Italy,58.0,201+,56.2,201+,84.2,201+,63.7,201+,60.4,201+,
+251-300,251-300,Vrije Universiteit Amsterdam,Netherlands,57.4,201+,56.8,201+,87.6,192=,61.8,201+,53.4,201+,
+251-300,251-300,Waseda University,Japan,62.6,201+,68.8,158=,79.7,201+,56.7,201+,35.1,201+,
+251-300,201-250,Washington State University,United States of America,56.0,201+,56.5,201+,91.2,90,70.1,156=,49.0,201+,
+251-300,251-300,Weizmann Institute of Science,Israel,66.7,153=,40.2,201+,91.0,93,65.2,201+,40.0,201+,
+251-300,201-250,Western University,Canada,54.5,201+,67.7,173=,87.9,182=,64.5,201+,55.5,201+,
+301-350,351-400,Ain Shams University,Egypt,54.2,201+,67.5,178=,73.5,201+,53.5,201+,59.7,201+,
+301-350,401-450,Anna University,India,45.1,201+,63.7,201+,77.7,201+,66.9,201+,78.7,38,
+301-350,351-400,Beihang University (former BUAA),China (Mainland),57.0,201+,51.7,201+,89.3,132=,74.7,95=,41.1,201+,
+301-350,301-350,Brno University of Technology,Czechia,51.6,201+,62.7,201+,84.2,201+,59.8,201+,69.5,116=,
+301-350,351-400,East China Normal University,China (Mainland),54.4,201+,42.0,201+,93.3,48=,81.4,43=,46.8,201+,
+301-350,301-350,Eberhard Karls Universität Tübingen,Germany,54.9,201+,59.0,201+,81.8,201+,60.1,201+,66.5,148,
+301-350,301-350,Florida State University,United States of America,53.6,201+,57.5,201+,89.3,132=,65.7,201+,48.1,201+,
+301-350,301-350,Graz University of Technology,Austria,57.1,201+,53.6,201+,82.0,201+,57.3,201+,66.7,147,
+301-350,451-500,Hunan University,China (Mainland),47.9,201+,44.3,201+,98.6,6,89.5,12,38.4,201+,
+301-350,351-400,Indian Institute of Technology Roorkee (IITR),India,59.4,201+,63.7,201+,80.5,201+,56.7,201+,41.6,201+,
+301-350,251-300,Jagiellonian University,Poland,54.9,201+,58.0,201+,77.1,201+,60.1,201+,69.7,108=,
+301-350,351-400,Jeonbuk National University,Republic of Korea,56.0,201+,58.1,201+,85.6,201+,62.1,201+,39.9,201+,
+301-350,401-450,Lanzhou University,China (Mainland),58.6,201+,33.2,201+,89.3,132=,77.8,68,54.6,201+,
+301-350,351-400,Leibniz University Hannover,Germany,52.2,201+,57.9,201+,83.8,201+,58.6,201+,63.4,196=,
+301-350,301-350,Loughborough University,United Kingdom,50.5,201+,67.7,173=,80.2,201+,57.7,201+,56.9,201+,
+301-350,351-400,Middle East Technical University,Türkiye,59.7,201+,71.6,115,72.1,201+,47.3,201+,40.7,201+,
+301-350,301-350,National Yang Ming Chiao Tung University,Taiwan,52.4,201+,69.6,146=,79.8,201+,63.2,201+,43.3,201+,
+301-350,301-350,Philipps-Universität Marburg,Germany,57.6,201+,52.3,201+,84.0,201+,60.1,201+,55.8,201+,
+301-350,351-400,Pusan National University,Republic of Korea,58.0,201+,57.2,201+,82.8,201+,64.7,201+,46.7,201+,
+301-350,251-300,Radboud University,Netherlands,59.6,201+,50.9,201+,83.9,201+,59.8,201+,55.3,201+,
+301-350,301-350,Rheinische Friedrich-Wilhelms-Universität Bonn,Germany,51.7,201+,56.5,201+,85.6,201+,60.7,201+,65.0,176=,
+301-350,251-300,Swansea University,United Kingdom,51.5,201+,66.5,199,81.5,201+,55.0,201+,57.7,201+,
+301-350,251-300,Tecnológico de Monterrey,Mexico,59.2,201+,75.5,75=,74.3,201+,48.2,201+,45.2,201+,
+301-350,201-250,Tokyo University of Science,Japan,66.9,150=,61.7,201+,76.3,201+,55.3,201+,24.5,201+,
+301-350,251-300,TU Dortmund University,Germany,52.2,201+,58.7,201+,79.0,201+,57.7,201+,76.4,50=,
+301-350,251-300,UNESP,Brazil,52.8,201+,67.9,169=,76.8,201+,62.6,201+,53.9,201+,
+301-350,451-500,United Arab Emirates University,United Arab Emirates,55.0,201+,65.3,201+,73.9,201+,48.2,201+,69.6,112=,
+301-350,251-300,Universidade de Santiago de Compostela,Spain,54.1,201+,54.7,201+,81.5,201+,60.1,201+,68.3,128=,
+301-350,301-350,Universität Jena,Germany,54.9,201+,45.6,201+,81.0,201+,63.4,201+,78.4,39=,
+301-350,301-350,Universiti Teknologi PETRONAS (UTP),Malaysia,57.2,201+,57.2,201+,80.5,201+,53.5,201+,69.5,116=,
+301-350,351-400,University at Buffalo SUNY,United States of America,55.2,201+,57.6,201+,87.4,201+,64.5,201+,50.6,201+,
+301-350,301-350,University College Cork,Ireland,57.9,201+,68.8,158=,74.8,201+,53.9,201+,38.8,201+,
+301-350,301-350,University of Antwerp,Belgium,49.0,201+,55.8,201+,87.7,189=,60.7,201+,72.4,81=,
+301-350,351-400,"University of California, Riverside",United States of America,52.0,201+,51.9,201+,93.3,48=,70.9,144=,60.9,201+,
+301-350,351-400,University of Coimbra,Portugal,56.2,201+,53.9,201+,81.0,201+,59.8,201+,60.9,201+,
+301-350,301-350,University of Gothenburg,Sweden,57.4,201+,56.7,201+,81.2,201+,56.7,201+,60.9,201+,
+301-350,301-350,University of Houston,United States of America,56.3,201+,49.8,201+,90.1,109=,62.9,201+,49.0,201+,
+301-350,251-300,University of Notre Dame,United States of America,52.7,201+,56.8,201+,87.3,201+,62.9,201+,52.1,201+,
+301-350,301-350,University of Tehran,Iran (Islamic Republic of),54.6,201+,45.7,201+,84.1,201+,69.1,172=,65.4,169=,
+301-350,401-450,University of the Punjab,Pakistan,59.8,201+,65.7,201+,78.2,201+,53.9,201+,44.1,201+,
+301-350,251-300,University of Tsukuba,Japan,59.4,201+,58.2,201+,77.7,201+,58.6,201+,46.5,201+,
+301-350,251-300,University of Utah,United States of America,54.5,201+,50.5,201+,87.6,192=,68.7,180,53.8,201+,
+301-350,251-300,University of Warsaw,Poland,56.9,201+,60.5,201+,74.5,201+,56.4,201+,64.0,187=,
+301-350,251-300,Ural Federal University - UrFU,Russian Federation,54.0,201+,65.6,201+,67.8,201+,56.0,201+,73.9,68,
+301-350,251-300,Vanderbilt University,United States of America,51.6,201+,62.0,201+,89.4,128=,65.9,201+,52.9,201+,
+301-350,351-400,Vellore Institute of Technology (VIT),India,51.7,201+,65.3,201+,79.1,201+,61.3,201+,61.3,201+,
+301-350,301-350,Virginia Polytechnic Institute and State University,United States of America,53.4,201+,59.2,201+,88.4,166=,64.5,201+,47.6,201+,
+301-350,351-400,Vrije Universiteit Brussel (VUB),Belgium,56.8,201+,58.4,201+,80.0,201+,55.0,201+,58.3,201+,
+301-350,301-350,Warsaw University of Technology,Poland,59.1,201+,65.6,201+,70.6,201+,49.1,201+,57.7,201+,
+301-350,351-400,Wuhan University of Technology,China (Mainland),51.1,201+,41.8,201+,94.1,37=,81.0,47=,55.1,201+,
+351-400,301-350,Aristotle University of Thessaloniki,Greece,55.2,201+,59.6,201+,79.9,201+,53.2,201+,60.7,201+,
+351-400,301-350,Case Western Reserve University,United States of America,51.4,201+,57.5,201+,91.6,78,63.2,201+,45.4,201+,
+351-400,351-400,Central South University,China (Mainland),47.9,201+,47.3,201+,90.3,105=,82.9,37,50.1,201+,
+351-400,401-450,Colorado State University,United States of America,49.1,201+,57.5,201+,89.5,124=,66.2,201+,50.6,201+,
+351-400,551-600,"ENSCM, Chimie Montpellier",France,56.4,201+,34.1,201+,83.0,201+,65.7,201+,82.5,24=,
+351-400,301-350,Griffith University,Australia,45.6,201+,51.2,201+,94.5,31,65.9,201+,58.5,201+,
+351-400,301-350,Indiana University Bloomington,United States of America,54.1,201+,55.4,201+,86.0,201+,62.1,201+,47.6,201+,
+351-400,351-400,Inha University,Republic of Korea,55.7,201+,58.0,201+,86.5,201+,61.6,201+,35.2,201+,
+351-400,301-350,ITMO University,Russian Federation,48.7,201+,67.2,185=,78.9,201+,52.4,201+,58.5,201+,
+351-400,401-450,Jadavpur University,India,56.1,201+,54.9,201+,78.2,201+,58.6,201+,41.9,201+,
+351-400,351-400,King Khalid University,Saudi Arabia,46.7,201+,63.8,201+,76.4,201+,61.0,201+,71.1,97,
+351-400,401-450,Kyungpook National University,Republic of Korea,53.1,201+,55.9,201+,82.1,201+,62.1,201+,42.8,201+,
+351-400,351-400,Mahidol University,Thailand,58.2,201+,55.5,201+,78.9,201+,56.0,201+,50.6,201+,
+351-400,301-350,Mendeleev University of Chemical Technology,Russian Federation,65.3,170=,63.0,201+,62.4,201+,45.4,201+,45.5,201+,
+351-400,301-350,Moscow Institute of Physics and Technology (MIPT / Moscow Phystech),Russian Federation,50.3,201+,74.2,88=,71.3,201+,51.6,201+,51.7,201+,
+351-400,401-450,National and Kapodistrian University of Athens,Greece,53.8,201+,50.9,201+,79.8,201+,56.0,201+,59.4,201+,
+351-400,401-450,National Chung Hsing University,Taiwan,53.5,201+,59.8,201+,78.4,201+,52.4,201+,50.8,201+,
+351-400,401-450,National Sun Yat-sen University,Taiwan,57.0,201+,60.7,201+,78.6,201+,53.2,201+,36.6,201+,
+351-400,351-400,Northeastern University,United States of America,53.3,201+,50.1,201+,88.6,156=,63.4,201+,52.3,201+,
+351-400,401-450,Sharif University of Technology,Iran (Islamic Republic of),53.1,201+,54.4,201+,83.5,201+,61.6,201+,60.6,201+,
+351-400,351-400,Shenzhen University,China (Mainland),48.9,201+,38.4,201+,94.3,34=,84.4,28,59.9,201+,
+351-400,451-500,Sogang University,Republic of Korea,60.7,201+,63.0,201+,73.7,201+,50.0,201+,37.2,201+,
+351-400,351-400,SRM INSTITUTE OF SCIENCE AND TECHNOLOGY,India,52.3,201+,63.4,201+,81.5,201+,58.9,201+,53.0,201+,
+351-400,351-400,Tel Aviv University,Israel,58.7,201+,41.8,201+,85.0,201+,61.6,201+,49.2,201+,
+351-400,351-400,The University of Arizona,United States of America,46.4,201+,60.1,201+,87.5,198=,60.1,201+,60.5,201+,
+351-400,401-450,The University of Georgia,United States of America,52.6,201+,54.4,201+,83.1,201+,59.8,201+,50.1,201+,
+351-400,301-350,Tomsk State University,Russian Federation,58.1,201+,67.0,188=,66.4,201+,42.8,201+,59.5,201+,
+351-400,401-450,Tufts University,United States of America,56.3,201+,60.3,201+,82.4,201+,56.7,201+,36.2,201+,
+351-400,301-350,Universidad de Concepción,Chile,50.5,201+,69.4,151=,73.1,201+,47.8,201+,61.0,201+,
+351-400,301-350,Universidad de Santiago de Chile (USACH),Chile,54.7,201+,70.0,135=,70.5,201+,50.4,201+,42.0,201+,
+351-400,351-400,Universidad de Sevilla,Spain,56.0,201+,51.5,201+,79.2,201+,57.7,201+,56.9,201+,
+351-400,351-400,Universidad Nacional de Colombia,Colombia,55.9,201+,78.1,53,69.5,201+,43.8,201+,44.0,201+,
+351-400,301-350,Universidad Nacional de La Plata (UNLP),Argentina,60.4,201+,66.8,195,71.6,201+,47.8,201+,41.7,201+,
+351-400,301-350,Universidade Federal de São Carlos (UFSCar),Brazil,50.9,201+,62.1,201+,79.6,201+,63.2,201+,51.1,201+,
+351-400,301-350,Universidade Nova de Lisboa,Portugal,53.0,201+,57.0,201+,80.4,201+,58.9,201+,64.2,185=,
+351-400,351-400,Università degli Studi di Pavia,Italy,45.3,201+,60.2,201+,85.7,201+,62.9,201+,66.3,151=,
+351-400,251-300,Università degli Studi di Perugia,Italy,57.6,201+,40.6,201+,81.7,201+,58.0,201+,65.5,165=,
+351-400,251-300,Universität Leipzig,Germany,51.5,201+,52.4,201+,79.6,201+,58.6,201+,80.1,31=,
+351-400,351-400,Université de Liège,Belgium,51.2,201+,57.6,201+,81.2,201+,55.3,201+,55.9,201+,
+351-400,401-450,Université de Lorraine,France,55.2,201+,33.4,201+,79.7,201+,62.1,201+,90.5,8,
+351-400,301-350,University Duesseldorf,Germany,55.2,201+,42.9,201+,82.8,201+,60.1,201+,72.0,86,
+351-400,351-400,University of Bayreuth,Germany,53.8,201+,45.9,201+,85.1,201+,62.1,201+,58.5,201+,
+351-400,301-350,University of Cologne,Germany,54.5,201+,53.1,201+,82.8,201+,57.7,201+,50.1,201+,
+351-400,301-350,University of Delaware,United States of America,56.4,201+,48.8,201+,89.2,137=,65.9,201+,42.2,201+,
+351-400,301-350,University of Limerick,Ireland,51.2,201+,59.1,201+,79.1,201+,53.2,201+,70.0,105,
+351-400,301-350,University of Otago,New Zealand,57.9,201+,60.4,201+,75.7,201+,50.8,201+,53.0,201+,
+351-400,301-350,"University of Rome ""Tor Vergata""",Italy,52.2,201+,58.5,201+,84.4,201+,62.9,201+,41.3,201+,
+351-400,351-400,University of Virginia,United States of America,51.0,201+,57.6,201+,86.4,201+,63.2,201+,49.4,201+,
+351-400,351-400,University Ulm,Germany,53.7,201+,51.6,201+,88.5,160=,59.8,201+,54.1,201+,
+401-450,451-500,Alexandria University,Egypt,48.2,201+,56.9,201+,78.1,201+,54.6,201+,63.5,193=,
+401-450,401-450,Ankara Üniversitesi,Türkiye,55.9,201+,59.2,201+,74.9,201+,53.9,201+,41.7,201+,
+401-450,401-450,Beijing University of Technology,China (Mainland),49.5,201+,52.1,201+,88.9,147=,71.9,124=,33.7,201+,
+401-450,501-550,"Birla Institute of Technology and Science, Pilani",India,49.8,201+,65.0,201+,78.9,201+,53.5,201+,44.7,201+,
+401-450,351-400,Budapest University of Technology and Economics,Hungary,50.1,201+,55.3,201+,78.7,201+,52.0,201+,59.7,201+,
+401-450,401-450,Christian-Albrechts-University zu Kiel,Germany,50.4,201+,47.6,201+,81.9,201+,60.1,201+,67.2,142=,
+401-450,351-400,City University of New York,United States of America,46.4,201+,52.1,201+,85.5,201+,62.4,201+,55.9,201+,
+401-450,401-450,Dalhousie University,Canada,50.8,201+,59.4,201+,87.9,182=,58.6,201+,37.5,201+,
+401-450,401-450,Hacettepe University,Türkiye,50.7,201+,63.1,201+,75.4,201+,49.5,201+,53.5,201+,
+401-450,501-550,Hong Kong Baptist University,"Hong Kong SAR, China",53.1,201+,49.4,201+,90.4,101=,65.2,201+,19.4,201+,
+401-450,501-550,Imam Abdulrahman Bin Faisal University (IAU) (formerly UNIVERSITY OF DAMMAM),Saudi Arabia,39.6,201+,78.2,49=,80.6,201+,54.3,201+,47.4,201+,
+401-450,451-500,Institut National des Sciences Appliquées de Lyon (INSA),France,49.2,201+,62.3,201+,77.1,201+,53.2,201+,48.8,201+,
+401-450,351-400,"Institute of Chemical Technology (UDCT), Mumbai",India,54.1,201+,53.7,201+,81.3,201+,58.0,201+,39.6,201+,
+401-450,301-350,Instituto Politécnico Nacional (IPN),Mexico,51.8,201+,67.5,178=,72.8,201+,52.8,201+,39.7,201+,
+401-450,401-450,Iran University of Science and Technology,Iran (Islamic Republic of),54.1,201+,43.7,201+,84.1,201+,61.0,201+,48.5,201+,
+401-450,601-650,Jouf University,Saudi Arabia,62.2,201+,35.7,201+,73.6,201+,49.5,201+,60.4,201+,
+401-450,451-500,Koç University,Türkiye,56.1,201+,66.9,190=,68.1,201+,47.8,201+,38.7,201+,
+401-450,351-400,Martin-Luther-Universität Halle-Wittenberg,Germany,46.0,201+,51.3,201+,79.2,201+,54.6,201+,76.4,50=,
+401-450,401-450,Masaryk University,Czechia,48.3,201+,56.9,201+,82.2,201+,56.7,201+,53.6,201+,
+401-450,401-450,Nanjing Tech University,China (Mainland),52.0,201+,28.2,201+,90.1,109=,83.4,34,49.0,201+,
+401-450,301-350,National Research Tomsk Polytechnic University,Russian Federation,52.9,201+,64.6,201+,70.6,201+,47.8,201+,59.0,201+,
+401-450,401-450,Palacký University Olomouc,Czechia,42.3,201+,53.1,201+,84.7,201+,62.1,201+,83.3,21,
+401-450,551-600,Shoolini University of Biotechnology and Management Sciences,India,57.1,201+,53.4,201+,73.6,201+,51.6,201+,48.0,201+,
+401-450,351-400,Technische Universität Braunschweig,Germany,53.9,201+,47.1,201+,79.5,201+,55.3,201+,62.3,201+,
+401-450,351-400,"The University of Tennessee, Knoxville",United States of America,47.3,201+,43.9,201+,91.9,72=,74.1,102=,50.4,201+,
+401-450,,Tokyo University of Agriculture and Technology,Japan,62.4,201+,54.4,201+,70.2,201+,47.3,201+,42.0,201+,
+401-450,301-350,Universidad de Zaragoza,Spain,51.3,201+,47.8,201+,80.9,201+,58.0,201+,65.5,165=,
+401-450,451-500,Universidad Nacional de Córdoba - UNC,Argentina,56.7,201+,68.6,162,65.0,201+,42.8,201+,39.4,201+,
+401-450,401-450,Universidad Politécnica de Madrid (UPM),Spain,53.3,201+,66.9,190=,76.6,201+,47.3,201+,40.9,201+,
+401-450,351-400,Universidade Federal de Minas Gerais (UFMG),Brazil,49.6,201+,64.3,201+,75.5,201+,55.3,201+,41.2,201+,
+401-450,401-450,Universidade Federal do Rio Grande Do Sul,Brazil,47.8,201+,55.9,201+,76.4,201+,53.9,201+,66.1,155=,
+401-450,451-500,Universität Innsbruck,Austria,54.9,201+,46.3,201+,74.6,201+,52.4,201+,64.6,180,
+401-450,401-450,Universität Regensburg,Germany,49.5,201+,33.4,201+,89.9,113=,67.8,189=,68.1,130=,
+401-450,351-400,Universite libre de Bruxelles,Belgium,52.4,201+,66.6,197=,72.1,201+,50.4,201+,52.8,201+,
+401-450,401-450,University of Bari,Italy,53.8,201+,46.7,201+,81.7,201+,55.7,201+,55.3,201+,
+401-450,401-450,University of Belgrade,Serbia,53.9,201+,39.8,201+,73.2,201+,56.4,201+,89.7,9,
+401-450,451-500,University of Calcutta,India,53.7,201+,54.2,201+,75.1,201+,55.7,201+,48.4,201+,
+401-450,401-450,University of Cape Town,South Africa,56.1,201+,60.6,201+,69.1,201+,43.3,201+,56.3,201+,
+401-450,551-600,University of Electronic Science and Technology of China,China (Mainland),42.3,201+,40.8,201+,93.3,48=,78.6,67,56.2,201+,
+401-450,401-450,University of Galway,Ireland,50.9,201+,62.0,201+,72.9,201+,50.0,201+,52.6,201+,
+401-450,451-500,University of Johannesburg,South Africa,47.7,201+,47.6,201+,83.0,201+,59.8,201+,68.7,124=,
+401-450,451-500,University of Jordan,Jordan,53.6,201+,73.3,98,64.0,201+,42.2,201+,45.6,201+,
+401-450,401-450,University of Lausanne,Switzerland,51.2,201+,60.6,201+,77.9,201+,54.6,201+,43.7,201+,
+401-450,501-550,University of Madras,India,53.6,201+,47.4,201+,76.7,201+,57.0,201+,56.6,201+,
+401-450,401-450,University of Milano-Bicocca,Italy,54.1,201+,56.2,201+,80.2,201+,55.7,201+,43.5,201+,
+401-450,351-400,"University of Missouri, Columbia",United States of America,54.1,201+,45.6,201+,86.2,201+,58.6,201+,54.4,201+,
+401-450,451-500,University of Rochester,United States of America,52.4,201+,52.0,201+,83.2,201+,60.4,201+,41.7,201+,
+401-450,401-450,University of Surrey,United Kingdom,47.0,201+,61.3,201+,84.3,201+,55.3,201+,54.8,201+,
+401-450,451-500,University of Tabriz,Iran (Islamic Republic of),47.0,201+,42.3,201+,86.3,201+,64.5,201+,67.4,139=,
+401-450,351-400,University of Texas Dallas,United States of America,51.5,201+,53.9,201+,83.9,201+,59.8,201+,43.7,201+,
+401-450,401-450,Zhengzhou University,China (Mainland),32.5,201+,56.4,201+,93.9,42,90.2,11,56.5,201+,
+451-500,401-450,Abo Akademi University,Finland,54.8,201+,36.9,201+,75.2,201+,52.8,201+,60.6,201+,
+451-500,501-550,Al-Azhar University,Egypt,48.3,201+,53.4,201+,76.2,201+,59.2,201+,58.5,201+,
+451-500,451-500,American University of Beirut (AUB),Lebanon,57.1,201+,67.8,172,63.5,201+,48.2,201+,30.5,201+,
+451-500,451-500,Banaras Hindu University,India,53.6,201+,56.8,201+,78.0,201+,53.9,201+,33.2,201+,
+451-500,551-600,Bandung Institute of Technology (ITB),Indonesia,57.8,201+,63.4,201+,68.5,201+,45.9,201+,28.9,201+,
+451-500,351-400,Bilkent University,Türkiye,58.0,201+,63.2,201+,69.1,201+,43.8,201+,35.1,201+,
+451-500,501-550,Boston College,United States of America,52.7,201+,52.9,201+,78.0,201+,56.7,201+,28.8,201+,
+451-500,501-550,China Agricultural University,China (Mainland),46.9,201+,44.8,201+,88.0,179=,70.1,156=,34.6,201+,
+451-500,501-550,Chongqing University,China (Mainland),43.2,201+,40.7,201+,88.3,169=,78.9,66,49.8,201+,
+451-500,551-600,Chung-Ang University (CAU),Republic of Korea,45.7,201+,58.6,201+,83.6,201+,60.7,201+,40.0,201+,
+451-500,,Fuzhou University,China (Mainland),41.4,201+,34.9,201+,94.3,34=,85.6,24,42.5,201+,
+451-500,401-450,Gdańsk University of Technology,Poland,43.8,201+,46.2,201+,84.4,201+,57.3,201+,74.8,63,
+451-500,451-500,Heriot-Watt University,United Kingdom,45.3,201+,62.2,201+,76.4,201+,53.2,201+,45.7,201+,
+451-500,401-450,Hiroshima University,Japan,55.3,201+,54.6,201+,70.8,201+,48.7,201+,45.3,201+,
+451-500,501-550,Jawaharlal Nehru University,India,54.4,201+,60.6,201+,74.8,201+,48.2,201+,31.3,201+,
+451-500,351-400,Jiangnan University,China (Mainland),44.6,201+,40.7,201+,85.1,201+,76.3,81,59.7,201+,
+451-500,401-450,Kazan (Volga region) Federal University,Russian Federation,53.2,201+,59.1,201+,64.0,201+,47.8,201+,48.2,201+,
+451-500,501-550,King Faisal University,Saudi Arabia,47.9,201+,59.5,201+,73.3,201+,50.0,201+,66.0,159=,
+451-500,451-500,Kobe University,Japan,49.5,201+,56.2,201+,76.8,201+,52.0,201+,42.0,201+,
+451-500,451-500,La Trobe University,Australia,46.6,201+,53.5,201+,79.8,201+,59.8,201+,46.8,201+,
+451-500,451-500,Lancaster University,United Kingdom,46.2,201+,56.1,201+,77.4,201+,51.6,201+,55.2,201+,
+451-500,501-550,Lovely Professional University (LPU),India,54.4,201+,50.5,201+,69.4,201+,47.8,201+,53.8,201+,
+451-500,501-550,Maastricht University,Netherlands,49.1,201+,61.0,201+,74.6,201+,54.3,201+,45.1,201+,
+451-500,451-500,Macquarie University,Australia,47.3,201+,55.6,201+,82.7,201+,57.3,201+,49.6,201+,
+451-500,451-500,Mansoura University,Egypt,46.8,201+,53.8,201+,76.6,201+,56.7,201+,62.5,201+,
+451-500,451-500,Medizinische Universität Wien,Austria,48.5,201+,57.4,201+,74.4,201+,52.4,201+,49.8,201+,
+451-500,401-450,Nantes University,France,52.1,201+,38.2,201+,82.1,201+,59.2,201+,64.5,181=,
+451-500,451-500,Osaka Metropolitan University,Japan,51.1,201+,49.3,201+,78.7,201+,58.6,201+,37.4,201+,
+451-500,551-600,Savitribai Phule Pune University,India,50.4,201+,60.7,201+,77.0,201+,52.8,201+,41.4,201+,
+451-500,451-500,Sejong University,Republic of Korea,44.2,201+,55.0,201+,86.5,201+,61.0,201+,53.2,201+,
+451-500,501-550,Sultan Qaboos University,Oman,48.4,201+,59.8,201+,69.0,201+,47.3,201+,60.1,201+,
+451-500,401-450,Taras Shevchenko National University of Kyiv,Ukraine,48.2,201+,60.6,201+,69.8,201+,52.0,201+,51.9,201+,
+451-500,551-600,Tarbiat Modares University,Iran (Islamic Republic of),47.9,201+,34.8,201+,87.4,201+,67.8,189=,58.2,201+,
+451-500,551-600,The American University in Cairo,Egypt,57.8,201+,71.2,118=,58.6,201+,41.7,201+,31.3,201+,
+451-500,451-500,The University of Texas Southwestern Medical Center at Dallas,United States of America,56.3,201+,42.7,201+,79.3,201+,55.3,201+,35.3,201+,
+451-500,,Ton Duc Thang University,Viet Nam,42.6,201+,40.1,201+,86.9,201+,63.4,201+,78.4,39=,
+451-500,451-500,Universidad Autónoma Metropolitana (UAM),Mexico,58.3,201+,57.5,201+,73.0,201+,48.2,201+,30.3,201+,
+451-500,351-400,Universität Duisburg-Essen,Germany,50.6,201+,38.1,201+,82.5,201+,62.6,201+,57.1,201+,
+451-500,451-500,Universität Rostock,Germany,50.6,201+,30.4,201+,84.3,201+,60.4,201+,72.9,77=,
+451-500,451-500,Universitat Rovira i Virgili,Spain,45.0,201+,37.4,201+,89.5,124=,68.9,175=,61.6,201+,
+451-500,451-500,University of Aberdeen,United Kingdom,52.9,201+,53.9,201+,73.2,201+,51.6,201+,52.9,201+,
+451-500,501-550,"University of Agriculture, Faisalabad",Pakistan,44.0,201+,55.6,201+,84.0,201+,58.9,201+,49.5,201+,
+451-500,451-500,University of Hyderabad,India,59.1,201+,37.8,201+,78.0,201+,53.5,201+,52.5,201+,
+451-500,451-500,University of Karachi,Pakistan,51.1,201+,57.3,201+,70.4,201+,46.8,201+,58.4,201+,
+451-500,401-450,University of Parma,Italy,53.7,201+,43.8,201+,80.0,201+,56.0,201+,42.9,201+,
+451-500,401-450,University of Reading,United Kingdom,47.2,201+,69.1,155,70.2,201+,46.8,201+,54.6,201+,
+451-500,451-500,University of Saskatchewan,Canada,47.5,201+,47.3,201+,87.0,201+,58.9,201+,50.8,201+,
+451-500,351-400,University of South Australia,Australia,48.6,201+,55.9,201+,81.9,201+,54.6,201+,47.4,201+,
+451-500,401-450,University of South Carolina,United States of America,41.7,201+,56.0,201+,89.4,128=,64.7,201+,46.7,201+,
+451-500,451-500,University of Southern Denmark (SDU),Denmark,50.0,201+,52.6,201+,78.6,201+,56.0,201+,52.1,201+,
+451-500,451-500,University of Trieste,Italy,48.0,201+,43.4,201+,80.3,201+,56.7,201+,63.7,192,
+451-500,501-550,University of Witwatersrand,South Africa,48.7,201+,57.4,201+,76.8,201+,49.1,201+,63.8,191,
+501-550,451-500,Ajou University,Republic of Korea,49.2,201+,52.8,201+,81.6,201+,57.7,201+,23.4,201+,
+501-550,601-650,Aligarh Muslim University,India,47.1,201+,45.6,201+,82.6,201+,56.0,201+,56.4,201+,
+501-550,451-500,Chiang Mai University,Thailand,52.9,201+,52.7,201+,73.1,201+,49.5,201+,38.1,201+,
+501-550,501-550,Chiba University,Japan,54.9,201+,53.0,201+,73.0,201+,50.8,201+,33.9,201+,
+501-550,501-550,Chonnam National University,Republic of Korea,48.7,201+,45.8,201+,85.1,201+,58.3,201+,41.2,201+,
+501-550,551-600,Czech Technical University in Prague,Czechia,57.7,201+,64.1,201+,57.0,201+,31.5,201+,53.5,201+,
+501-550,551-600,Dartmouth College,United States of America,46.8,201+,59.0,201+,76.9,201+,54.3,201+,35.7,201+,
+501-550,551-600,Dongguk University,Republic of Korea,40.9,201+,47.7,201+,86.5,201+,61.8,201+,53.6,201+,
+501-550,551-600,Donghua University,China (Mainland),43.8,201+,33.7,201+,90.9,94=,75.2,90,48.0,201+,
+501-550,551-600,Florida International University,United States of America,43.3,201+,51.6,201+,81.5,201+,58.6,201+,58.1,201+,
+501-550,501-550,Gadjah Mada University,Indonesia,57.4,201+,65.9,201+,58.6,201+,39.3,201+,27.8,201+,
+501-550,,Gebze Technical University (GTU),Türkiye,49.8,201+,51.0,201+,74.4,201+,46.8,201+,53.2,201+,
+501-550,601-650,George Washington University,United States of America,52.7,201+,56.3,201+,67.9,201+,49.5,201+,32.1,201+,
+501-550,551-600,Indian Institute of Technology Indore (IIT Indore),India,51.7,201+,46.7,201+,74.8,201+,53.2,201+,39.7,201+,
+501-550,501-550,Isfahan University of Technology,Iran (Islamic Republic of),50.6,201+,33.2,201+,84.3,201+,61.3,201+,56.1,201+,
+501-550,601-650,Islamic Azad University,Iran (Islamic Republic of),39.3,201+,31.5,201+,79.6,201+,74.0,105=,90.7,7,
+501-550,501-550,Justus-Liebig-University Giessen,Germany,44.5,201+,35.9,201+,84.7,201+,60.7,201+,64.9,178=,
+501-550,501-550,Karl-Franzens-Universitaet Graz,Austria,51.2,201+,46.4,201+,74.5,201+,52.4,201+,45.7,201+,
+501-550,501-550,Kasetsart University,Thailand,51.0,201+,52.1,201+,75.8,201+,50.4,201+,34.8,201+,
+501-550,601-650,Manipal Academy of Higher Education - Manipal University (MAHE),India,47.1,201+,60.5,201+,74.0,201+,49.5,201+,50.4,201+,
+501-550,401-450,Oregon State University,United States of America,43.3,201+,47.5,201+,88.2,172=,59.5,201+,54.6,201+,
+501-550,451-500,Shiraz University,Iran (Islamic Republic of),51.2,201+,33.1,201+,80.7,201+,57.7,201+,63.9,189=,
+501-550,551-600,Stellenbosch University,South Africa,50.4,201+,58.7,201+,66.3,201+,48.7,201+,51.7,201+,
+501-550,501-550,"Stony Brook University, State University of New York",United States of America,44.9,201+,46.3,201+,87.1,201+,60.7,201+,47.0,201+,
+501-550,501-550,Swinburne University of Technology,Australia,37.3,201+,52.6,201+,88.1,176=,63.4,201+,62.1,201+,
+501-550,401-450,Umea University,Sweden,48.7,201+,53.0,201+,77.1,201+,52.4,201+,48.6,201+,
+501-550,501-550,Universidade de Vigo,Spain,42.8,201+,42.8,201+,83.7,201+,56.0,201+,65.4,169=,
+501-550,401-450,Universität Bremen,Germany,44.4,201+,53.7,201+,76.3,201+,54.3,201+,54.7,201+,
+501-550,601-650,Université Côte d'Azur,France,56.4,201+,38.7,201+,69.1,201+,45.4,201+,57.9,201+,
+501-550,401-450,Université Laval,Canada,44.4,201+,52.2,201+,81.4,201+,56.4,201+,56.0,201+,
+501-550,451-500,Universiti Malaysia Pahang Al - Sultan Abdullah (UMPSA),Malaysia,54.4,201+,42.5,201+,73.9,201+,49.5,201+,50.8,201+,
+501-550,551-600,Universiti Teknologi MARA - UiTM,Malaysia,45.6,201+,52.8,201+,75.4,201+,54.6,201+,51.2,201+,
+501-550,601-650,University of Akron,United States of America,45.7,201+,51.4,201+,81.4,201+,56.4,201+,39.2,201+,
+501-550,401-450,University of Alicante,Spain,48.0,201+,39.8,201+,83.8,201+,59.5,201+,53.4,201+,
+501-550,501-550,University of Cincinnati,United States of America,42.9,201+,49.2,201+,87.9,182=,62.6,201+,48.5,201+,
+501-550,451-500,University of East Anglia (UEA),United Kingdom,46.3,201+,51.4,201+,73.6,201+,54.3,201+,53.8,201+,
+501-550,451-500,University of Genoa,Italy,42.8,201+,51.2,201+,84.9,201+,55.0,201+,56.9,201+,
+501-550,551-600,University of Kwazulu-Natal,South Africa,46.0,201+,39.9,201+,76.9,201+,56.0,201+,75.2,60=,
+501-550,501-550,University of Manitoba,Canada,43.4,201+,61.4,201+,78.6,201+,52.8,201+,47.5,201+,
+501-550,501-550,University of Mons,Belgium,50.8,201+,55.5,201+,71.2,201+,49.1,201+,49.1,201+,
+501-550,451-500,University of New Mexico,United States of America,44.0,201+,60.0,201+,80.6,201+,56.7,201+,42.2,201+,
+501-550,551-600,University of Patras,Greece,47.9,201+,51.5,201+,74.8,201+,48.7,201+,53.4,201+,
+501-550,601-650,University of South Florida,United States of America,36.4,201+,51.7,201+,90.1,109=,64.2,201+,56.0,201+,
+501-550,451-500,University of Szeged,Hungary,46.5,201+,54.5,201+,77.4,201+,50.8,201+,57.5,201+,
+501-550,451-500,University of Tasmania,Australia,49.0,201+,46.9,201+,76.5,201+,55.3,201+,52.3,201+,
+501-550,451-500,Victoria University of Wellington,New Zealand,54.2,201+,57.1,201+,68.2,201+,47.3,201+,30.6,201+,
+501-550,401-450,Wroclaw University of Science and Technology (WUST),Poland,48.9,201+,47.0,201+,73.1,201+,52.0,201+,67.7,136=,
+551-600,551-600,"Adam Mickiewicz University, Poznań",Poland,42.6,201+,40.6,201+,75.9,201+,54.6,201+,69.7,108=,
+551-600,551-600,AGH University of Science and Technology,Poland,41.7,201+,51.9,201+,71.9,201+,49.5,201+,68.3,128=,
+551-600,,Airlangga University,Indonesia,58.0,201+,67.1,187,51.5,201+,33.8,201+,35.9,201+,
+551-600,501-550,Ben-Gurion University of The Negev,Israel,49.2,201+,39.9,201+,81.8,201+,59.2,201+,38.9,201+,
+551-600,,Chandigarh University,India,54.0,201+,70.0,135=,51.6,201+,36.0,201+,29.4,201+,
+551-600,551-600,Colorado School of Mines,United States of America,42.9,201+,59.7,201+,79.3,201+,50.8,201+,35.9,201+,
+551-600,501-550,Dublin City University,Ireland,44.8,201+,60.3,201+,63.9,201+,48.7,201+,48.8,201+,
+551-600,551-600,EGE UNIVERSITY,Türkiye,45.8,201+,55.3,201+,71.9,201+,52.8,201+,45.3,201+,
+551-600,551-600,Eötvös Loránd University,Hungary,45.7,201+,56.4,201+,67.7,201+,46.4,201+,60.1,201+,
+551-600,601-650,Ferdowsi University of Mashhad,Iran (Islamic Republic of),48.9,201+,32.0,201+,80.1,201+,57.3,201+,58.3,201+,
+551-600,,Imam Mohammad Ibn Saud Islamic University – IMSIU,Saudi Arabia,62.3,201+,51.5,201+,57.4,201+,40.5,201+,31.3,201+,
+551-600,,Kaohsiung Medical University,Taiwan,42.4,201+,49.1,201+,79.7,201+,56.7,201+,46.9,201+,
+551-600,551-600,Konkuk University,Republic of Korea,40.4,201+,48.4,201+,85.6,201+,59.5,201+,51.7,201+,
+551-600,,Lahore University of Management Sciences (LUMS),Pakistan,55.3,201+,65.0,201+,59.1,201+,38.0,201+,20.6,201+,
+551-600,451-500,Massey University,New Zealand,48.1,201+,54.6,201+,69.1,201+,47.8,201+,43.6,201+,
+551-600,551-600,National Taiwan Normal University,Taiwan,58.3,201+,55.9,201+,64.9,201+,45.9,201+,15.9,201+,
+551-600,,Ocean University of China,China (Mainland),43.2,201+,38.9,201+,86.2,201+,66.4,201+,48.2,201+,
+551-600,551-600,Panjab University,India,49.1,201+,47.3,201+,76.4,201+,53.9,201+,41.4,201+,
+551-600,601-650,Peter the Great St. Petersburg Polytechnic University,Russian Federation,53.8,201+,62.6,201+,56.6,201+,38.7,201+,45.1,201+,
+551-600,551-600,Renmin (People's) University of China,China (Mainland),42.4,201+,58.3,201+,82.8,201+,61.6,201+,17.0,201+,
+551-600,501-550,Rensselaer Polytechnic Institute,United States of America,45.0,201+,54.8,201+,79.4,201+,55.7,201+,33.3,201+,
+551-600,551-600,Shahid Beheshti University (SBU),Iran (Islamic Republic of),44.3,201+,36.1,201+,82.2,201+,59.5,201+,56.4,201+,
+551-600,401-450,Simon Fraser University,Canada,51.2,201+,46.5,201+,74.0,201+,52.8,201+,39.2,201+,
+551-600,551-600,South Ural State University (National Research University),Russian Federation,41.2,201+,54.1,201+,71.4,201+,50.4,201+,71.4,91=,
+551-600,451-500,The National University of Science and Technology MISIS,Russian Federation,39.4,201+,59.9,201+,75.5,201+,53.9,201+,59.4,201+,
+551-600,451-500,The University of Texas M. D. Anderson Cancer Center,United States of America,47.4,201+,44.2,201+,81.9,201+,57.0,201+,45.1,201+,
+551-600,,Universidad Andrés Bello,Chile,49.5,201+,58.8,201+,61.8,201+,44.9,201+,45.9,201+,
+551-600,451-500,Universidad de los Andes,Colombia,52.0,201+,73.0,99=,56.9,201+,35.3,201+,27.8,201+,
+551-600,501-550,Universidad de Oviedo,Spain,49.1,201+,36.1,201+,79.2,201+,56.0,201+,48.2,201+,
+551-600,551-600,Universidad Nacional de Rosario (UNR),Argentina,55.2,201+,62.4,201+,60.1,201+,43.8,201+,22.9,201+,
+551-600,551-600,Universidad Nacional del Litoral,Argentina,52.5,201+,62.4,201+,60.7,201+,41.7,201+,28.2,201+,
+551-600,501-550,Universidade Federal de Santa Catarina,Brazil,44.6,201+,53.8,201+,76.7,201+,53.5,201+,44.0,201+,
+551-600,601-650,Universitas Indonesia,Indonesia,61.9,201+,67.9,169=,48.7,201+,31.5,201+,20.6,201+,
+551-600,501-550,Universität Konstanz,Germany,53.8,201+,41.2,201+,69.4,201+,47.8,201+,52.8,201+,
+551-600,451-500,Universität Potsdam,Germany,49.4,201+,34.2,201+,80.2,201+,54.6,201+,63.2,199=,
+551-600,451-500,University of Canterbury | Te Whare Wānanga o Waitaha,New Zealand,51.3,201+,60.9,201+,64.0,201+,46.8,201+,33.5,201+,
+551-600,501-550,University of Central Florida,United States of America,41.4,201+,51.8,201+,82.3,201+,56.4,201+,51.6,201+,
+551-600,,University of Engineering & Technology (UET) Lahore,Pakistan,48.9,201+,62.0,201+,64.7,201+,44.4,201+,37.5,201+,
+551-600,601-650,University of Guelph,Canada,41.1,201+,63.3,201+,78.2,201+,50.4,201+,46.3,201+,
+551-600,501-550,University of Kansas,United States of America,44.1,201+,58.2,201+,78.4,201+,56.0,201+,33.8,201+,
+551-600,551-600,University of Messina (UniME),Italy,50.9,201+,28.8,201+,78.5,201+,53.5,201+,62.2,201+,
+551-600,501-550,University of Minho,Portugal,41.9,201+,46.0,201+,84.3,201+,58.9,201+,54.4,201+,
+551-600,,University of North Texas,United States of America,45.5,201+,41.2,201+,78.5,201+,54.6,201+,52.8,201+,
+551-600,501-550,University of Oregon,United States of America,46.3,201+,55.7,201+,71.5,201+,55.3,201+,30.6,201+,
+551-600,501-550,University of Pretoria,South Africa,42.7,201+,56.5,201+,71.3,201+,48.7,201+,55.3,201+,
+551-600,551-600,University of Salerno,Italy,47.9,201+,34.6,201+,82.0,201+,57.3,201+,52.9,201+,
+551-600,601-650,University of Sharjah,United Arab Emirates,47.2,201+,58.9,201+,70.3,201+,45.9,201+,50.2,201+,
+551-600,601-650,University of South Africa,South Africa,44.1,201+,48.7,201+,73.9,201+,50.8,201+,57.8,201+,
+551-600,501-550,University of Tartu,Estonia,45.0,201+,46.4,201+,75.5,201+,54.6,201+,57.5,201+,
+551-600,451-500,University of Turku,Finland,49.5,201+,48.0,201+,71.8,201+,51.6,201+,49.3,201+,
+551-600,551-600,University of Wroclaw,Poland,48.6,201+,43.5,201+,74.8,201+,51.2,201+,60.2,201+,
+551-600,601-650,Viet Nam National University Ho Chi Minh City (VNU-HCM),Viet Nam,48.1,201+,55.7,201+,75.3,201+,50.0,201+,34.2,201+,
+551-600,501-550,Vilnius University,Lithuania,45.8,201+,50.4,201+,72.4,201+,49.5,201+,51.5,201+,
+601-700,,Aalborg University,Denmark,39.2,201+,56.3,201+,69.0,201+,45.9,201+,52.8,201+,
+601-700,451-500,Al-Farabi Kazakh National University,Kazakhstan,53.6,201+,60.3,201+,50.2,201+,34.6,201+,52.9,201+,
+601-700,,American University of Sharjah,United Arab Emirates,50.5,201+,62.6,201+,53.5,201+,33.8,201+,37.8,201+,
+601-700,601-650,Amirkabir University of Technology,Iran (Islamic Republic of),41.5,201+,39.9,201+,79.0,201+,56.0,201+,59.2,201+,
+601-700,,Amity University,India,43.3,201+,56.1,201+,74.0,201+,51.2,201+,40.7,201+,
+601-700,601-650,Anhui University,China (Mainland),47.7,201+,24.3,201+,89.0,143=,70.9,144=,30.4,201+,
+601-700,551-600,Assiut University,Egypt,38.9,201+,49.8,201+,80.3,201+,57.0,201+,46.7,201+,
+601-700,,Bahauddin Zakariya University,Pakistan,41.4,201+,52.1,201+,69.4,201+,51.2,201+,49.2,201+,
+601-700,601-650,Bauman Moscow State Technical University,Russian Federation,52.9,201+,79.8,40,43.3,201+,24.0,201+,19.5,201+,
+601-700,501-550,Baylor College of Medicine,United States of America,40.0,201+,55.9,201+,76.3,201+,53.5,201+,38.5,201+,
+601-700,,Beijing Jiaotong University,China (Mainland),42.3,201+,45.5,201+,81.9,201+,57.3,201+,22.3,201+,
+601-700,,Belarusian State University,Belarus,51.0,201+,54.6,201+,52.4,201+,32.3,201+,60.8,201+,
+601-700,,Boğaziçi University,Türkiye,54.1,201+,69.7,142=,50.2,201+,33.8,201+,12.0,201+,
+601-700,,Central China Normal University (f.k.a. Huazhong Normal University),China (Mainland),37.4,201+,28.9,201+,100.0,1=,75.0,91=,21.7,201+,
+601-700,,China University of Petroleum (East China),China (Mainland),46.1,201+,33.1,201+,84.0,201+,70.1,156=,32.4,201+,
+601-700,,Chungnam National University,Republic of Korea,45.5,201+,53.6,201+,75.8,201+,53.2,201+,33.0,201+,
+601-700,,Clemson University,United States of America,34.7,201+,49.5,201+,83.7,201+,56.7,201+,53.2,201+,
+601-700,,Cranfield University,United Kingdom,41.7,201+,66.9,190=,70.5,201+,43.8,201+,41.1,201+,
+601-700,501-550,Drexel University,United States of America,32.0,201+,50.9,201+,91.3,84=,60.7,201+,46.2,201+,
+601-700,,Gazi Üniversitesi,Türkiye,45.3,201+,55.9,201+,70.7,201+,47.8,201+,41.3,201+,
+601-700,,Georgetown University,United States of America,45.4,201+,58.4,201+,64.2,201+,47.8,201+,26.9,201+,
+601-700,,"Government College University, Faisalabad",Pakistan,38.6,201+,33.1,201+,83.5,201+,60.4,201+,54.9,201+,
+601-700,,HeFei University of Technology,China (Mainland),40.7,201+,30.3,201+,87.9,182=,71.3,138=,37.7,201+,
+601-700,601-650,Indian Institute of Technology BHU Varanasi (IIT BHU Varanasi),India,44.7,201+,44.8,201+,81.4,201+,58.3,201+,21.2,201+,
+601-700,,Indian Institute of Technology Hyderabad (IITH),India,52.4,201+,38.5,201+,72.8,201+,49.5,201+,33.2,201+,
+601-700,,Istanbul University,Türkiye,48.1,201+,55.6,201+,57.2,201+,38.0,201+,47.0,201+,
+601-700,,Jamia Millia Islamia,India,42.9,201+,42.0,201+,83.1,201+,57.7,201+,47.4,201+,
+601-700,551-600,Japan Advanced Institute of Science and Technology,Japan,50.1,201+,56.1,201+,72.3,201+,41.1,201+,30.8,201+,
+601-700,,Jiangsu University,China (Mainland),35.7,201+,23.9,201+,88.7,153=,77.0,77=,62.7,201+,
+601-700,,Jinan University (China),China (Mainland),32.6,201+,37.5,201+,88.5,160=,74.1,102=,47.7,201+,
+601-700,501-550,Kanazawa University,Japan,45.0,201+,36.5,201+,79.8,201+,57.7,201+,46.9,201+,
+601-700,551-600,Kansas State University,United States of America,38.7,201+,51.1,201+,73.7,201+,49.1,201+,52.6,201+,
+601-700,,Kaunas University of Technology,Lithuania,49.5,201+,55.5,201+,61.0,201+,42.8,201+,45.1,201+,
+601-700,601-650,Khon Kaen University,Thailand,44.4,201+,48.8,201+,70.2,201+,48.7,201+,58.8,201+,
+601-700,601-650,Lebanese University,Lebanon,50.8,201+,59.6,201+,62.5,201+,45.4,201+,24.3,201+,
+601-700,601-650,Lodz University of Technology,Poland,39.6,201+,38.7,201+,76.5,201+,51.2,201+,69.0,118=,
+601-700,551-600,Louisiana State University,United States of America,42.9,201+,47.3,201+,79.0,201+,55.0,201+,42.5,201+,
+601-700,,Lulea University,Sweden,36.8,201+,50.8,201+,74.3,201+,48.7,201+,63.0,201+,
+601-700,601-650,National Central University,Taiwan,47.9,201+,58.9,201+,71.0,201+,43.8,201+,34.3,201+,
+601-700,601-650,National Research Nuclear University MEPhI (Moscow Engineering Physics Institute),Russian Federation,42.3,201+,64.9,201+,63.8,201+,35.3,201+,50.1,201+,
+601-700,,Northwest Agriculture and Forestry University,China (Mainland),36.5,201+,36.2,201+,87.9,182=,67.8,189=,41.3,201+,
+601-700,551-600,Okayama University,Japan,51.1,201+,37.3,201+,75.1,201+,50.0,201+,44.4,201+,
+601-700,551-600,Prince of Songkla University,Thailand,43.3,201+,45.0,201+,71.5,201+,50.0,201+,48.5,201+,
+601-700,,Qingdao University,China (Mainland),35.4,201+,35.9,201+,92.4,63=,79.6,62,44.9,201+,
+601-700,,Scuola Normale Superiore di Pisa,Italy,48.8,201+,60.3,201+,60.3,201+,43.3,201+,32.6,201+,
+601-700,,Shinshu University,Japan,38.4,201+,45.2,201+,87.3,201+,55.7,201+,50.6,201+,
+601-700,,Texas Tech University,United States of America,37.3,201+,52.5,201+,78.8,201+,53.5,201+,44.2,201+,
+601-700,,The University of Alabama,United States of America,43.6,201+,54.1,201+,75.2,201+,49.5,201+,34.3,201+,
+601-700,,The University of Lahore,Pakistan,43.8,201+,55.4,201+,72.1,201+,52.8,201+,33.8,201+,
+601-700,601-650,Tokyo Metropolitan University,Japan,48.4,201+,47.4,201+,71.2,201+,49.1,201+,33.9,201+,
+601-700,,Universidad de la República (Udelar),Uruguay,43.6,201+,53.8,201+,67.9,201+,44.9,201+,42.2,201+,
+601-700,,Universidade de Brasília,Brazil,43.9,201+,53.3,201+,67.5,201+,47.3,201+,37.8,201+,
+601-700,601-650,Universidade Federal de São Paulo,Brazil,46.5,201+,53.5,201+,70.2,201+,47.3,201+,36.9,201+,
+601-700,551-600,Universidade Federal do Paraná - UFPR,Brazil,46.8,201+,50.8,201+,76.9,201+,51.2,201+,34.5,201+,
+601-700,601-650,Universität des Saarlandes,Germany,43.7,201+,34.9,201+,82.3,201+,57.7,201+,61.5,201+,
+601-700,601-650,Universität für Bodenkultur Wien,Austria,43.2,201+,44.7,201+,75.1,201+,50.8,201+,58.3,201+,
+601-700,501-550,Université de Caen Normandie,France,41.5,201+,42.6,201+,75.2,201+,53.5,201+,71.3,94=,
+601-700,601-650,Université de Fribourg,Switzerland,49.4,201+,38.0,201+,76.3,201+,53.2,201+,48.2,201+,
+601-700,,Université de Sherbrooke,Canada,45.3,201+,52.2,201+,70.8,201+,47.3,201+,30.4,201+,
+601-700,601-650,Université de Tunis El Manar,Tunisia,48.8,201+,34.4,201+,71.9,201+,45.9,201+,54.4,201+,
+601-700,501-550,Université du Québec,Canada,60.5,201+,48.1,201+,53.7,201+,38.7,201+,25.8,201+,
+601-700,,University of Baghdad,Iraq,46.2,201+,67.9,169=,54.3,201+,39.9,201+,39.5,201+,
+601-700,,University of Bucharest,Romania,43.7,201+,56.2,201+,73.3,201+,46.8,201+,44.6,201+,
+601-700,601-650,University of Calabria,Italy,40.6,201+,37.7,201+,79.6,201+,53.2,201+,59.7,201+,
+601-700,551-600,"University of California, Santa Cruz",United States of America,42.0,201+,52.9,201+,79.5,201+,52.8,201+,25.0,201+,
+601-700,501-550,University of Connecticut,United States of America,31.7,201+,50.5,201+,88.2,172=,62.9,201+,53.4,201+,
+601-700,,University of Crete,Greece,49.2,201+,42.3,201+,70.0,201+,48.2,201+,39.7,201+,
+601-700,,University of Debrecen,Hungary,46.4,201+,47.8,201+,68.8,201+,47.8,201+,53.7,201+,
+601-700,,University of Dundee,United Kingdom,50.7,201+,53.3,201+,64.8,201+,49.5,201+,27.8,201+,
+601-700,601-650,University of Hull,United Kingdom,48.8,201+,46.0,201+,65.2,201+,45.9,201+,49.4,201+,
+601-700,501-550,University of Iowa,United States of America,45.4,201+,57.2,201+,74.6,201+,50.8,201+,30.3,201+,
+601-700,551-600,University of Kentucky,United States of America,35.3,201+,56.9,201+,83.9,201+,57.7,201+,44.2,201+,
+601-700,601-650,University of Leicester,United Kingdom,44.0,201+,53.7,201+,70.8,201+,51.6,201+,42.6,201+,
+601-700,501-550,University of Ljubljana,Slovenia,44.5,201+,39.8,201+,74.6,201+,53.2,201+,62.6,201+,
+601-700,,University of Lodz,Poland,46.6,201+,34.1,201+,73.7,201+,48.7,201+,60.3,201+,
+601-700,,University of Miami,United States of America,38.8,201+,58.9,201+,70.9,201+,50.0,201+,41.8,201+,
+601-700,601-650,University of Mississippi,United States of America,45.6,201+,38.7,201+,72.0,201+,50.0,201+,51.9,201+,
+601-700,,University of Modena and Reggio Emilia,Italy,37.9,201+,53.9,201+,77.8,201+,52.8,201+,48.2,201+,
+601-700,,University of Mumbai,India,43.3,201+,58.8,201+,67.4,201+,47.3,201+,38.8,201+,
+601-700,551-600,University of Namur,Belgium,47.4,201+,42.1,201+,70.6,201+,50.4,201+,45.3,201+,
+601-700,501-550,University of Nebraska - Lincoln,United States of America,32.7,201+,47.9,201+,91.9,72=,61.6,201+,34.8,201+,
+601-700,,University of Oklahoma,United States of America,38.7,201+,45.8,201+,81.8,201+,59.5,201+,40.5,201+,
+601-700,601-650,University of Oulu,Finland,42.3,201+,44.5,201+,72.1,201+,48.2,201+,55.8,201+,
+601-700,601-650,University of Palermo,Italy,39.5,201+,40.0,201+,82.6,201+,55.0,201+,51.8,201+,
+601-700,,University of Petroleum and Energy Studies (UPES),India,48.6,201+,46.2,201+,59.3,201+,41.1,201+,53.2,201+,
+601-700,601-650,University of Seoul,Republic of Korea,47.2,201+,52.1,201+,67.9,201+,47.3,201+,37.2,201+,
+601-700,,University of Sussex,United Kingdom,46.0,201+,51.3,201+,68.1,201+,46.8,201+,39.8,201+,
+601-700,,University of the Philippines,Philippines,53.4,201+,60.8,201+,54.0,201+,35.3,201+,28.5,201+,
+601-700,551-600,University of Victoria (UVic),Canada,42.5,201+,53.9,201+,73.8,201+,52.0,201+,43.3,201+,
+601-700,601-650,University of Zagreb,Croatia,42.6,201+,42.3,201+,73.8,201+,52.8,201+,69.9,106=,
+601-700,,University POLITEHNICA of Bucharest,Romania,42.0,201+,57.5,201+,66.7,201+,48.2,201+,53.5,201+,
+601-700,501-550,Virginia Commonwealth University,United States of America,44.9,201+,41.2,201+,79.1,201+,52.0,201+,50.5,201+,
+601-700,,Wayne State University,United States of America,45.0,201+,48.5,201+,78.6,201+,54.3,201+,38.5,201+,
+601-700,,Yangzhou University,China (Mainland),39.1,201+,26.4,201+,91.9,72=,77.0,77=,50.1,201+,
+601-700,601-650,Yeungnam University,Republic of Korea,37.0,201+,38.7,201+,83.9,201+,59.8,201+,57.6,201+,
+601-700,,York University,Canada,47.3,201+,55.9,201+,61.9,201+,45.4,201+,29.9,201+,
