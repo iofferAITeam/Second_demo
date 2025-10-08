@@ -793,15 +793,18 @@ async def chat_endpoint(request: ChatRequest):
     """
     try:
         # Import AI teams and user data
-        import json
-        from src.teams.hybrid_qa_team import hybrid_qa_query
-        from src.teams.school_rec_teams import (
-            create_school_rec_team,
-            create_simple_school_rec_agent,
-        )
+        from src.teams.hybrid_qa_team import create_hybrid_qa_team 
+        from src.teams.school_rec_teams import create_school_rec_team
         from src.teams.student_info_team import create_student_info_team
         from src.domain.students_pg import StudentDocument
         from autogen_agentchat.ui import Console
+
+        # session 初始化
+        try:
+            init_session(request.user_id)
+            print(f"✅ Session 初始化: {request.user_id}")
+        except Exception as e:
+            print(f"⚠️ Session 初始化失败: {e}")
 
         # 查询用户档案
         user_profile = None
@@ -828,152 +831,71 @@ async def chat_endpoint(request: ChatRequest):
             # Use keyword-based routing (bypassing Gemini dependency)
             team_type = keyword_based_routing(request.message)
 
+        # 🟢 统一使用 AutoGen Teams
+        print(f"🎯 路由到: {team_type}")
+        
+        # 步骤1: 选择对应的 AutoGen Team
         if team_type == "GENERAL_QA":
-            # Use real hybrid QA agent with user context
-            qa_result = await hybrid_qa_query(enhanced_message)
-            qa_data = json.loads(qa_result)
-
-            # 清理AI响应
-            raw_message = qa_data.get(
-                "answer", "I apologize, but I cannot provide an answer right now."
-            )
-            cleaned_message = clean_ai_response(raw_message)
-
-            response = ChatResponse(
-                message=cleaned_message,
-                thinking_process=qa_data.get(
-                    "thinking_process", "Processing your question..."
-                ),
-                reference_links=qa_data.get("reference_links", []),
-                strategy=qa_data.get("strategy", "hybrid_qa"),
-                source=qa_data.get("source", "knowledge_base"),
-                rag_similarity=qa_data.get("rag_similarity", 0.0),
-                team_used="GENERAL_QA",
-                timestamp=datetime.now().isoformat(),
-            )
-
+            team = create_hybrid_qa_team()
         elif team_type == "SCHOOL_REC":
-            print(f"🎓 SCHOOL_REC route reached! Using Multi-Agent workflow")
-            # Use the new Multi-Agent workflow (6 agents without AutoGen)
-            try:
-                from src.workflows.multi_agent_workflow import get_multi_agent_workflow
-
-                print("🚀 启动多Agent学校推荐workflow (6个Agent无AutoGen)")
-
-                # Enhanced message with user context
-                enhanced_message = request.message
-                if user_context:
-                    enhanced_message = f"{user_context}\n\n用户请求: {request.message}"
-
-                print(f"📤 处理推荐请求: {enhanced_message[:100]}...")
-
-                # Create and run the multi-agent workflow
-                workflow = get_multi_agent_workflow()
-                team_response = await workflow.run_complete_recommendation(
-                    enhanced_message, request.user_id
-                )
-
-                if team_response and len(team_response.strip()) > 50:
-                    strategy_used = "multi_agent_workflow_no_autogen"
-                    print("✅ 多Agent workflow成功完成推荐")
-                else:
-                    raise Exception("No valid response from Multi-Agent workflow")
-
-                print(f"✅ Workflow响应: {len(team_response)} 字符")
-
-                response = ChatResponse(
-                    message=team_response,
-                    thinking_process="使用6个Agent工作流生成个性化学校推荐，完全绕过AutoGen框架，包含档案分析、学校研究、项目匹配、详细分析等完整流程",
-                    reference_links=[
-                        "https://usnews.com/colleges",
-                        "https://collegeboard.org",
-                    ],
-                    strategy=strategy_used,
-                    source="multi_agent_workflow",
-                    rag_similarity=0.95,
-                    team_used="SCHOOL_REC_MULTI_AGENT_WORKFLOW",
-                    timestamp=datetime.now().isoformat(),
-                )
-
-            except Exception as workflow_error:
-                print(
-                    f"❌ 多Agent推荐工作流错误: {type(workflow_error).__name__}: {str(workflow_error)}"
-                )
-                import traceback
-
-                traceback.print_exc()
-
-                # Fallback response
-                response = ChatResponse(
-                    message="很抱歉，学校推荐系统暂时不可用。请稍后再试，或者前往个人中心完善您的资料以获得更准确的推荐。我们的团队正在努力修复这个问题。",
-                    thinking_process="多Agent工作流失败，提供回退响应",
-                    reference_links=["https://usnews.com/colleges"],
-                    strategy="workflow_error_fallback",
-                    source="system",
-                    rag_similarity=0.0,
-                    team_used="SCHOOL_REC_MULTI_AGENT_FALLBACK",
-                    timestamp=datetime.now().isoformat(),
-                )
-
+            team = create_school_rec_team()
         elif team_type == "STUDENT_INFO":
-            # Use real student info team
-            try:
-                student_team = create_student_info_team()
-                task_result = await Console(
-                    student_team.run_stream(task=request.message)
-                )
-                team_response = task_result.messages[-1].content
-
-                # Clean up response
-                if "TERMINATE" in team_response:
-                    team_response = team_response.replace("TERMINATE", "").strip()
-
-                response = ChatResponse(
-                    message=team_response,
-                    thinking_process="Extracting and validating student information",
-                    reference_links=[],
-                    strategy="information_extraction",
-                    source="user_input",
-                    rag_similarity=0.0,
-                    team_used="STUDENT_INFO",
-                    timestamp=datetime.now().isoformat(),
-                )
-            except Exception as team_error:
-                # Fallback if team fails
-                response = ChatResponse(
-                    message=f"I've noted your information: {request.message}. Let me process this for your profile.",
-                    thinking_process=f"Team initialization error: {str(team_error)}, using fallback response",
-                    reference_links=[],
-                    strategy="fallback",
-                    source="fallback",
-                    rag_similarity=0.0,
-                    team_used="STUDENT_INFO",
-                    timestamp=datetime.now().isoformat(),
-                )
+            team = create_student_info_team()
         else:
-            # Default to General QA for unknown team types
-            qa_result = await hybrid_qa_query(request.message)
-            qa_data = json.loads(qa_result)
-
-            # 清理AI响应
-            raw_message = qa_data.get(
-                "answer", "I apologize, but I cannot provide an answer right now."
+            team = create_hybrid_qa_team()
+            team_type = "GENERAL_QA"
+        
+        # 步骤2: 执行 AutoGen Team
+        print(f"🚀 运行 {team_type} team...")
+        try:
+            task_result = await Console(
+                team.run_stream(task=enhanced_message)
             )
-            cleaned_message = clean_ai_response(raw_message)
-
+            
+            # 步骤3: 提取最终消息
+            team_response = ""
+            
+            for i in range(len(task_result.messages) - 1, -1, -1):
+                msg = task_result.messages[i]
+                content = str(msg.content) if hasattr(msg, 'content') else str(msg)
+                
+                if content.strip() and content.strip() != "TERMINATE":
+                    team_response = content.replace("TERMINATE", "").strip()
+                    print(f"✅ 找到有效消息: {len(team_response)} 字符")
+                    break
+            
+            if not team_response:
+                team_response = "I apologize, but I couldn't generate a proper response."
+            
+            team_response = clean_ai_response(team_response)
+            
+            # 步骤4: 构建响应
             response = ChatResponse(
-                message=cleaned_message,
-                thinking_process=qa_data.get(
-                    "thinking_process", "Processing your question..."
-                ),
-                reference_links=qa_data.get("reference_links", []),
-                strategy=qa_data.get("strategy", "hybrid_qa"),
-                source=qa_data.get("source", "knowledge_base"),
-                rag_similarity=qa_data.get("rag_similarity", 0.0),
-                team_used="GENERAL_QA",
+                message=team_response,
+                thinking_process=f"使用 AutoGen {team_type} team 处理请求",
+                reference_links=[],
+                strategy="autogen_team",
+                source="autogen",
+                rag_similarity=0.0,
+                team_used=team_type,
                 timestamp=datetime.now().isoformat(),
             )
-
+            
+        except Exception as team_error:
+            print(f"❌ {team_type} team 执行失败: {str(team_error)}")
+            import traceback
+            traceback.print_exc()
+            
+            response = ChatResponse(
+                message="I apologize, but I'm experiencing technical difficulties.",
+                thinking_process=f"Team execution error: {str(team_error)}",
+                reference_links=[],
+                strategy="error_fallback",
+                source="system",
+                rag_similarity=0.0,
+                team_used=f"{team_type}_FALLBACK",
+                timestamp=datetime.now().isoformat(),
+            )
         return response
 
     except Exception as e:
@@ -1868,62 +1790,6 @@ async def ws_endpoint(ws: WebSocket, user_id: str):
                 step="tools_start",
                 extra_details={"team": team_key},
             )
-
-            # Execute selected team
-            # Special handling for SCHOOL_RECOMMENDATION to use Multi-Agent workflow
-            if team_key == "SCHOOL_RECOMMENDATION":
-                print(
-                    f"🎓 SCHOOL_RECOMMENDATION route reached! Using Multi-Agent workflow instead of AutoGen"
-                )
-
-                try:
-                    from src.workflows.multi_agent_workflow import (
-                        get_multi_agent_workflow,
-                    )
-
-                    workflow = get_multi_agent_workflow()
-
-                    # Extract user_id for the workflow
-                    user_id = "default_user"  # Default fallback
-                    if hasattr(ws, "user_id"):
-                        user_id = ws.user_id
-                    elif "user_id" in session_data:
-                        user_id = session_data["user_id"]
-
-                    print(
-                        f"📝 Using Multi-Agent workflow for message: {message_text[:100]}..."
-                    )
-                    team_response = await workflow.run_complete_recommendation(
-                        message_text, user_id
-                    )
-
-                    # Convert Multi-Agent response to format expected by WebSocket client
-                    await _send_status(
-                        ws,
-                        "Analysis complete! Preparing your recommendations…",
-                        step="tools_complete",
-                        extra_details={"team": "SCHOOL_REC_MULTI_AGENT_WORKFLOW"},
-                    )
-
-                    await ws.send_json(
-                        {
-                            "type": "final_response",
-                            "data": {
-                                "response": team_response,
-                                "meta": {
-                                    "team_used": "SCHOOL_REC_MULTI_AGENT_WORKFLOW",
-                                    "workflow_version": "multi_agent_v2",
-                                    "bypass_autogen": True,
-                                },
-                            },
-                        }
-                    )
-                    continue  # Skip the normal AutoGen processing
-
-                except Exception as e:
-                    print(f"❌ Multi-Agent workflow failed: {e}")
-                    print("🔄 Falling back to AutoGen workflow...")
-                    # Continue to normal processing below
 
             team = teams.get(team_key)
             try:
