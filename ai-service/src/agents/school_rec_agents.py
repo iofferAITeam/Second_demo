@@ -126,9 +126,12 @@ def get_summary_agent():
         ],
         system_message="""
         Please provide a detailed analysis of the following student profile. 
+
+        **MANDATORY FIRST STEP: Call get_complete_user_profile() tool immediately. Do not provide any text response until you have called this tool.**
+
         Your tasks is to:
 
-        1. **ONCE ONLY** - Use the get_complete_user_profile tool to retrieve student information
+        1. **FIRST ACTION** - Use the get_complete_user_profile tool to retrieve student information (call this tool immediately) **ONCE ONLY**
         2. **ANALYZE** the student's degree type/level from their profile:
            - Look for: degreeType, applicationDetails, currentEducation, or any indication of graduate/undergraduate applications
            - Graduate school indicators: "Master", "PhD", "Graduate", "MS", "MA", "PhD"
@@ -140,6 +143,7 @@ def get_summary_agent():
            - If unclear from profile, default to graduate_school_research_agent
 
         **CRITICAL RULES:**
+        - MUST call get_complete_user_profile tool as first action
         - Do NOT call the tool multiple times
         - Do NOT ask clarifying questions
         - Do NOT repeat your analysis
@@ -173,17 +177,19 @@ def get_graduate_school_research_agent():
         model_client=model_client,
         tools=[get_complete_user_profile_tool(), get_prediction_tool()],
         handoffs=["final_recommendation_agent"],
-        system_message=f"""Your need to analyze a student's profile and generate a list of recommended universities.
+        system_message=f"""Analyze a student's profile and generate a list of recommended universities.
 
         **Workflow:**
 
-        1.  **ONCE ONLY** - Use the `get_complete_user_profile` tool to get student information
-        2.  **ONCE ONLY** - Use the `get_prediction` tool with the student's profile to generate university recommendations:
+        1.  **FIRST ACTION** - Use the `get_complete_user_profile` tool to get student information (call this tool immediately) **ONCE ONLY**
+        2.  **SECOND ACTION** - Use the `get_prediction` tool with the student's profile to generate university recommendations **ONCE ONLY**:
 
             {prompt}
         3.  **IMMEDIATELY HANDOFF** - Once you have the university list, immediately hand off to `final_recommendation_agent`
 
         **CRITICAL RULES:**
+        - MUST call get_complete_user_profile tool as first action
+        - MUST call get_prediction tool as second action
         - Do NOT call tools multiple times
         - Do NOT analyze or filter the university list yourself
         - Do NOT provide additional commentary
@@ -230,7 +236,7 @@ def get_final_recommendation_agent():
         handoffs=["final_school_analysis_agent", "program_recommendation_agent"],
         system_message="""
         
-        Please act as a specialist in matching students with realistic academic programs.
+        Task: Match students with realistic academic programs.
 
         IMPORTANT: You will receive a list of recommended universities from the school_research_agent. From this list, you must SELECT EXACTLY 10 universities (no more, no less) to create a balanced recommendation.
 
@@ -397,7 +403,7 @@ def get_final_school_analysis_agent():
         system_message="""
         
 
-        You task is to do AI Admissions Strategy analysis. 
+        Your task is to do AI Admissions Strategy analysis. 
         Your primary function is to conduct a holistic evaluation of 
         a single graduate applicant's profile against a provided list of 
         10 target programs.

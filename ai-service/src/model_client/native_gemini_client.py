@@ -255,6 +255,50 @@ class NativeGeminiClient:
             logger.info(f"🔧 Processing {len(tools)} tools for Gemini API")
             function_declarations = []
 
+            # 提取工具名称用于强制调用提示
+            tool_names = []
+            for tool in tools:
+                if hasattr(tool, "_name"):
+                    tool_names.append(getattr(tool, "_name"))
+                elif hasattr(tool, "get") and callable(getattr(tool, "get")):
+                    if tool.get("type") == "function":
+                        tool_names.append(tool["function"]["name"])
+                else:
+                    tool_names.append("function_tool")
+
+            # 添加工具调用提示到最后一个用户消息
+            if contents and contents[-1].get("role") == "user":
+                original_text = contents[-1]["parts"][0]["text"]
+                # 添加强制工具调用指示和示例
+                tool_examples = []
+                for name in tool_names:
+                    if "get_complete_user_profile" in name:
+                        tool_examples.append(
+                            f'Call {name} with no parameters: {{"name": "{name}", "args": {{}}}}'
+                        )
+                    elif "get_prediction" in name:
+                        tool_examples.append(
+                            f'Call {name} with profile data: {{"name": "{name}", "args": {{"student_info": "[profile_data]"}}}}'
+                        )
+                    else:
+                        tool_examples.append(
+                            f'Call {name}: {{"name": "{name}", "args": {{}}}}'
+                        )
+
+                enhanced_text = f"""{original_text}
+
+CRITICAL INSTRUCTION: You MUST call one of the available tools as your first action. Do NOT provide any text response before calling a tool.
+
+Available tools: {', '.join(tool_names)}
+
+IMPORTANT: To call a tool, you must use the function calling feature. The system will automatically execute the tool when you call it.
+
+You are REQUIRED to call a tool immediately. Do not explain, do not ask questions, just call the appropriate tool now."""
+                contents[-1]["parts"][0]["text"] = enhanced_text
+                logger.info(
+                    f"🔧 Enhanced user message with tool calling instruction for tools: {tool_names}"
+                )
+
             for tool in tools:
                 logger.info(f"🔧 Processing tool type: {type(tool)}, tool: {tool}")
                 try:
@@ -371,8 +415,14 @@ class NativeGeminiClient:
                 request_data["tools"] = [
                     {"functionDeclarations": function_declarations}
                 ]
+
+                # 强制工具调用 - 设置tool_config
+                request_data["toolConfig"] = {
+                    "functionCallingConfig": {"mode": "ANY"}  # 强制调用任意一个工具
+                }
+
                 logger.info(
-                    f"✅ Added {len(function_declarations)} function declarations to request"
+                    f"✅ Added {len(function_declarations)} function declarations to request with forced tool calling"
                 )
             else:
                 logger.warning("⚠️ No valid function declarations found")
