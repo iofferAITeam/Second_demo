@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Plus } from 'lucide-react'
-import { AcademicPerformanceData, MajorSubjectData, LanguageTestData, StandardizedTestData, FormSectionProps } from '@/types/profile-form'
+import { AcademicPerformanceData, LanguageTestData, StandardizedTestData, FormSectionProps } from '@/types/profile-form'
 
 interface AcademicPerformanceFormProps extends FormSectionProps {
   data: AcademicPerformanceData
@@ -37,49 +37,7 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
       }]
       handleInputChange('standardizedTestsData', defaultStandardizedTest)
     }
-
-    // Initialize majorSubjectsData if not present
-    if (!data.majorSubjectsData && data.majorSubjects) {
-      const defaultMajorSubjects = (data.majorSubjects || []).map(subject => ({ subject, gpa: '', majorGpa: '' }))
-      handleInputChange('majorSubjectsData', defaultMajorSubjects)
-    }
   }, []) // Only run once on mount
-
-  // Get major subjects data for UI (use majorSubjectsData if available, otherwise initialize from majorSubjects)
-  const getMajorSubjectsData = (): MajorSubjectData[] => {
-    if (data.majorSubjectsData) {
-      return data.majorSubjectsData
-    }
-    // Initialize from existing majorSubjects (string array) for backward compatibility
-    return (data.majorSubjects || []).map(subject => ({ subject, gpa: '', majorGpa: '' }))
-  }
-
-  const addMajorSubject = () => {
-    const currentSubjects = getMajorSubjectsData()
-    const newSubjects = [...currentSubjects, { subject: '', gpa: '', majorGpa: '' }]
-    handleInputChange('majorSubjectsData', newSubjects)
-    // Also update the backend-compatible format
-    handleInputChange('majorSubjects', newSubjects.map(s => s.subject))
-  }
-
-  const removeMajorSubject = (index: number) => {
-    const currentSubjects = getMajorSubjectsData()
-    const newSubjects = currentSubjects.filter((_, i) => i !== index)
-    handleInputChange('majorSubjectsData', newSubjects)
-    // Also update the backend-compatible format
-    handleInputChange('majorSubjects', newSubjects.map(s => s.subject))
-  }
-
-  const updateMajorSubject = (index: number, field: keyof MajorSubjectData, value: string) => {
-    const currentSubjects = getMajorSubjectsData()
-    const newSubjects = [...currentSubjects]
-    newSubjects[index] = { ...newSubjects[index], [field]: value }
-    handleInputChange('majorSubjectsData', newSubjects)
-    // Also update the backend-compatible format when subject changes
-    if (field === 'subject') {
-      handleInputChange('majorSubjects', newSubjects.map(s => s.subject))
-    }
-  }
 
   // Language Tests functions
   const getLanguageTestsData = (): LanguageTestData[] => {
@@ -197,85 +155,74 @@ export default function AcademicPerformanceForm({ data, errors, onChange }: Acad
 
       {/* Major & GPA Section */}
       <div className="space-y-[16px]">
-        <div className="space-y-[24px]">
-          {getMajorSubjectsData().map((majorSubject, index) => (
-            <div key={index} className="space-y-[16px]">
-              <div className="flex gap-[16px] items-start">
-                <div className="flex-1">
-                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">Major Subject {index + 1}</h4>
-                  <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-                    errors?.majorSubjects ? 'border-red-500' : 'border-[#e8efff]'
-                  }`}>
-                    <input
-                      type="text"
-                      placeholder="Name of Major Subject"
-                      value={majorSubject.subject || ''}
-                      onChange={(e) => updateMajorSubject(index, 'subject', e.target.value)}
-                      className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-                    />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <h4 className="text-[16px] font-semibold text-black font-inter mb-[16px]">GPA</h4>
-                  <div className="flex gap-[16px] items-center">
-                    <div className="w-[140px]">
-                      <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-                        errors?.gpa ? 'border-red-500' : 'border-[#e8efff]'
-                      }`}>
-                        <input
-                          type="text"
-                          placeholder="Overall GPA"
-                          value={majorSubject.gpa || ''}
-                          onChange={(e) => updateMajorSubject(index, 'gpa', e.target.value)}
-                          className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-                        />
-                      </div>
-                      {errors?.gpa && (
-                        <p className="text-red-500 text-xs mt-1">{errors.gpa}</p>
-                      )}
-                    </div>
-                    <div className="w-[140px]">
-                      <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
-                        errors?.majorGpa ? 'border-red-500' : 'border-[#e8efff]'
-                      }`}>
-                        <input
-                          type="text"
-                          placeholder="Major GPA"
-                          value={majorSubject.majorGpa || ''}
-                          onChange={(e) => updateMajorSubject(index, 'majorGpa', e.target.value)}
-                          className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
-                        />
-                      </div>
-                      {errors?.majorGpa && (
-                        <p className="text-red-500 text-xs mt-1">{errors.majorGpa}</p>
-                      )}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeMajorSubject(index)}
-                      className="text-red-500 hover:text-red-700 text-[14px] font-medium px-[12px] py-[8px] rounded-[6px] hover:bg-red-50 transition-colors"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
+        {/* Major Dropdown */}
+        <div className="space-y-[16px]">
+          <h4 className="text-[16px] font-semibold text-black font-inter">Major</h4>
+          <div className="w-[400px]">
+            <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] h-[56px] flex items-center ${
+              errors?.major ? 'border-red-500' : 'border-[#e8efff]'
+            }`}>
+              <Select value={data.major || ''} onValueChange={(value: string) => handleInputChange('major', value)}>
+                <SelectTrigger className="border-none bg-transparent p-0 h-auto shadow-none focus:ring-0 [&>span]:text-black [&>span[data-placeholder]]:text-[#cdd4e4] flex items-center justify-between w-full">
+                  <SelectValue placeholder="Please Choose Major" />
+                </SelectTrigger>
+                <SelectContent className="!bg-white !z-[9999] !border !border-[#e8efff] !rounded-[12px] !shadow-lg">
+                  <SelectItem value="computer-science">Computer Science</SelectItem>
+                  <SelectItem value="business">Business Administration</SelectItem>
+                  <SelectItem value="engineering">Engineering</SelectItem>
+                  <SelectItem value="medicine">Medicine</SelectItem>
+                  <SelectItem value="law">Law</SelectItem>
+                  <SelectItem value="arts">Arts & Humanities</SelectItem>
+                  <SelectItem value="science">Natural Sciences</SelectItem>
+                  <SelectItem value="social-science">Social Sciences</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          ))}
-          <div className="flex gap-[8px] items-center">
-            <Plus className="h-4 w-4 text-[#1c5dff]" />
-            <button 
-              type="button"
-              onClick={addMajorSubject}
-              className="text-[#1c5dff] text-[16px] font-inter bg-transparent border-none cursor-pointer hover:underline"
-            >
-              Add More Major Subject
-            </button>
+            {errors?.major && (
+              <p className="text-red-500 text-xs mt-1">{errors.major}</p>
+            )}
           </div>
         </div>
-        {errors?.majorSubjects && (
-          <p className="text-red-500 text-xs mt-1">{errors.majorSubjects}</p>
-        )}
+
+        {/* GPA Section */}
+        <div className="space-y-[16px]">
+          <h4 className="text-[16px] font-semibold text-black font-inter">GPA</h4>
+          <div className="flex gap-[16px] items-center">
+            <div className="w-[200px]">
+              <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+                errors?.gpa ? 'border-red-500' : 'border-[#e8efff]'
+              }`}>
+                <input
+                  type="text"
+                  placeholder="Overall GPA"
+                  value={data.gpa || ''}
+                  onChange={(e) => handleInputChange('gpa', e.target.value)}
+                  className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+                />
+              </div>
+              {errors?.gpa && (
+                <p className="text-red-500 text-xs mt-1">{errors.gpa}</p>
+              )}
+            </div>
+            <div className="w-[200px]">
+              <div className={`bg-white border rounded-[30px] px-[20px] py-[16px] ${
+                errors?.majorGpa ? 'border-red-500' : 'border-[#e8efff]'
+              }`}>
+                <input
+                  type="text"
+                  placeholder="Major GPA"
+                  value={data.majorGpa || ''}
+                  onChange={(e) => handleInputChange('majorGpa', e.target.value)}
+                  className="w-full bg-transparent text-[14px] text-black font-light font-inter placeholder-[#cdd4e4] outline-none"
+                />
+              </div>
+              {errors?.majorGpa && (
+                <p className="text-red-500 text-xs mt-1">{errors.majorGpa}</p>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
 

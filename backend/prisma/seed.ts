@@ -18,12 +18,13 @@ async function main() {
     where: { userId: '8d8529cc-37f5-4222-9ceb-e47cd7f31d1b' },
     update: {},
     create: {
+      id: 'profile_8d8529cc-37f5-4222-9ceb-e47cd7f31d1b',
       userId: '8d8529cc-37f5-4222-9ceb-e47cd7f31d1b',
       gpa: 3.8,
       major: '计算机科学',
-      toefl: 105,
-      gre: 320,
       nationality: 'China',
+      languageTestsData: [{ testType: 'toefl', score: '105', date: '2024-01-01' }],
+      standardizedTestsData: [{ testType: 'gre', score: '320', date: '2024-02-01' }],
       goals: 'Pursue a Master\'s degree in Computer Science and work in the tech industry',
       updatedAt: new Date()
     }

@@ -333,6 +333,11 @@ export class ChatController {
               if (Object.keys(extractedData.academicBackground).length > 0 ||
                   Object.keys(extractedData.testScores).length > 0) {
                 try {
+                  // 构建语言测试数据
+                  const languageTestsData = extractedData.testScores.toefl 
+                    ? [{ testType: 'toefl', score: extractedData.testScores.toefl.toString(), date: new Date().toISOString().split('T')[0] }]
+                    : undefined
+                  
                   // 直接保存到userProfile表
                   await prisma.user_profiles.upsert({
                     where: { userId },
@@ -340,13 +345,13 @@ export class ChatController {
                       id: `profile_${userId}`,
                       userId,
                       gpa: extractedData.academicBackground.gpa,
-                      toefl: extractedData.testScores.toefl,
+                      languageTestsData: languageTestsData || undefined,
                       major: extractedData.academicBackground.major,
                       updatedAt: new Date()
                     },
                     update: {
                       gpa: extractedData.academicBackground.gpa || undefined,
-                      toefl: extractedData.testScores.toefl || undefined,
+                      languageTestsData: languageTestsData || undefined,
                       major: extractedData.academicBackground.major || undefined,
                       updatedAt: new Date()
                     }
@@ -377,8 +382,8 @@ export class ChatController {
               userId,
               gpa: userProfile.gpa,
               major: userProfile.major,
-              gre: userProfile.gre,
-              toefl: userProfile.toefl,
+              languageTestsData: userProfile.languageTestsData,
+              standardizedTestsData: userProfile.standardizedTestsData,
               experiences: userProfile.experiences
             })
           }
@@ -403,10 +408,8 @@ export class ChatController {
           aiRequest.user_profile = {
             gpa: userProfile.gpa,
             major: userProfile.major,
-            gre: userProfile.gre,
-            gmat: userProfile.gmat,
-            toefl: userProfile.toefl,
-            ielts: userProfile.ielts,
+            languageTestsData: userProfile.languageTestsData,
+            standardizedTestsData: userProfile.standardizedTestsData,
             nationality: userProfile.nationality,
             goals: userProfile.goals,
             experiences: userProfile.experiences,
@@ -470,8 +473,8 @@ export class ChatController {
                   userProfileSnapshot: userProfile ? {
                     gpa: userProfile.gpa,
                     major: userProfile.major,
-                    toefl: userProfile.toefl,
-                    gre: userProfile.gre,
+                    languageTestsData: userProfile.languageTestsData,
+                    standardizedTestsData: userProfile.standardizedTestsData,
                     nationality: userProfile.nationality,
                     goals: userProfile.goals,
                     experiences: userProfile.experiences

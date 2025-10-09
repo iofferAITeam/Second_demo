@@ -73,14 +73,10 @@ export default function EditProfileModal({
         },
         academicPerformance: {
           gpa: '',
-          satScore: '',
-          actScore: '',
-          toeflScore: '',
-          ieltsScore: '',
-          greScore: '',
-          gmatScore: '',
-          highSchoolName: '',
-          graduationYear: ''
+          majorGpa: '',
+          major: '',
+          languageTestsData: [],
+          standardizedTestsData: []
         },
         applicationIntentions: {
           intendedDegree: '',

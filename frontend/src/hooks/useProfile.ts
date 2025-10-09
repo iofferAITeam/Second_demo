@@ -180,8 +180,8 @@ export function useProfile() {
     // 可选字段（不计入必需完成度，但会显示）
     const optionalFields = [
       { key: 'gpa', value: formData.academicPerformance.gpa, label: 'GPA' },
-      { key: 'toefl', value: formData.academicPerformance.toeflScore, label: 'TOEFL' },
-      { key: 'sat', value: formData.academicPerformance.satScore, label: 'SAT' },
+      { key: 'languageTests', value: formData.academicPerformance.languageTestsData?.length, label: 'Language Tests' },
+      { key: 'standardizedTests', value: formData.academicPerformance.standardizedTestsData?.length, label: 'Standardized Tests' },
       { key: 'careerIntentions', value: formData.applicationIntentions.careerIntentions, label: 'Career Intentions' },
       { key: 'mbti', value: formData.basicInfo.mbti, label: 'MBTI' },
       { key: 'hobbies', value: formData.basicInfo.hobbies, label: 'Hobbies' }
