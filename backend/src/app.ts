@@ -39,7 +39,7 @@ app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 app.use(cookieParser())
 
-// 🚫 限流
+// 🚫 限流配置（稍后应用，在 token 刷新之后）
 const limiter = rateLimit({
   windowMs: (parseInt(process.env.RATE_LIMIT_WINDOW || '15')) * 60 * 1000, // 15分钟
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100'), // 100请求
@@ -49,7 +49,6 @@ const limiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 })
-app.use('/api', limiter)
 
 // 🩺 健康检查
 app.get('/health', (req, res) => {
@@ -80,9 +79,12 @@ app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'), {
 // 📁 静态文件服务 - 用于提供测试页面
 app.use('/public', express.static(path.join(process.cwd(), 'public')))
 
-// 🔄 自动 Token 续期中间件
+// 🔄 自动 Token 续期中间件（在限流之前，确保用户能刷新token）
 app.use('/api', autoRefreshToken)
 app.use('/api', injectTokensInResponse)
+
+// 🚫 应用限流（在 token 刷新之后，避免阻止合法的刷新请求）
+app.use('/api', limiter)
 
 // 📋 API路由
 app.use('/api', routes)

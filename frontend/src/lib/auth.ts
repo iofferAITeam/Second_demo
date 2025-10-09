@@ -45,18 +45,33 @@ export const clearAuthTokens = (): void => {
 }
 
 // Check if user is authenticated
+// NOTE: This only checks if an access token EXISTS, not if it's expired
+// Token refresh is handled automatically by the API client on 401 responses
 export const isAuthenticated = (): boolean => {
   const token = getToken()
   if (!token) return false
 
   try {
-    // Basic token validation - check if it's not expired
+    // Validate token format (but don't check expiry - refresh handles that)
     const payload = JSON.parse(atob(token.split('.')[1]))
-    const currentTime = Math.floor(Date.now() / 1000)
-    return payload.exp > currentTime
+    return !!payload && !!payload.userId
   } catch (error) {
     // Invalid token format
     return false
+  }
+}
+
+// Check if token is expired (for display purposes only)
+export const isTokenExpired = (): boolean => {
+  const token = getToken()
+  if (!token) return true
+
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const currentTime = Math.floor(Date.now() / 1000)
+    return payload.exp <= currentTime
+  } catch (error) {
+    return true
   }
 }
 

@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import ChatMessages from './ChatMessages'
 import ChatInput from './ChatInput'
-import { api, ChatMessage } from '@/lib/api'
+import { apiClient } from '@/utils/api-client'
+import { ChatMessage } from '@/lib/api'
 
 export interface Message {
   id: string
@@ -166,8 +167,8 @@ export default function ChatInterface() {
     setIsLoading(true)
 
     try {
-      // Call real API
-      const response = await api.sendMessage(content, currentSessionId)
+      // Call real API with proper token refresh
+      const response = await apiClient.sendChatMessage(content, currentSessionId)
 
       // Remove loading message and add real AI response
       setMessages(prev => {
@@ -184,7 +185,7 @@ export default function ChatInterface() {
           // Get user profile data
           const getUserProfile = async () => {
             try {
-              const profileResponse = await api.getProfile()
+              const profileResponse = await apiClient.getUserProfile()
               return profileResponse.data || null
             } catch (error) {
               console.warn('Failed to get user profile:', error)
@@ -252,8 +253,8 @@ export default function ChatInterface() {
       if (!currentSessionId) {
         try {
           const sessionTitle = content.length > 50 ? content.substring(0, 50) + '...' : content
-          const sessionResponse = await api.createSession(sessionTitle)
-          setCurrentSessionId(sessionResponse.session.id)
+          const sessionResponse = await apiClient.createChatSession(sessionTitle)
+          setCurrentSessionId(sessionResponse.session?.id || (sessionResponse as any).id)
         } catch (sessionError) {
           console.warn('Failed to create session:', sessionError)
           // Continue without session - messages will still be saved with userId

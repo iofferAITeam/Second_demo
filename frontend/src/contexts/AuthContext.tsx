@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { isAuthenticated, getUserDataFromToken, getToken } from '@/lib/auth'
+import { apiClient } from '@/utils/api-client'
 
 interface UserData {
   id: string
@@ -16,9 +17,13 @@ interface AuthContextType {
   isLoading: boolean
   user: UserData | null
   token: string | null
+  error: string | null
   login: (token: string) => void
   logout: () => void
   checkAuth: () => void
+  signIn: (email: string, password: string) => Promise<void>
+  signUp: (email: string, name: string, password: string) => Promise<void>
+  clearError: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -32,27 +37,80 @@ export const useAuth = () => {
 }
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuth, setIsAuth] = useState<boolean>(false)
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [user, setUser] = useState<UserData | null>(null)
-  const [token, setTokenState] = useState<string | null>(null)
+  // Try to load cached user data from localStorage immediately (optimistic UI)
+  const getCachedUser = (): UserData | null => {
+    if (typeof window === 'undefined') return null
+    try {
+      const cached = localStorage.getItem('cached_user')
+      return cached ? JSON.parse(cached) : null
+    } catch {
+      return null
+    }
+  }
 
-  const checkAuth = () => {
-    setIsLoading(true)
+  const [isAuth, setIsAuth] = useState<boolean>(() => {
+    // Optimistic: if we have a token and cached user, assume logged in
+    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
+    const cachedUser = getCachedUser()
+    return !!(token && cachedUser)
+  })
+  const [isLoading, setIsLoading] = useState<boolean>(false) // Start as not loading
+  const [user, setUser] = useState<UserData | null>(getCachedUser()) // Show cached immediately
+  const [token, setTokenState] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const checkAuth = async () => {
+    // Don't show loading spinner - we're verifying in background
     const currentToken = getToken()
     const authStatus = isAuthenticated()
 
     if (authStatus && currentToken) {
-      const userData = getUserDataFromToken()
-      setIsAuth(true)
-      setUser(userData)
-      setTokenState(currentToken)
+      try {
+        // Verify token with backend (this will auto-refresh if needed)
+        const response = await apiClient.verify()
+        if (response.user) {
+          setIsAuth(true)
+          setUser(response.user)
+          setTokenState(getToken()) // Get potentially refreshed token
+          // Cache user data for next load
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('cached_user', JSON.stringify(response.user))
+          }
+        } else {
+          // Verification failed
+          setIsAuth(false)
+          setUser(null)
+          setTokenState(null)
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('cached_user')
+          }
+        }
+      } catch (error) {
+        console.error('Auth verification failed:', error)
+        // Only clear auth if it's truly invalid (not just network error)
+        const userData = getUserDataFromToken()
+        if (userData) {
+          // Token exists and is valid format, keep user logged in
+          setIsAuth(true)
+          setUser(userData)
+          setTokenState(currentToken)
+        } else {
+          setIsAuth(false)
+          setUser(null)
+          setTokenState(null)
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('cached_user')
+          }
+        }
+      }
     } else {
       setIsAuth(false)
       setUser(null)
       setTokenState(null)
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('cached_user')
+      }
     }
-    setIsLoading(false)
   }
 
   const login = (newToken: string) => {
@@ -66,6 +124,72 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuth(false)
     setUser(null)
     setTokenState(null)
+    setError(null)
+    // Clear cached user data
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('cached_user')
+    }
+  }
+
+  // Sign in with email and password
+  const signIn = async (email: string, password: string) => {
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      const response = await apiClient.login(email, password)
+      
+      if (response.success && response.user) {
+        setIsAuth(true)
+        setUser(response.user)
+        setTokenState(apiClient['getAccessToken']())
+        // Cache user data for next load
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('cached_user', JSON.stringify(response.user))
+        }
+      } else {
+        throw new Error(response.error || 'Login failed')
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed'
+      setError(errorMessage)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Sign up with email, name and password
+  const signUp = async (email: string, name: string, password: string) => {
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      const response = await apiClient.register(email, name, password)
+      
+      if (response.success && response.user) {
+        setIsAuth(true)
+        setUser(response.user)
+        setTokenState(apiClient['getAccessToken']())
+        // Cache user data for next load
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('cached_user', JSON.stringify(response.user))
+        }
+      } else {
+        throw new Error(response.error || 'Registration failed')
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Registration failed'
+      setError(errorMessage)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Clear error
+  const clearError = () => {
+    setError(null)
   }
 
   useEffect(() => {
@@ -77,9 +201,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isLoading,
     user,
     token,
+    error,
     login,
     logout,
-    checkAuth
+    checkAuth,
+    signIn,
+    signUp,
+    clearError
   }
 
   return (

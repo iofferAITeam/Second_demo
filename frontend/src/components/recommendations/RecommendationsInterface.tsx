@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import CompetitivenessChart from "./CompetitivenessChart";
 import SchoolRecommendationCard from "./SchoolRecommendationCard";
-import { api } from "@/lib/api";
+import { apiClient } from "@/utils/api-client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useCompetitiveness } from "@/hooks/useCompetitiveness";
@@ -184,7 +184,7 @@ export default function RecommendationsInterface() {
     // Load current user profile
     const loadCurrentUserProfile = async () => {
       try {
-        const profileResponse = await api.getProfile();
+        const profileResponse = await apiClient.getUserProfile();
         setCurrentUserProfile(profileResponse);
       } catch (error) {
         console.warn('Failed to load current user profile, using default data:', error);
@@ -202,7 +202,7 @@ export default function RecommendationsInterface() {
     const loadRecommendations = async () => {
       try {
         // First try to get the latest AI recommendation from database
-        const dbResponse = await api.getLatestRecommendation()
+        const dbResponse = await apiClient.getLatestRecommendation()
 
         if (dbResponse.hasRecommendations && dbResponse.recommendation) {
           const recommendation = dbResponse.recommendation

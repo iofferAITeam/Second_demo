@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { AuthController } from '../controllers/AuthController'
+import { authenticateToken } from '../middleware/auth'
 
 const router = Router()
 
@@ -9,8 +10,8 @@ router.post('/register', AuthController.register)
 // 用户登录
 router.post('/login', AuthController.login)
 
-// 验证令牌
-router.get('/verify', AuthController.verify)
+// 验证令牌 - 使用中间件以支持自动刷新
+router.get('/verify', authenticateToken, AuthController.verify)
 
 // 用户登出
 router.post('/logout', AuthController.logout)

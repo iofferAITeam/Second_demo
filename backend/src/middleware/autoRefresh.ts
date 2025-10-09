@@ -27,8 +27,17 @@ export const autoRefreshToken = async (req: AuthRequest, res: Response, next: Ne
 
     const token = authHeader.substring(7)
 
-    // 解析 token 但不验证过期（允许稍微过期的 token）
-    const decodedToken = jwt.decode(token) as any
+    // 验证 token 签名但允许过期（安全且支持自动刷新）
+    let decodedToken: any
+    try {
+      decodedToken = jwt.verify(token, process.env.JWT_SECRET!, {
+        ignoreExpiration: true  // 允许过期的token进行刷新检查
+      }) as any
+    } catch (error) {
+      // Token签名无效或格式错误，跳过自动刷新
+      logger.warn('Token signature invalid, skipping auto-refresh')
+      return next()
+    }
 
     if (!decodedToken || !decodedToken.exp) {
       return next()

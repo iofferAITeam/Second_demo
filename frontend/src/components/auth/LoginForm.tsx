@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth'
+import { useAuth } from '@/contexts/AuthContext'
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons'
 import Navbar from '@/components/shared/Navbar'
 import '@/styles/auth.css'
@@ -108,10 +108,7 @@ export default function LoginForm() {
     try {
       if (isLogin) {
         // 登录逻辑
-        await signIn({
-          email: formData.email,
-          password: formData.password,
-        })
+        await signIn(formData.email, formData.password)
         // 登录成功，直接跳转，不显示弹出提示
         router.push(redirectUrl)
       } else {
@@ -124,13 +121,11 @@ export default function LoginForm() {
           return
         }
 
-        await signUp({
-          email: emailOrPhone,
-          name: formData.name || 'User',
-          password: formData.password,
-          // 只在 inputType 为 phone 时传递 verificationCode，避免类型错误
-          ...(inputType === 'phone' && { verificationCode: formData.verificationCode })
-        })
+        await signUp(
+          emailOrPhone,
+          formData.name || 'User',
+          formData.password
+        )
         // 注册成功，直接跳转，不显示弹出提示
         router.push(redirectUrl)
       }
