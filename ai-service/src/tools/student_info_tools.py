@@ -1,4 +1,4 @@
-from src.domain.students import (
+from src.domain.students_pg import (
     StudentBasicInfoModel,
     BasicInformation,
     ApplicationDetails,
@@ -21,6 +21,7 @@ from google import genai
 
 from autogen_core.tools import FunctionTool
 from src.tools.InfoExtractionTool import InfoExtractionTool
+
 
 def update_student_information(update_data: StudentBasicInfoModel):
     """
@@ -120,16 +121,28 @@ def update_student_information(update_data: StudentBasicInfoModel):
             if isinstance(field_value, dict) and isinstance(nested_model, BaseModel):
                 merge_into_model(nested_model, field_value)
             else:
-                setattr(profile, field_name, as_model(single_model_fields[field_name], field_value))
+                setattr(
+                    profile,
+                    field_name,
+                    as_model(single_model_fields[field_name], field_value),
+                )
         elif field_name in list_model_fields and field_value is not None:
             # Only set lists if non-empty; convert dict items to proper models
             if isinstance(field_value, list) and not field_value:
                 continue
-            setattr(profile, field_name, as_model_list(list_model_fields[field_name], field_value))
+            setattr(
+                profile,
+                field_name,
+                as_model_list(list_model_fields[field_name], field_value),
+            )
         elif field_name == "additionalEducationBackground":
             if isinstance(field_value, list) and not field_value:
                 continue
-            setattr(profile, field_name, field_value if isinstance(field_value, list) else [])
+            setattr(
+                profile,
+                field_name,
+                field_value if isinstance(field_value, list) else [],
+            )
         elif field_name not in {"scoreInformation", "programInterest", "user_id"}:
             # For any other direct fields that exist on the model
             if hasattr(profile, field_name) and not is_empty_string(field_value):
@@ -141,20 +154,23 @@ def update_student_information(update_data: StudentBasicInfoModel):
     # 7) Return updated profile
     return "Successfully updated the student information"
 
-def extract_info_from_source(source:str) -> dict:
+
+def extract_info_from_source(source: str) -> dict:
     extracted_info = InfoExtractionTool(source).run()
     return extracted_info
+
 
 def get_update_student_information_tool():
     return FunctionTool(
         name="update_student_information",
         func=update_student_information,
-        description="Updates the student information in the database."
+        description="Updates the student information in the database.",
     )
+
 
 def get_extract_student_information_tool():
     return FunctionTool(
         name="extract_student_information",
         func=extract_info_from_source,
-        description="Extracts student information from a text or file and returns a JSON object with the extracted information."
+        description="Extracts student information from a text or file and returns a JSON object with the extracted information.",
     )
