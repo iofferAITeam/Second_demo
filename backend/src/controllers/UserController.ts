@@ -61,10 +61,6 @@ export class UserController {
         gpa: profile.gpa || undefined,
         major: profile.major || undefined,
         graduationDate: profile.graduationDate || undefined,
-        toefl: profile.toefl || undefined,
-        ielts: profile.ielts || undefined,
-        gre: profile.gre || undefined,
-        gmat: profile.gmat || undefined,
         goals: profile.goals || undefined
       } : null
       const profileData = transformDatabaseToFormData(userForTransform, profileForTransform)
@@ -152,10 +148,6 @@ export class UserController {
           gpa: profile.gpa || undefined,
           major: profile.major || undefined,
           graduationDate: profile.graduationDate || undefined,
-          toefl: profile.toefl || undefined,
-          ielts: profile.ielts || undefined,
-          gre: profile.gre || undefined,
-          gmat: profile.gmat || undefined,
           goals: profile.goals || undefined,
           createdAt: profile.createdAt,
           updatedAt: profile.updatedAt
@@ -331,10 +323,8 @@ export class UserController {
         where: { userId },
         select: {
           gpa: true,
-          toefl: true,
-          ielts: true,
-          gre: true,
-          gmat: true,
+          languageTestsData: true,
+          standardizedTestsData: true,
           researchExperience: true,
           workExperiences: true,
           internshipExperiences: true,
@@ -404,10 +394,8 @@ function calculateCompetitivenessScores(profile: any) {
 
   // Standardized Test Scores
   const testScore = calculateTestScore(
-    profile.toefl,
-    profile.ielts,
-    profile.gre,
-    profile.gmat
+    profile.languageTestsData,
+    profile.standardizedTestsData
   )
 
   // Recommendation Letters
@@ -506,39 +494,43 @@ function calculateExtracurricularScore(activities: any, awards: any, leadershipS
   return Math.min(score, 100)
 }
 
-function calculateTestScore(toefl: number | null, ielts: number | null, gre: number | null, gmat: number | null): number {
+function calculateTestScore(languageTestsData: any, standardizedTestsData: any): number {
   let score = 50
 
-  // TOEFL scoring
-  if (toefl) {
-    if (toefl >= 110) score += 25
-    else if (toefl >= 100) score += 20
-    else if (toefl >= 90) score += 15
-    else if (toefl >= 80) score += 10
+  // Parse language tests (TOEFL, IELTS)
+  if (languageTestsData && Array.isArray(languageTestsData)) {
+    for (const test of languageTestsData) {
+      const testScore = parseFloat(test.score)
+      if (test.testType === 'toefl') {
+        if (testScore >= 110) score += 25
+        else if (testScore >= 100) score += 20
+        else if (testScore >= 90) score += 15
+        else if (testScore >= 80) score += 10
+      } else if (test.testType === 'ielts') {
+        if (testScore >= 8.0) score += 25
+        else if (testScore >= 7.5) score += 20
+        else if (testScore >= 7.0) score += 15
+        else if (testScore >= 6.5) score += 10
+      }
+    }
   }
 
-  // IELTS scoring
-  if (ielts) {
-    if (ielts >= 8.0) score += 25
-    else if (ielts >= 7.5) score += 20
-    else if (ielts >= 7.0) score += 15
-    else if (ielts >= 6.5) score += 10
-  }
-
-  // GRE scoring
-  if (gre) {
-    if (gre >= 330) score += 20
-    else if (gre >= 320) score += 15
-    else if (gre >= 310) score += 10
-    else if (gre >= 300) score += 5
-  }
-
-  // GMAT scoring
-  if (gmat) {
-    if (gmat >= 700) score += 20
-    else if (gmat >= 650) score += 15
-    else if (gmat >= 600) score += 10
-    else if (gmat >= 550) score += 5
+  // Parse standardized tests (GRE, GMAT)
+  if (standardizedTestsData && Array.isArray(standardizedTestsData)) {
+    for (const test of standardizedTestsData) {
+      const testScore = parseFloat(test.score)
+      if (test.testType === 'gre') {
+        if (testScore >= 330) score += 20
+        else if (testScore >= 320) score += 15
+        else if (testScore >= 310) score += 10
+        else if (testScore >= 300) score += 5
+      } else if (test.testType === 'gmat') {
+        if (testScore >= 700) score += 20
+        else if (testScore >= 650) score += 15
+        else if (testScore >= 600) score += 10
+        else if (testScore >= 550) score += 5
+      }
+    }
   }
 
   return Math.min(score, 100)

@@ -16,8 +16,6 @@ interface UserProfile {
   id: string
   userId: string
   phone?: string | null
-  wechat?: string | null
-  birthDate?: Date | null
   nationality?: string | null
   visaRequired?: boolean | null
   mbti?: string | null
@@ -26,37 +24,12 @@ interface UserProfile {
   hobbies?: string | null
   currentEducation?: string | null
   gpa?: number | null
-  lastTwoYearsGpa?: number | null
+  majorGpa?: number | null
   major?: string | null
-  graduationDate?: Date | null
-  undergraduateUniversity?: string | null
-  universityRank?: number | null
-  universityType?: string | null
-  highSchoolName?: string | null
-  graduationYear?: string | null
-  majorSubjects?: any | null
-  majorSubjectsData?: any | null
   researchExperience?: string | null
   publications?: string | null
-  toefl?: number | null
-  ielts?: number | null
-  gre?: number | null
-  gmat?: number | null
-  satScore?: number | null
-  actScore?: number | null
-  languageTestType?: string | null
-  languageTestScore?: string | null
-  languageTestDate?: string | null
   languageTestsData?: any | null
-  standardizedTestType?: string | null
-  standardizedTestScore?: string | null
-  standardizedTestDate?: string | null
   standardizedTestsData?: any | null
-  targetDegreeType?: string | null
-  targetMajors?: any | null
-  targetCountries?: any | null
-  applicationYear?: string | null
-  applicationTerm?: string | null
   intendedDegree?: string | null
   intendedIntakeTerm?: string | null
   intendedMajor?: string | null
@@ -66,14 +39,8 @@ interface UserProfile {
   otherPreference?: string | null
   internshipExperience?: string | null
   volunteerExperience?: string | null
-  goals?: string | null
   careerGoals?: string | null
-  personalStatement?: string | null
-  budgetRange?: string | null
   scholarshipNeeds?: boolean | null
-  preferredCityType?: string | null
-  climatePreference?: string | null
-  campusSize?: string | null
   createdAt: Date
   updatedAt: Date
 }
@@ -106,36 +73,21 @@ export function transformFormDataToDatabase(formData: ProfileFormData): {
     // Academic Performance
     currentEducation: academicPerformance.highestDegree || undefined,
     gpa: academicPerformance.gpa ? parseFloat(academicPerformance.gpa) : undefined,
-    major: academicPerformance.universityName || undefined,
+    majorGpa: academicPerformance.majorGpa ? parseFloat(academicPerformance.majorGpa) : undefined,
+    major: academicPerformance.major || undefined,
     graduationDate: academicPerformance.graduationYear ? new Date(academicPerformance.graduationYear) : undefined,
     undergraduateUniversity: academicPerformance.graduatedInstitution || undefined,
-    highSchoolName: academicPerformance.highSchoolName || undefined,
     graduationYear: academicPerformance.graduationYear || undefined,
-    majorSubjects: academicPerformance.majorSubjects || undefined,
-    majorSubjectsData: academicPerformance.majorSubjectsData || undefined,
     researchExperience: academicPerformance.researchExperience || undefined,
     publications: academicPerformance.publications || undefined,
-    
-    // Test Scores
-    toefl: academicPerformance.toeflScore ? parseInt(academicPerformance.toeflScore) : undefined,
-    ielts: academicPerformance.ieltsScore ? parseFloat(academicPerformance.ieltsScore) : undefined,
-    gre: academicPerformance.greScore ? parseInt(academicPerformance.greScore) : undefined,
-    gmat: academicPerformance.gmatScore ? parseInt(academicPerformance.gmatScore) : undefined,
-    satScore: academicPerformance.satScore ? parseInt(academicPerformance.satScore) : undefined,
-    actScore: academicPerformance.actScore ? parseInt(academicPerformance.actScore) : undefined,
     
     // Language and Standardized Tests (arrays of test records)
     languageTestsData: academicPerformance.languageTestsData || undefined,
     standardizedTestsData: academicPerformance.standardizedTestsData || undefined,
     
     // Application Intentions
-    targetDegreeType: applicationIntentions.intendedDegree || undefined,
-    applicationTerm: applicationIntentions.intendedIntakeTerm || undefined,
-    targetMajors: applicationIntentions.intendedMajor ? [applicationIntentions.intendedMajor] : undefined,
-    targetCountries: applicationIntentions.intendedCountries || undefined,
-    budgetRange: applicationIntentions.intendedBudgets || undefined,
     scholarshipNeeds: applicationIntentions.otherFinancialAidsRequired,
-    goals: applicationIntentions.careerIntentions || undefined,
+    careerGoals: applicationIntentions.careerIntentions || undefined,
     
     // Additional fields for direct mapping
     intendedDegree: applicationIntentions.intendedDegree || undefined,
@@ -187,13 +139,10 @@ export function transformDatabaseToFormData(user: User, profile: UserProfile | n
       },
       academicPerformance: {
         gpa: '',
-        satScore: '',
-        actScore: '',
-        toeflScore: '',
-        ieltsScore: '',
-        greScore: '',
-        gmatScore: '',
-        highSchoolName: '',
+        majorGpa: '',
+        major: '',
+        languageTestsData: [],
+        standardizedTestsData: [],
         graduationYear: ''
       },
       applicationIntentions: {
@@ -228,41 +177,24 @@ export function transformDatabaseToFormData(user: User, profile: UserProfile | n
     },
     academicPerformance: {
       gpa: profile.gpa?.toString() || '',
-      majorGpa: profile.lastTwoYearsGpa?.toString() || '',
-      satScore: profile.satScore?.toString() || '',
-      actScore: profile.actScore?.toString() || '',
-      toeflScore: profile.toefl?.toString() || '',
-      ieltsScore: profile.ielts?.toString() || '',
-      greScore: profile.gre?.toString() || '',
-      gmatScore: profile.gmat?.toString() || '',
+      majorGpa: profile.majorGpa?.toString() || '',
+      major: profile.major || '',
       highestDegree: profile.currentEducation || '',
-      highSchoolName: profile.highSchoolName || '',
-      universityName: profile.undergraduateUniversity || '',
-      graduatedInstitution: profile.undergraduateUniversity || '',
-      graduationYear: profile.graduationYear || profile.graduationDate?.getFullYear().toString() || '',
-      majorSubjects: Array.isArray(profile.majorSubjects) ? profile.majorSubjects : [],
-    majorSubjectsData: profile.majorSubjectsData || [],
-      languageTestType: profile.languageTestType || '',
-      languageTestScore: profile.languageTestScore || '',
-      languageTestDate: profile.languageTestDate || '',
       languageTestsData: profile.languageTestsData || [],
-      standardizedTestType: profile.standardizedTestType || '',
-      standardizedTestScore: profile.standardizedTestScore || '',
-      standardizedTestDate: profile.standardizedTestDate || '',
       standardizedTestsData: profile.standardizedTestsData || [],
       researchExperience: profile.researchExperience || '',
       publications: profile.publications || ''
     },
     applicationIntentions: {
-      intendedDegree: profile.targetDegreeType || profile.intendedDegree || '',
-      intendedIntakeTerm: profile.applicationTerm || profile.intendedIntakeTerm || '',
-      intendedMajor: profile.intendedMajor || (Array.isArray(profile.targetMajors) ? profile.targetMajors[0] || '' : ''),
-      intendedCountries: profile.intendedCountries || (Array.isArray(profile.targetCountries) ? profile.targetCountries : []),
-      intendedBudgets: profile.intendedBudgets || profile.budgetRange || '',
+      intendedDegree: profile.intendedDegree || '',
+      intendedIntakeTerm: profile.intendedIntakeTerm || '',
+      intendedMajor: profile.intendedMajor || '',
+      intendedCountries: profile.intendedCountries || [],
+      intendedBudgets: profile.intendedBudgets || '',
       scholarshipRequirements: profile.scholarshipRequirements || '',
       otherFinancialAidsRequired: profile.scholarshipNeeds || false,
       otherPreference: profile.otherPreference || '',
-      careerIntentions: profile.goals || '',
+      careerIntentions: profile.careerGoals || '',
       internshipExperience: profile.internshipExperience || '',
       volunteerExperience: profile.volunteerExperience || ''
     }

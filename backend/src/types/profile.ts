@@ -17,26 +17,11 @@ export interface BasicInfoData {
 export interface AcademicPerformanceData {
   gpa?: string
   majorGpa?: string
-  satScore?: string
-  actScore?: string
-  toeflScore?: string
-  ieltsScore?: string
-  greScore?: string
-  gmatScore?: string
+  major?: string
   highestDegree?: string
-  highSchoolName?: string
-  universityName?: string
   graduatedInstitution?: string
   graduationYear?: string
-  majorSubjects?: string[]
-  majorSubjectsData?: any[]
-  languageTestType?: string
-  languageTestScore?: string
-  languageTestDate?: string
   languageTestsData?: any[]
-  standardizedTestType?: string
-  standardizedTestScore?: string
-  standardizedTestDate?: string
   standardizedTestsData?: any[]
   researchExperience?: string
   publications?: string
@@ -82,7 +67,7 @@ export interface ProfileUpdateData {
   // Academic Performance
   currentEducation?: string
   gpa?: number
-  lastTwoYearsGpa?: number
+  majorGpa?: number
   major?: string
   graduationDate?: Date
   undergraduateUniversity?: string
@@ -90,18 +75,8 @@ export interface ProfileUpdateData {
   universityType?: string
   highSchoolName?: string
   graduationYear?: string
-  majorSubjects?: any
-  majorSubjectsData?: any
   researchExperience?: string
   publications?: string
-  
-  // Test Scores
-  toefl?: number
-  ielts?: number
-  gre?: number
-  gmat?: number
-  satScore?: number
-  actScore?: number
   
   // Language and Standardized Tests
   languageTestType?: string
@@ -162,10 +137,6 @@ export interface ProfileResponse {
     gpa?: number
     major?: string
     graduationDate?: Date
-    toefl?: number
-    ielts?: number
-    gre?: number
-    gmat?: number
     goals?: string
     createdAt: Date
     updatedAt: Date

@@ -89,8 +89,8 @@ export class RecommendationsController {
           email: req.user?.email,
           gpa: userProfile.gpa,
           major: userProfile.major,
-          toefl: userProfile.toefl,
-          gre: userProfile.gre,
+          languageTestsData: userProfile.languageTestsData,
+          standardizedTestsData: userProfile.standardizedTestsData,
           nationality: userProfile.nationality || 'China',
           goals: userProfile.goals,
           createdAt: latestRecommendation.createdAt
