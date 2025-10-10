@@ -83,42 +83,43 @@ function isSchoolRecommendationResponse(content: string): boolean {
 
 // 解析学校推荐数据
 function parseSchoolRecommendations(content: string) {
-  // 更准确的正则表达式，匹配格式："数字. 学校名称 - 项目名称"
-  const schoolRegex = /(\d+)\.\s+([^-\n]+?)(?:\s*-\s*([^\n]+?))?\s*\n\*?\s*([\s\S]*?)(?=\n\d+\.\s+[A-Z]|\n---|\n### |$)/g
+  logger.info('Starting to parse school recommendations from content')
+  logger.info('Content length:', content.length)
+
+  // 新的解析策略：首先找到所有 "Evaluation for:" 部分
+  const evaluationRegex = /Evaluation for:\s*([^-\n]+?)\s*-\s*([^\n]*?)\n([\s\S]*?)(?=Evaluation for:|$)/g
   let match
   const recommendations = []
+  let evaluationCount = 0
 
-  while ((match = schoolRegex.exec(content)) !== null) {
-    const id = match[1]
-    let schoolName = match[2].trim()
-    const programName = match[3] ? match[3].trim() : 'Master of Science in Computer Science'
-    const details = match[4]
+  while ((match = evaluationRegex.exec(content)) !== null) {
+    evaluationCount++
+    const schoolName = match[1].trim()
+    const programName = match[2].trim() || 'Master of Science in Computer Science'
+    const evaluationContent = match[3]
 
-    // 清理学校名称，移除括号中的内容和额外空格
-    schoolName = schoolName.replace(/\s*\([^)]*\)/, '').trim()
+    logger.info(`Found evaluation ${evaluationCount} for: ${schoolName}`)
 
-    // 跳过非学校条目（如描述性文本）
-    if (schoolName.length > 100 || (!schoolName.includes('University') && !schoolName.includes('College') && !schoolName.includes('Institute'))) {
-      continue
-    }
+    // 提取评分 - 寻找数字化的分数
+    const academicMatch = evaluationContent.match(/Academic Background Score:\s*(\d+(?:\.\d+)?)/i)
+    const practicalMatch = evaluationContent.match(/Practical Experience Score:\s*(\d+(?:\.\d+)?)/i)
+    const languageMatch = evaluationContent.match(/Language Proficiency Score:\s*(\d+(?:\.\d+)?)/i)
+    const fitMatch = evaluationContent.match(/Overall Fit Score:\s*(\d+(?:\.\d+)?)/i)
 
-    // 提取评分
-    const academicMatch = details.match(/Academic Background Score:\s*(\d+(?:\.\d+)?)\/5/)
-    const practicalMatch = details.match(/Practical Experience Score:\s*(\d+(?:\.\d+)?)\/5/)
-    const languageMatch = details.match(/Language Proficiency Score:\s*(\d+(?:\.\d+)?)\/5/)
-    const fitMatch = details.match(/Overall Fit Score:\s*(\d+(?:\.\d+)?)\/5/)
-    const noteMatch = details.match(/Strategist's Note:\s*(.*?)(?=\n\d+\.|$)/s)
+    // 提取策略师备注
+    const noteMatch = evaluationContent.match(/Strategist's Note:\s*(.*?)(?=\n\n|\n[A-Z]|$)/s)
 
     // 只有包含评分的才是真正的学校推荐
     if (!academicMatch && !practicalMatch && !languageMatch && !fitMatch) {
+      logger.warn(`Skipping evaluation for ${schoolName} - no scores found`)
       continue
     }
 
     // 推断学校详细信息
     const schoolInfo = getSchoolInfo(schoolName)
 
-    recommendations.push({
-      id,
+    const recommendation = {
+      id: evaluationCount.toString(),
       schoolName: schoolName,
       programName: programName,
       academicScore: academicMatch ? parseFloat(academicMatch[1]) : null,
@@ -126,16 +127,26 @@ function parseSchoolRecommendations(content: string) {
       languageScore: languageMatch ? parseFloat(languageMatch[1]) : null,
       fitScore: fitMatch ? parseFloat(fitMatch[1]) : null,
       strategistNote: noteMatch ? noteMatch[1].trim() : null,
-      analysisContent: details,
+      analysisContent: evaluationContent,
       ...schoolInfo,
       category: getCategoryFromScores({
         academic: academicMatch ? parseFloat(academicMatch[1]) : 0,
         fit: fitMatch ? parseFloat(fitMatch[1]) : 0
       }),
-      displayOrder: parseInt(id) || 0
+      displayOrder: evaluationCount
+    }
+
+    logger.info(`Parsed recommendation for ${schoolName}:`, {
+      academicScore: recommendation.academicScore,
+      practicalScore: recommendation.practicalScore,
+      languageScore: recommendation.languageScore,
+      fitScore: recommendation.fitScore
     })
+
+    recommendations.push(recommendation)
   }
 
+  logger.info(`Total recommendations parsed: ${recommendations.length}`)
   return recommendations
 }
 

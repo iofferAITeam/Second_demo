@@ -6,6 +6,33 @@ interface ChatMessagesProps {
   messages: Message[]
 }
 
+// Function to clean and format AI response content
+const formatAIContent = (content: string) => {
+  // Remove JSON blocks that are typically used for backend processing
+  const jsonBlockRegex = /```json\s*\{[\s\S]*?\}\s*```/gi
+  const inlineJsonRegex = /\{[\s\S]*?"(school_recommendations|critical_gaps|profile_summary|thinking_process)"[\s\S]*?\}/gi
+
+  // Remove raw JSON objects but keep structured content
+  let cleanedContent = content
+    .replace(jsonBlockRegex, '')
+    .replace(inlineJsonRegex, '')
+
+  // Enhance section headers with emojis and better formatting
+  cleanedContent = cleanedContent
+    .replace(/=== THINKING PROCESS ===/gi, '🧠 **思考过程**')
+    .replace(/=== PROFILE SUMMARY ===/gi, '📋 **档案总结**')
+    .replace(/=== RECOMMENDATIONS ===/gi, '🎯 **推荐结果**')
+    .replace(/=== ANALYSIS ===/gi, '📊 **分析报告**')
+    .replace(/=== CRITICAL GAPS ===/gi, '⚠️ **关键差距**')
+
+  // Clean up extra whitespace and line breaks
+  cleanedContent = cleanedContent
+    .replace(/\n\s*\n\s*\n/g, '\n\n')
+    .trim()
+
+  return cleanedContent
+}
+
 export default function ChatMessages({ messages }: ChatMessagesProps) {
 
   return (
@@ -58,7 +85,7 @@ export default function ChatMessages({ messages }: ChatMessagesProps) {
                     )
                   }}
                 >
-                  {message.content}
+                  {formatAIContent(message.content)}
                 </ReactMarkdown>
               ) : (
                 message.content

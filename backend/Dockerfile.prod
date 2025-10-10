@@ -30,7 +30,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 # Install only necessary system dependencies
-RUN apk add --no-cache openssl openssl-dev libc6-compat
+RUN apk add --no-cache openssl openssl-dev libc6-compat wget
 
 # Create app user
 RUN addgroup --system --gid 1001 nodejs
