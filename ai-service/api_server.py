@@ -793,7 +793,8 @@ async def chat_endpoint(request: ChatRequest):
     """
     try:
         # Import AI teams and user data
-        from src.teams.hybrid_qa_team import create_hybrid_qa_team 
+        import json
+        from src.teams.hybrid_qa_team import hybrid_qa_query
         from src.teams.school_rec_teams import create_school_rec_team
         from src.teams.student_info_team import create_student_info_team
         from src.domain.students_pg import StudentDocument
@@ -836,14 +837,58 @@ async def chat_endpoint(request: ChatRequest):
         
         # 步骤1: 选择对应的 AutoGen Team
         if team_type == "GENERAL_QA":
-            team = create_hybrid_qa_team()
+            # Use real hybrid QA agent with user context
+            qa_result = await hybrid_qa_query(enhanced_message)
+            qa_data = json.loads(qa_result)
+
+            # 清理AI响应
+            raw_message = qa_data.get(
+                "answer", "I apologize, but I cannot provide an answer right now."
+            )
+            cleaned_message = clean_ai_response(raw_message)
+
+            response = ChatResponse(
+                message=cleaned_message,
+                thinking_process=qa_data.get(
+                    "thinking_process", "Processing your question..."
+                ),
+                reference_links=qa_data.get("reference_links", []),
+                strategy=qa_data.get("strategy", "hybrid_qa"),
+                source=qa_data.get("source", "knowledge_base"),
+                rag_similarity=qa_data.get("rag_similarity", 0.0),
+                team_used="GENERAL_QA",
+                timestamp=datetime.now().isoformat(),
+            )
+            return response
+            
         elif team_type == "SCHOOL_REC":
             team = create_school_rec_team()
         elif team_type == "STUDENT_INFO":
             team = create_student_info_team()
         else:
-            team = create_hybrid_qa_team()
-            team_type = "GENERAL_QA"
+            # Default to General QA for unknown team types
+            qa_result = await hybrid_qa_query(request.message)
+            qa_data = json.loads(qa_result)
+
+            # 清理AI响应
+            raw_message = qa_data.get(
+                "answer", "I apologize, but I cannot provide an answer right now."
+            )
+            cleaned_message = clean_ai_response(raw_message)
+
+            response = ChatResponse(
+                message=cleaned_message,
+                thinking_process=qa_data.get(
+                    "thinking_process", "Processing your question..."
+                ),
+                reference_links=qa_data.get("reference_links", []),
+                strategy=qa_data.get("strategy", "hybrid_qa"),
+                source=qa_data.get("source", "knowledge_base"),
+                rag_similarity=qa_data.get("rag_similarity", 0.0),
+                team_used="GENERAL_QA",
+                timestamp=datetime.now().isoformat(),
+            )
+            return response
         
         # 步骤2: 执行 AutoGen Team
         print(f"🚀 运行 {team_type} team...")
