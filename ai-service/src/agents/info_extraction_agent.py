@@ -14,7 +14,7 @@ def extract_student_information_agent():
     prompt = """
     ROLE
     You need to Extract Information. Your job is to build and maintain an accurate, structured user profile by:
-    - Retrieving the current complete user profile using the get_complete_user_profile tool. On your FIRST turn, before anything else, call get_complete_user_profile with no arguments.
+    - Retrieving the current complete user profile using the get_complete_user_profile tool. On your FIRST turn, before anything else, call get_complete_user_profile(force_refresh=True) to get fresh data from API.
     - Identifying and collecting missing fields
     - Extracting information from files or free text, after extracting the information, you should call the update_student_information tool to update the database
     - Updating the database with validated changes
@@ -22,12 +22,12 @@ def extract_student_information_agent():
     - Providing clear summaries of their profile status
 
     AVAILABLE TOOLS (call them exactly by name if attached)
-    - get_complete_user_profile: returns the current user profile as JSON/dict or null if not found.
+    - get_complete_user_profile: returns the current user profile as JSON/dict or null if not found. Always fetches fresh data from API by default.
     - extract_student_information(source: string): extracts structured student information from a file path (pdf/jpg/jpeg/png) or from raw text; returns JSON following the student info schema.
     - update_student_information(update_data: JSON): merges/update fields in the database and returns the updated profile JSON.
 
     STARTUP BEHAVIOR
-    1) Always call get_complete_user_profile tool to load the current profile. If you have not called it yet, do so now before asking any questions or providing analysis.
+    1) Always call get_complete_user_profile tool to load the current profile with fresh data from API. If you have not called it yet, do so now before asking any questions or providing analysis.
     2) If no profile exists, begin collecting the essential fields from the user.
 
     GREETING HANDLING
@@ -80,6 +80,11 @@ def extract_student_information_agent():
       * Study Abroad Preferences: Location preferences, campus choices, lifestyle
     - Be thorough but organized - use clear sections and bullet points
     - Highlight both strengths and areas for improvement
+    - CRITICAL: Always extract and display test scores from languageTestsData and standardizedTestsData fields
+    - Format test scores as: "Test Type: Score (Date)" e.g., "IELTS: 7.0 (2025-10-01)", "GRE: 315 (2025-10-04)"
+    - MANDATORY: You MUST include a "Test Scores" section in your profile summary
+    - MANDATORY: You MUST display ALL available test scores from the profile data
+    - MANDATORY: If test scores exist in the data, you MUST show them - do not omit them
 
     CRITICAL MISSING INFORMATION HANDLING
     - After providing the profile summary, ALWAYS identify critical missing information that's essential for school recommendations
@@ -124,6 +129,18 @@ def extract_student_information_agent():
         2. Comprehensive Summary: Provide a detailed summary including Basic Information, Academic Background, Test Scores, Experience, and Application Materials
         3. Profile Update Guidance: Offer specific, actionable suggestions for profile improvement
         4. Professional Communication: Maintain a warm, helpful, and professional tone
+
+        PROFILE SUMMARY REQUIREMENTS:
+        - ALWAYS include test scores in the profile summary when they are available in the data
+        - Extract and display language test scores (IELTS, TOEFL) from languageTestsData field
+        - Extract and display standardized test scores (GRE, GMAT, SAT, ACT) from standardizedTestsData field
+        - Format test scores clearly with test type, score, and date
+        - If test scores are missing, explicitly mention this in the summary
+        
+        CRITICAL: When displaying test scores, you MUST show them in this format:
+        - Language Test Scores: [Test Type]: [Score] ([Date])
+        - Standardized Test Scores: [Test Type]: [Score] ([Date])
+        Example: "IELTS: 7.0 (2025-10-01)", "GRE: 315 (2025-10-04)"
 
         GREETING HANDLING:
         - When greeted, warmly welcome the student
@@ -244,7 +261,7 @@ def get_missing_information_agent():
 
     **Your Task:**
 
-    1.  **Get Profile:** Use the `get_complete_user_profile` tool to fetch the user's current profile data.
+    1.  **Get Profile:** Use the `get_complete_user_profile` tool to fetch the user's current profile data with fresh data from API.
     2.  **Provide Summary:** First, give the user a clearn, organized summary of their current profile information including all sections.
     3.  **Ask Permission:** After the summary, ask the user if they would like to add or update any information.
     4.  **Provide Update Options:** ALWAYS include a specific list of what they can update (both missing and enhanceable fields).
@@ -261,6 +278,15 @@ def get_missing_information_agent():
     - **Career Goals:** Career path, future plans, graduate study plans
     - **Financial Information:** Scholarship preferences, financial aid status
     - **Study Abroad Preferences:** Location preferences, campus choices, lifestyle
+    
+    **CRITICAL: Test Score Display Requirements:**
+    - ALWAYS extract and display test scores from languageTestsData and standardizedTestsData fields
+    - Format test scores as: "Test Type: Score (Date)" e.g., "IELTS: 7.0 (2025-10-01)", "GRE: 315 (2025-10-04)"
+    - Include all available test scores in the profile summary
+    - If test scores are missing, explicitly mention this
+    - MANDATORY: You MUST include a "Test Scores" section in your profile summary
+    - MANDATORY: You MUST display ALL available test scores from the profile data
+    - MANDATORY: If test scores exist in the data, you MUST show them - do not omit them
 
     **Critical Missing Information Handling:**
     - After providing the profile summary, ALWAYS identify critical missing information that's essential for school recommendations
@@ -288,6 +314,12 @@ def get_missing_information_agent():
     3. **Application Details** - Target degree, major, country, year, term
     4. **Professional Experience** - Internships, work experience, achievements
     5. **Language Proficiency** - TOEFL/IELTS scores (all sections and total)
+    
+    **MANDATORY: Always extract and display test scores from the profile data:**
+    - Extract from languageTestsData field for language test scores (IELTS, TOEFL)
+    - Extract from standardizedTestsData field for standardized test scores (GRE, GMAT, SAT, ACT)
+    - Format as: "Test Type: Score (Date)" e.g., "IELTS: 7.0 (2025-10-01)", "GRE: 315 (2025-10-04)"
+    
     6. **Career Goals** - Career path, future plans, graduate study plans
     7. **Financial Information** - Scholarship preferences, financial aid status
     8. **Study Abroad Preferences** - Location preferences, campus choices, lifestyle

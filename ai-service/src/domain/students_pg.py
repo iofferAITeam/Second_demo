@@ -59,6 +59,7 @@ def _fetch_user_profile_from_api(user_id: str) -> Optional[Dict[str, Any]]:
 # 扩展的 Pydantic 模型结构，匹配PostgreSQL数据库字段
 class Name(BaseModel):
     firstName: str = ""
+    middleName: str = ""
     lastName: str = ""
 
 
@@ -79,6 +80,10 @@ class BasicInformation(BaseModel):
     contactInformation: ContactInformation = ContactInformation()
     nationality: str = ""
     visaRequired: bool = False
+    mbti: str = ""
+    extracurricular: str = ""
+    personalStrengths: str = ""
+    hobbies: str = ""
 
 
 class ApplicationDetails(BaseModel):
@@ -98,6 +103,10 @@ class ApplicationDetails(BaseModel):
     otherPreference: str = ""
     budgetRange: str = ""
     scholarshipNeeds: bool = False
+    careerIntentions: str = ""
+    internshipExperience: str = ""
+    volunteerExperience: str = ""
+    otherFinancialAidsRequired: bool = False
 
 
 class CurrentInstitution(BaseModel):
@@ -141,6 +150,13 @@ class EducationBackground(BaseModel):
     minor: Minor = Minor()
     onlineOrOtherCourses: OnlineOrOtherCourses = OnlineOrOtherCourses()
     coursesTaken: List = []
+    # 新增API字段
+    majorGpa: str = ""
+    researchExperience: str = ""
+    publications: str = ""
+    # 添加测试数据字段
+    languageTestsData: List[LanguageTestDetails] = []
+    standardizedTestsData: List[StandardizedTestDetails] = []
 
 
 class CareerDevelopment(BaseModel):
@@ -455,12 +471,18 @@ class StudentDocument(BaseModel):
                 "standardizedTestsData", []
             )
 
+            print(f"🔍 DEBUG: API data - languageTestsData: {language_tests_data}")
+            print(
+                f"🔍 DEBUG: API data - standardizedTestsData: {standardized_tests_data}"
+            )
+
             # 构建完整的学生档案
             student_profile = StudentDocument(
                 user_id=user_id,
                 basicInformation=BasicInformation(
                     name=Name(
                         firstName=basic_info.get("firstName", ""),
+                        middleName=basic_info.get("middleName", ""),
                         lastName=basic_info.get("lastName", ""),
                     ),
                     contactInformation=ContactInformation(
@@ -473,6 +495,10 @@ class StudentDocument(BaseModel):
                     ),
                     nationality=basic_info.get("nationality", ""),
                     visaRequired=basic_info.get("visaRequired", False),
+                    mbti=basic_info.get("mbti", ""),
+                    extracurricular=basic_info.get("extracurricular", ""),
+                    personalStrengths=basic_info.get("personalStrengths", ""),
+                    hobbies=basic_info.get("hobbies", ""),
                 ),
                 applicationDetails=ApplicationDetails(
                     degreeType=application_intentions.get("intendedDegree", ""),
@@ -501,6 +527,16 @@ class StudentDocument(BaseModel):
                     scholarshipNeeds=application_intentions.get(
                         "otherFinancialAidsRequired", False
                     ),
+                    careerIntentions=application_intentions.get("careerIntentions", ""),
+                    internshipExperience=application_intentions.get(
+                        "internshipExperience", ""
+                    ),
+                    volunteerExperience=application_intentions.get(
+                        "volunteerExperience", ""
+                    ),
+                    otherFinancialAidsRequired=application_intentions.get(
+                        "otherFinancialAidsRequired", False
+                    ),
                 ),
                 educationBackground=EducationBackground(
                     highestDegree=academic_performance.get("highestDegree", ""),
@@ -522,6 +558,18 @@ class StudentDocument(BaseModel):
                     graduationYear="",  # API数据中未包含
                     majorSubjects="",  # API数据中未包含
                     majorSubjectsData=[],
+                    majorGpa=academic_performance.get("majorGpa", ""),
+                    researchExperience=academic_performance.get(
+                        "researchExperience", ""
+                    ),
+                    publications=academic_performance.get("publications", ""),
+                    languageTestsData=[
+                        LanguageTestDetails(**test) for test in language_tests_data
+                    ],
+                    standardizedTestsData=[
+                        StandardizedTestDetails(**test)
+                        for test in standardized_tests_data
+                    ],
                 ),
                 careerDevelopment=CareerDevelopment(
                     careerPath=application_intentions.get("careerIntentions", ""),
@@ -591,6 +639,21 @@ class StudentDocument(BaseModel):
                 createdAt=user_data.get("createdAt"),
                 updatedAt=None,
             )
+
+            print(
+                f"🔍 DEBUG: Built StudentDocument - languageTestsData: {len(student_profile.languageTestsData)}"
+            )
+            print(
+                f"🔍 DEBUG: Built StudentDocument - standardizedTestsData: {len(student_profile.standardizedTestsData)}"
+            )
+
+            if student_profile.languageTestsData:
+                for i, test in enumerate(student_profile.languageTestsData):
+                    print(f"🔍 DEBUG: Built Language Test {i}: {test}")
+
+            if student_profile.standardizedTestsData:
+                for i, test in enumerate(student_profile.standardizedTestsData):
+                    print(f"🔍 DEBUG: Built Standardized Test {i}: {test}")
 
             logger.info(f"Successfully found user profile for: {user_id}")
             return student_profile
