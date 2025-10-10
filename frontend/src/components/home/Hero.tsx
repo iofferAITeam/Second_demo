@@ -24,16 +24,16 @@ export default function Hero() {
     e.preventDefault()
 
     // 构建发送给聊天模型的消息，请求AI引导完成个人资料收集
-    const message = `Hi! I'd like to complete my academic profile with your help. Here's what I've shared so far:
+    const message = `Hi! I need to complete my academic profile. Here's my basic information:
 
 🎓 Desired Degree: ${formData.degree || 'Not specified'}
 🌍 Country of Interest: ${formData.country || 'Not specified'}
 📚 Desired Major/Program: ${formData.program || 'Not specified'}
 📝 About Me: ${formData.about || 'Not provided'}
 
-Could you please help me build a complete academic profile by guiding me through the important information I should provide? I want to make sure I have all the necessary details for school applications.
+I want to create a comprehensive profile for my applications. Can you help me by asking questions to gather all the important academic information? I need guidance on what details to include to make my profile complete.
 
-Please ask me questions step by step to collect my academic background, test scores, experiences, and other relevant information that would be important for university applications.`
+Please start by asking about my academic background, test scores, work experience, and other information that universities typically require.`
 
     // 将消息保存到sessionStorage，然后跳转到聊天页面
     sessionStorage.setItem('initialMessage', message)

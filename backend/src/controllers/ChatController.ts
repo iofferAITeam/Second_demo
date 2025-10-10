@@ -275,7 +275,15 @@ export class ChatController {
 
       // 提取用户资料信息
       let profileExtraction = null
-      if (userId) {
+
+      // 检测是否为AI引导的个人资料收集消息（来自Hero.tsx）
+      const isAiGuidedProfileCollection = message.includes('Could you please help me build a complete academic profile') ||
+                                         message.includes('guide me through the important information') ||
+                                         message.includes('step by step to collect my academic background') ||
+                                         message.includes('I want to create a comprehensive profile for my applications') ||
+                                         message.includes('Can you help me by asking questions to gather all the important academic information')
+
+      if (userId && !isAiGuidedProfileCollection) {
         try {
           // 使用STUDENT_INFO团队提取用户资料信息
           const extractionResponse = await axios.post(`${process.env.AI_SERVICE_URL}/chat/message`, {
