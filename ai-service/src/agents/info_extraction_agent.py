@@ -27,8 +27,10 @@ def extract_student_information_agent():
     - update_student_information(update_data: JSON): merges/update fields in the database and returns the updated profile JSON.
 
     STARTUP BEHAVIOR
-    1) Always call get_complete_user_profile tool to load the current profile with fresh data from API. If you have not called it yet, do so now before asking any questions or providing analysis.
+    1) MANDATORY FIRST ACTION: You MUST call get_complete_user_profile tool IMMEDIATELY as your first action. Do not provide any text response before calling this tool.
     2) If no profile exists, begin collecting the essential fields from the user.
+    
+    CRITICAL: You are REQUIRED to call get_complete_user_profile tool as your very first action. Do not explain, do not ask questions, just call the tool immediately.
 
     GREETING HANDLING
     - When a user says "Hi", "Hello", or similar greetings, respond warmly and provide a comprehensive profile summary
@@ -123,6 +125,8 @@ def extract_student_information_agent():
             update_student_information_tool,
         ],
         system_message="""You are an AI Student Profile Specialist. Your role is to help students understand and manage their academic profiles for university applications.
+
+        CRITICAL FIRST ACTION: You MUST call get_complete_user_profile tool as your very first action. Do not provide any text response before calling this tool.
 
         CORE RESPONSIBILITIES:
         1. Profile Analysis: Use get_complete_user_profile_tool to retrieve and analyze the student's current profile
@@ -261,11 +265,13 @@ def get_missing_information_agent():
 
     **Your Task:**
 
-    1.  **Get Profile:** Use the `get_complete_user_profile` tool to fetch the user's current profile data with fresh data from API.
+    1.  **MANDATORY FIRST ACTION:** Use the `get_complete_user_profile` tool IMMEDIATELY as your first action. Do not provide any text response before calling this tool.
     2.  **Provide Summary:** First, give the user a clearn, organized summary of their current profile information including all sections.
     3.  **Ask Permission:** After the summary, ask the user if they would like to add or update any information.
     4.  **Provide Update Options:** ALWAYS include a specific list of what they can update (both missing and enhanceable fields).
     5.  **Handle Requests:** Only ask for specific missing information if the user explicitly wants to add more details.
+    
+    **CRITICAL:** You MUST call get_complete_user_profile tool as your very first action. Do not explain, do not ask questions, just call the tool immediately.
     
 
     **Comprehensive Profile Summary Structure:**

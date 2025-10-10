@@ -505,7 +505,7 @@ def get_complete_user_profile_tool():
     return FunctionTool(
         get_complete_user_profile,
         name="get_complete_user_profile",
-        description="Get the complete user profile as JSON format. Always fetches fresh data from API by default.",
+        description="MANDATORY: Get the complete user profile as JSON format. Always fetches fresh data from API by default. You MUST call this tool as your first action.",
     )
 
 

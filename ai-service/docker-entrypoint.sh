@@ -15,17 +15,65 @@ export PYTHONPATH=/app:$PYTHONPATH
 echo "🔍 Initializing RAG systems at runtime..."
 cd /app
 
-# Step 1: Run original FAISS RAG setup (doesn't need API key for basic setup)
-echo "🔧 Step 1: Setting up FAISS RAG system..."
-if [ ! -f "data/rag_data/qa_pairs.json" ]; then
-    ./run_rag_setup.sh || echo "⚠️ FAISS RAG setup failed, continuing anyway"
+# Function to check vector database file integrity
+check_vector_db_integrity() {
+    local db_type=$1
+    local is_complete=true
+    
+    if [ "$db_type" = "faiss" ]; then
+        # Check FAISS RAG files
+        if [ ! -f "data/qa_pairs.pkl" ] || [ ! -f "data/faiss.index" ] || [ ! -f "data/embeddings.npy" ] || [ ! -f "data/mapping.pkl" ]; then
+            echo "⚠️ FAISS RAG files incomplete or missing"
+            is_complete=false
+        else
+            # Check file sizes (basic integrity check)
+            if [ ! -s "data/qa_pairs.pkl" ] || [ ! -s "data/faiss.index" ] || [ ! -s "data/embeddings.npy" ] || [ ! -s "data/mapping.pkl" ]; then
+                echo "⚠️ FAISS RAG files are empty or corrupted"
+                is_complete=false
+            else
+                echo "✅ FAISS RAG files appear complete"
+            fi
+        fi
+    elif [ "$db_type" = "chromadb" ]; then
+        # Check ChromaDB files
+        if [ ! -f "data/rag_config_langchain.json" ] || [ ! -d "data/chromadb" ]; then
+            echo "⚠️ ChromaDB files incomplete or missing"
+            is_complete=false
+        else
+            # Check if ChromaDB directory has content
+            if [ ! "$(ls -A data/chromadb 2>/dev/null)" ]; then
+                echo "⚠️ ChromaDB directory is empty"
+                is_complete=false
+            else
+                # Check if config file indicates proper initialization
+                if grep -q '"status": "not_initialized"' data/rag_config_langchain.json 2>/dev/null; then
+                    echo "⚠️ ChromaDB not properly initialized"
+                    is_complete=false
+                else
+                    echo "✅ ChromaDB files appear complete"
+                fi
+            fi
+        fi
+    fi
+    
+    echo $is_complete
+}
+
+# Step 1: Check and setup FAISS RAG system
+echo "🔧 Step 1: Checking FAISS RAG system..."
+if [ "$(check_vector_db_integrity faiss)" = "true" ]; then
+    echo "✅ FAISS RAG system files are complete and valid"
 else
-    echo "✅ FAISS RAG system already initialized"
+    echo "🔧 FAISS RAG files incomplete or corrupted, rebuilding..."
+    ./run_rag_setup.sh || echo "⚠️ FAISS RAG setup failed, continuing anyway"
 fi
 
-# Step 2: Run LangChain + ChromaDB RAG setup
-echo "🔧 Step 2: Setting up LangChain + ChromaDB RAG system..."
-if [ ! -f "data/rag_config_langchain.json" ] || grep -q '"status": "not_initialized"' data/rag_config_langchain.json 2>/dev/null; then
+# Step 2: Check and setup LangChain + ChromaDB RAG system
+echo "🔧 Step 2: Checking LangChain + ChromaDB RAG system..."
+if [ "$(check_vector_db_integrity chromadb)" = "true" ]; then
+    echo "✅ LangChain + ChromaDB RAG system files are complete and valid"
+else
+    echo "🔧 ChromaDB files incomplete or corrupted, rebuilding..."
     if [ -n "$OPENAI_API_KEY" ]; then
         echo "🔑 OPENAI_API_KEY found, running full LangChain RAG setup..."
         ./run_langchain_rag_setup_docker.sh || echo "⚠️ LangChain RAG setup failed, will create fallback"
@@ -34,8 +82,6 @@ if [ ! -f "data/rag_config_langchain.json" ] || grep -q '"status": "not_initiali
         mkdir -p data/chromadb
         echo '{"status": "not_initialized", "message": "OPENAI_API_KEY not available"}' > data/rag_config_langchain.json
     fi
-else
-    echo "✅ LangChain RAG system already initialized"
 fi
 
 # Step 3: Final validation and fallback creation

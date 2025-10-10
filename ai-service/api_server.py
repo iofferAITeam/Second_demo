@@ -541,6 +541,85 @@ def format_user_context(user_profile) -> str:
     if edu_bg.currentInstitution.name:
         context_parts.append(f"Current Institution: {edu_bg.currentInstitution.name}")
 
+    # 语言测试成绩
+    if user_profile.languageTestsData:
+        language_tests = []
+        for test in user_profile.languageTestsData:
+            if test.testType and test.score:
+                language_tests.append(f"{test.testType}: {test.score}")
+        if language_tests:
+            context_parts.append(f"Language Test Scores: {', '.join(language_tests)}")
+
+    # 标准化测试成绩
+    if user_profile.standardizedTestsData:
+        standardized_tests = []
+        for test in user_profile.standardizedTestsData:
+            if test.testType and test.score:
+                standardized_tests.append(f"{test.testType}: {test.score}")
+        if standardized_tests:
+            context_parts.append(
+                f"Standardized Test Scores: {', '.join(standardized_tests)}"
+            )
+
+    # 工作经验
+    if user_profile.workExperiences:
+        work_experiences = []
+        for work in user_profile.workExperiences:
+            if work.company and work.position:
+                work_experiences.append(f"{work.position} at {work.company}")
+        if work_experiences:
+            context_parts.append(f"Work Experience: {'; '.join(work_experiences)}")
+
+    # 实习经验
+    if user_profile.internshipExperiences:
+        internships = []
+        for intern in user_profile.internshipExperiences:
+            if intern.company and intern.position:
+                internships.append(f"{intern.position} at {intern.company}")
+        if internships:
+            context_parts.append(f"Internship Experience: {'; '.join(internships)}")
+
+    # 研究项目
+    if user_profile.researchProjects:
+        research_projects = []
+        for project in user_profile.researchProjects:
+            if project.title:
+                research_projects.append(project.title)
+        if research_projects:
+            context_parts.append(f"Research Projects: {'; '.join(research_projects)}")
+
+    # 课外活动
+    if user_profile.extracurricularActivities:
+        context_parts.append(
+            f"Extracurricular Activities: {', '.join(user_profile.extracurricularActivities)}"
+        )
+
+    # 获奖情况
+    if user_profile.awards:
+        awards = []
+        for award in user_profile.awards:
+            if award.name:
+                awards.append(award.name)
+        if awards:
+            context_parts.append(f"Awards: {'; '.join(awards)}")
+
+    # 编程技能
+    if user_profile.programmingSkills:
+        programming_skills = []
+        for skill in user_profile.programmingSkills:
+            if skill.language:
+                programming_skills.append(skill.language)
+        if programming_skills:
+            context_parts.append(f"Programming Skills: {', '.join(programming_skills)}")
+
+    # 研究经验
+    if user_profile.researchExperience:
+        context_parts.append(f"Research Experience: {user_profile.researchExperience}")
+
+    # 发表论文
+    if user_profile.publications:
+        context_parts.append(f"Publications: {user_profile.publications}")
+
     # 职业发展
     career_dev = user_profile.careerDevelopment
     if career_dev.careerPath:
@@ -834,7 +913,7 @@ async def chat_endpoint(request: ChatRequest):
 
         # 🟢 统一使用 AutoGen Teams
         print(f"🎯 路由到: {team_type}")
-        
+
         # 步骤1: 选择对应的 AutoGen Team
         if team_type == "GENERAL_QA":
             # Use real hybrid QA agent with user context
@@ -860,7 +939,7 @@ async def chat_endpoint(request: ChatRequest):
                 timestamp=datetime.now().isoformat(),
             )
             return response
-            
+
         elif team_type == "SCHOOL_REC":
             team = create_school_rec_team()
         elif team_type == "STUDENT_INFO":
@@ -889,31 +968,31 @@ async def chat_endpoint(request: ChatRequest):
                 timestamp=datetime.now().isoformat(),
             )
             return response
-        
+
         # 步骤2: 执行 AutoGen Team
         print(f"🚀 运行 {team_type} team...")
         try:
-            task_result = await Console(
-                team.run_stream(task=enhanced_message)
-            )
-            
+            task_result = await Console(team.run_stream(task=enhanced_message))
+
             # 步骤3: 提取最终消息
             team_response = ""
-            
+
             for i in range(len(task_result.messages) - 1, -1, -1):
                 msg = task_result.messages[i]
-                content = str(msg.content) if hasattr(msg, 'content') else str(msg)
-                
+                content = str(msg.content) if hasattr(msg, "content") else str(msg)
+
                 if content.strip() and content.strip() != "TERMINATE":
                     team_response = content.replace("TERMINATE", "").strip()
                     print(f"✅ 找到有效消息: {len(team_response)} 字符")
                     break
-            
+
             if not team_response:
-                team_response = "I apologize, but I couldn't generate a proper response."
-            
+                team_response = (
+                    "I apologize, but I couldn't generate a proper response."
+                )
+
             team_response = clean_ai_response(team_response)
-            
+
             # 步骤4: 构建响应
             response = ChatResponse(
                 message=team_response,
@@ -925,12 +1004,13 @@ async def chat_endpoint(request: ChatRequest):
                 team_used=team_type,
                 timestamp=datetime.now().isoformat(),
             )
-            
+
         except Exception as team_error:
             print(f"❌ {team_type} team 执行失败: {str(team_error)}")
             import traceback
+
             traceback.print_exc()
-            
+
             response = ChatResponse(
                 message="I apologize, but I'm experiencing technical difficulties.",
                 thinking_process=f"Team execution error: {str(team_error)}",
@@ -1080,11 +1160,11 @@ async def get_chat_history(limit: int = 50, offset: int = 0):
 def setup_logging():
     """设置详细的日志记录"""
     import os
-    
+
     # 确保 logs 目录存在
     logs_dir = "logs"
     os.makedirs(logs_dir, exist_ok=True)
-    
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_filename = os.path.join(logs_dir, f"api_server_detailed_{timestamp}.log")
 
