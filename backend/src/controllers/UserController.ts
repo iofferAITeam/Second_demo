@@ -15,7 +15,16 @@ interface AuthRequest extends Request {
 export class UserController {
   static async getProfile(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const userId = req.userId
+      let userId = req.userId
+
+      // Check for API key authentication (AI service to backend)
+      const apiKey = req.headers['x-api-key']
+      if (apiKey === process.env.AI_SERVICE_API_KEY) {
+        userId = req.query.user_id as string
+        if (!userId) {
+          return res.status(400).json({ error: 'user_id query parameter required for API key auth' })
+        }
+      }
 
       if (!userId) {
         return res.status(401).json({ error: 'Unauthorized' })
