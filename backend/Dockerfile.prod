@@ -46,6 +46,9 @@ COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 COPY --from=builder --chown=nodejs:nodejs /app/scripts ./scripts
 RUN chmod +x /app/scripts/*.sh
 
+# Create logs directory with correct permissions
+RUN mkdir -p /app/logs && chown -R nodejs:nodejs /app/logs
+
 USER nodejs
 
 EXPOSE 8001
