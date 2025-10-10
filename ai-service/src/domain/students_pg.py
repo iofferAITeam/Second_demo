@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 import json
 import uuid
+import os
+import requests
 from datetime import datetime
 
 from loguru import logger
@@ -11,6 +13,47 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
 from src.infrastructure.db.postgres import postgres_connector
+
+
+def _fetch_user_profile_from_api(user_id: str) -> Optional[Dict[str, Any]]:
+    """从后端API获取用户档案数据"""
+    try:
+        # 获取API密钥
+        api_key = os.getenv("AI_SERVICE_API_KEY")
+        if not api_key:
+            logger.error("AI_SERVICE_API_KEY environment variable not set")
+            return None
+
+        # 构建API URL - 在Docker环境中使用服务名称
+        api_url = f"http://backend:8001/api/user/profile?user_id={user_id}"
+
+        # 设置请求头
+        headers = {"x-api-key": api_key, "Content-Type": "application/json"}
+
+        # 发送请求
+        response = requests.get(api_url, headers=headers, timeout=30)
+
+        if response.status_code == 200:
+            data = response.json()
+            logger.info(
+                f"Successfully fetched user profile from API for user_id: {user_id}"
+            )
+            return data
+        elif response.status_code == 404:
+            logger.info(f"No user profile found for user_id: {user_id}")
+            return None
+        else:
+            logger.error(
+                f"API request failed with status {response.status_code}: {response.text}"
+            )
+            return None
+
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Request error when fetching user profile for {user_id}: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Unexpected error when fetching user profile for {user_id}: {e}")
+        return None
 
 
 # 扩展的 Pydantic 模型结构，匹配PostgreSQL数据库字段
@@ -380,29 +423,22 @@ class StudentDocument(BaseModel):
 
     @classmethod
     def find_by_user_id(cls, user_id: str) -> Optional[StudentDocument]:
-        """根据用户 ID 查找用户档案 - 完整版本匹配PostgreSQL所有字段"""
+        """根据用户 ID 查找用户档案 - 从API获取数据"""
         try:
-            session = postgres_connector.get_session()
-
-            # 查询用户基本信息和档案
-            query = text(
-                """
-                SELECT
-                    u.id, u.email, u.name,
-                    up.*
-                FROM users u
-                LEFT JOIN user_profiles up ON u.id = up."userId"
-                WHERE u.id = :user_id
-            """
-            )
-
-            result = session.execute(query, {"user_id": user_id}).fetchone()
-
-            if not result:
+            # 从API获取用户数据
+            api_data = _fetch_user_profile_from_api(user_id)
+            if not api_data:
                 logger.info(f"No user profile found for user_id: {user_id}")
                 return None
 
-            # 解析JSON字段
+            # 解析API返回的数据
+            user_data = api_data.get("user", {})
+            profile_data = api_data.get("profileData", {})
+            basic_info = profile_data.get("basicInfo", {})
+            academic_performance = profile_data.get("academicPerformance", {})
+            application_intentions = profile_data.get("applicationIntentions", {})
+
+            # 解析JSON字段的辅助函数
             def safe_json_parse(data, default=None):
                 if default is None:
                     default = {}
@@ -413,197 +449,155 @@ class StudentDocument(BaseModel):
                 except (json.JSONDecodeError, TypeError):
                     return default
 
-            experiences = safe_json_parse(result.experiences)
-            language_tests_data = safe_json_parse(result.languageTestsData, [])
-            standardized_tests_data = safe_json_parse(result.standardizedTestsData, [])
-            work_experiences = safe_json_parse(result.workExperiences, [])
-            internship_experiences = safe_json_parse(result.internshipExperiences, [])
-            research_projects = safe_json_parse(result.researchProjects, [])
-            awards = safe_json_parse(result.awards, [])
-            recommendation_letters = safe_json_parse(result.recommendationLetters, [])
-            programming_skills = safe_json_parse(result.programmingSkills, [])
-            language_skills = safe_json_parse(result.languageSkills, [])
+            # 解析语言测试数据
+            language_tests_data = academic_performance.get("languageTestsData", [])
+            standardized_tests_data = academic_performance.get(
+                "standardizedTestsData", []
+            )
 
             # 构建完整的学生档案
             student_profile = StudentDocument(
                 user_id=user_id,
                 basicInformation=BasicInformation(
                     name=Name(
-                        firstName=result.name.split(" ")[0] if result.name else "",
-                        lastName=(
-                            " ".join(result.name.split(" ")[1:])
-                            if result.name and len(result.name.split(" ")) > 1
-                            else ""
-                        ),
+                        firstName=basic_info.get("firstName", ""),
+                        lastName=basic_info.get("lastName", ""),
                     ),
                     contactInformation=ContactInformation(
-                        email=result.email or "",
+                        email=basic_info.get("email", user_data.get("email", "")),
                         phoneNumber=PhoneNumber(
-                            countryCode="+1", number=result.phone or ""
+                            countryCode="+1", number=basic_info.get("phone", "")
                         ),
-                        wechat=getattr(result, "wechat", "") or "",
-                        birthDate=getattr(result, "birthDate", "") or "",
+                        wechat="",  # API数据中未包含
+                        birthDate="",  # API数据中未包含
                     ),
-                    nationality=result.nationality or "",
-                    visaRequired=getattr(result, "visaRequired", False) or False,
+                    nationality=basic_info.get("nationality", ""),
+                    visaRequired=basic_info.get("visaRequired", False),
                 ),
                 applicationDetails=ApplicationDetails(
-                    degreeType=getattr(result, "targetDegreeType", "") or "",
-                    intendedMajor=getattr(result, "intendedMajor", "") or "",
+                    degreeType=application_intentions.get("intendedDegree", ""),
+                    intendedMajor=application_intentions.get("intendedMajor", ""),
                     targetCountry="",  # 从数组中提取
-                    applicationYear=getattr(result, "applicationYear", "") or "",
-                    applicationTerm=getattr(result, "applicationTerm", "") or "",
-                    targetDegreeType=getattr(result, "targetDegreeType", "") or "",
-                    targetMajors=safe_json_parse(
-                        getattr(result, "targetMajors", "[]"), []
+                    applicationYear="",  # API数据中未包含
+                    applicationTerm=application_intentions.get(
+                        "intendedIntakeTerm", ""
                     ),
-                    targetCountries=safe_json_parse(
-                        getattr(result, "targetCountries", "[]"), []
+                    targetDegreeType=application_intentions.get("intendedDegree", ""),
+                    targetMajors=[application_intentions.get("intendedMajor", "")],
+                    targetCountries=application_intentions.get("intendedCountries", []),
+                    intendedDegree=application_intentions.get("intendedDegree", ""),
+                    intendedIntakeTerm=application_intentions.get(
+                        "intendedIntakeTerm", ""
                     ),
-                    intendedDegree=getattr(result, "intendedDegree", "") or "",
-                    intendedIntakeTerm=getattr(result, "intendedIntakeTerm", "") or "",
-                    intendedCountries=safe_json_parse(
-                        getattr(result, "intendedCountries", "[]"), []
+                    intendedCountries=application_intentions.get(
+                        "intendedCountries", []
                     ),
-                    intendedBudgets=getattr(result, "intendedBudgets", "") or "",
-                    scholarshipRequirements=getattr(
-                        result, "scholarshipRequirements", ""
-                    )
-                    or "",
-                    otherPreference=getattr(result, "otherPreference", "") or "",
-                    budgetRange=getattr(result, "budgetRange", "") or "",
-                    scholarshipNeeds=getattr(result, "scholarshipNeeds", False)
-                    or False,
+                    intendedBudgets=application_intentions.get("intendedBudgets", ""),
+                    scholarshipRequirements=application_intentions.get(
+                        "scholarshipRequirements", ""
+                    ),
+                    otherPreference=application_intentions.get("otherPreference", ""),
+                    budgetRange=application_intentions.get("intendedBudgets", ""),
+                    scholarshipNeeds=application_intentions.get(
+                        "otherFinancialAidsRequired", False
+                    ),
                 ),
                 educationBackground=EducationBackground(
-                    highestDegree=result.currentEducation or "",
+                    highestDegree=academic_performance.get("highestDegree", ""),
                     currentInstitution=CurrentInstitution(
-                        name=getattr(result, "undergraduateUniversity", "") or "",
-                        type=getattr(result, "universityType", "") or "University",
+                        name="",  # API数据中未包含
+                        type="University",
                     ),
-                    major=result.major or "",
+                    major=academic_performance.get("major", ""),
                     gpa=Gpa(
-                        average=str(result.gpa or ""),
-                        lastYear=str(getattr(result, "lastTwoYearsGpa", "") or ""),
+                        average=academic_performance.get("gpa", ""),
+                        lastYear=academic_performance.get("majorGpa", ""),
                     ),
-                    lastTwoYearsGpa=str(getattr(result, "lastTwoYearsGpa", "") or ""),
-                    graduationDate=getattr(result, "graduationDate", "") or "",
-                    undergraduateUniversity=getattr(
-                        result, "undergraduateUniversity", ""
-                    )
-                    or "",
-                    universityRank=getattr(result, "universityRank", "") or "",
-                    universityType=getattr(result, "universityType", "") or "",
-                    highSchoolName=getattr(result, "highSchoolName", "") or "",
-                    graduationYear=getattr(result, "graduationYear", "") or "",
-                    majorSubjects=getattr(result, "majorSubjects", "") or "",
-                    majorSubjectsData=safe_json_parse(
-                        getattr(result, "majorSubjectsData", "[]"), []
-                    ),
+                    lastTwoYearsGpa=academic_performance.get("majorGpa", ""),
+                    graduationDate="",  # API数据中未包含
+                    undergraduateUniversity="",  # API数据中未包含
+                    universityRank="",  # API数据中未包含
+                    universityType="",  # API数据中未包含
+                    highSchoolName="",  # API数据中未包含
+                    graduationYear="",  # API数据中未包含
+                    majorSubjects="",  # API数据中未包含
+                    majorSubjectsData=[],
                 ),
                 careerDevelopment=CareerDevelopment(
-                    careerPath=getattr(result, "careerGoals", "") or "",
-                    futureCareerPlan=getattr(result, "careerGoals", "") or "",
-                    graduateStudyPlan=getattr(result, "goals", "") or "",
-                    hasWorkExperience=getattr(result, "totalWorkMonths", 0) > 0,
+                    careerPath=application_intentions.get("careerIntentions", ""),
+                    futureCareerPlan=application_intentions.get("careerIntentions", ""),
+                    graduateStudyPlan="",  # API数据中未包含
+                    hasWorkExperience=bool(
+                        application_intentions.get("internshipExperience", "")
+                    ),
                 ),
                 studyAbroadPreparation=StudyAbroadPreparation(
                     internationalDegree=InternationalDegree(
-                        desiredInstitution="",
-                        desiredProgram="",
+                        desiredInstitution="",  # API数据中未包含
+                        desiredProgram="",  # API数据中未包含
                     ),
                     lifestylePreferences=LifestylePreferences(
-                        preferredCityType=safe_json_parse(
-                            getattr(result, "preferredCityType", "[]"), []
-                        ),
+                        preferredCityType=[],
                         preferredEnvironment=[],
                         preferredGeography=[],
                         preferredLifestyle=[],
                     ),
                 ),
                 personalityProfile=PersonalityProfile(
-                    mbtiType=getattr(result, "mbti", "") or "",
-                    strengths=getattr(result, "personalStrengths", "") or "",
-                    interests=getattr(result, "researchInterests", "") or "",
-                    hobbies=getattr(result, "hobbies", "") or "",
-                    personalStrengths=getattr(result, "personalStrengths", "") or "",
-                    extracurricular=getattr(result, "extracurricular", "") or "",
+                    mbtiType=basic_info.get("mbti", ""),
+                    strengths=basic_info.get("personalStrengths", ""),
+                    interests="",  # API数据中未包含
+                    hobbies=basic_info.get("hobbies", ""),
+                    personalStrengths=basic_info.get("personalStrengths", ""),
+                    extracurricular=basic_info.get("extracurricular", ""),
                 ),
                 # 新增字段
-                researchExperience=getattr(result, "researchExperience", "") or "",
-                publications=getattr(result, "publications", "") or "",
+                researchExperience=academic_performance.get("researchExperience", ""),
+                publications=academic_performance.get("publications", ""),
                 languageTestsData=[
                     LanguageTestDetails(**test) for test in language_tests_data
                 ],
                 standardizedTestsData=[
                     StandardizedTestDetails(**test) for test in standardized_tests_data
                 ],
-                workExperiences=[WorkExperience(**exp) for exp in work_experiences],
-                internshipExperiences=[
-                    InternshipExperience(**exp) for exp in internship_experiences
-                ],
-                researchProjects=[
-                    ResearchProject(**proj) for proj in research_projects
-                ],
-                extracurricularActivities=safe_json_parse(
-                    getattr(result, "extracurricularActivities", "[]"), []
-                ),
-                awards=[Award(**award) for award in awards],
-                recommendationLetters=[
-                    RecommendationLetter(**rec) for rec in recommendation_letters
-                ],
-                programmingSkills=[
-                    ProgrammingSkill(**skill) for skill in programming_skills
-                ],
-                languageSkills=[LanguageSkill(**skill) for skill in language_skills],
+                workExperiences=[],  # API数据中未包含
+                internshipExperiences=[],  # API数据中未包含
+                researchProjects=[],  # API数据中未包含
+                extracurricularActivities=[],  # API数据中未包含
+                awards=[],  # API数据中未包含
+                recommendationLetters=[],  # API数据中未包含
+                programmingSkills=[],  # API数据中未包含
+                languageSkills=[],  # API数据中未包含
                 # 统计字段
-                hasResearchExperience=getattr(result, "hasResearchExperience", False)
-                or False,
-                publicationCount=getattr(result, "publicationCount", 0) or 0,
-                totalWorkMonths=getattr(result, "totalWorkMonths", 0) or 0,
-                leadershipScore=getattr(result, "leadershipScore", 0) or 0,
+                hasResearchExperience=academic_performance.get("researchExperience", "")
+                != "NONE",
+                publicationCount=0,  # API数据中未包含
+                totalWorkMonths=0,  # API数据中未包含
+                leadershipScore=0,  # API数据中未包含
                 # 标签字段
-                gpaTag=getattr(result, "gpaTag", "") or "",
-                paperTag=getattr(result, "paperTag", "") or "",
-                toeflTag=getattr(result, "toeflTag", "") or "",
-                greTag=getattr(result, "greTag", "") or "",
-                researchTag=getattr(result, "researchTag", "") or "",
-                collegeTypeTag=getattr(result, "collegeTypeTag", "") or "",
-                recommendationTag=getattr(result, "recommendationTag", "") or "",
-                networkingTag=getattr(result, "networkingTag", "") or "",
+                gpaTag="",  # API数据中未包含
+                paperTag="",  # API数据中未包含
+                toeflTag="",  # API数据中未包含
+                greTag="",  # API数据中未包含
+                researchTag="",  # API数据中未包含
+                collegeTypeTag="",  # API数据中未包含
+                recommendationTag="",  # API数据中未包含
+                networkingTag="",  # API数据中未包含
                 # 同步状态
-                lastSyncAt=(
-                    str(getattr(result, "lastSyncAt", ""))
-                    if getattr(result, "lastSyncAt")
-                    else None
-                ),
-                syncStatus=getattr(result, "syncStatus", "pending") or "pending",
-                syncErrors=getattr(result, "syncErrors", "") or None,
+                lastSyncAt=None,
+                syncStatus="pending",
+                syncErrors=None,
                 # 时间戳
-                createdAt=(
-                    str(getattr(result, "createdAt", ""))
-                    if getattr(result, "createdAt")
-                    else None
-                ),
-                updatedAt=(
-                    str(getattr(result, "updatedAt", ""))
-                    if getattr(result, "updatedAt")
-                    else None
-                ),
+                createdAt=user_data.get("createdAt"),
+                updatedAt=None,
             )
 
             logger.info(f"Successfully found user profile for: {user_id}")
             return student_profile
 
-        except SQLAlchemyError as e:
-            logger.error(f"Database error when finding user {user_id}: {e}")
-            return None
         except Exception as e:
             logger.error(f"Error finding user {user_id}: {e}")
             return None
-        finally:
-            if "session" in locals():
-                session.close()
 
     @classmethod
     def create_or_update_student(
@@ -813,6 +807,10 @@ class StudentDocument(BaseModel):
         """为当前对话会话创建或加载用户档案 - 匹配MongoDB版本功能"""
         student_profile = cls.find_by_user_id(user_id)
         if not student_profile:
+            # 如果API调用失败，创建一个空的档案作为fallback
+            logger.warning(
+                f"API call failed for user {user_id}, creating empty profile as fallback"
+            )
             student_profile = cls.create_or_update_student(user_id=user_id)
         return student_profile
 
