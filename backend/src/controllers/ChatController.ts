@@ -58,83 +58,89 @@ function cleanAiResponse(message: string): string {
 
 // 检测是否为学校推荐响应
 function isSchoolRecommendationResponse(content: string): boolean {
-  const recommendationKeywords = [
-    'Academic Background Score',
-    'Practical Experience Score',
-    'Language Proficiency Score',
-    'Overall Fit Score',
-    'Carnegie Mellon',
-    'UC Berkeley',
-    'Stanford',
-    'University of Washington',
-    'Georgia Tech',
-    'UCLA',
-    'Cornell',
-    'USC',
-    'Purdue',
-    'UC Irvine',
-    'Strategist\'s Note'
-  ]
-
-  return recommendationKeywords.some(keyword => content.includes(keyword)) &&
-         content.includes('Score') &&
-         content.includes('University')
+  return content.includes('Evaluation for:') &&
+         content.includes('Academic Background Score:') &&
+         content.includes('Overall Fit Score:') &&
+         (content.includes('Tier:') || content.includes('School Tier:'))
 }
 
 // 解析学校推荐数据
 function parseSchoolRecommendations(content: string) {
-  // 更准确的正则表达式，匹配格式："数字. 学校名称 - 项目名称"
-  const schoolRegex = /(\d+)\.\s+([^-\n]+?)(?:\s*-\s*([^\n]+?))?\s*\n\*?\s*([\s\S]*?)(?=\n\d+\.\s+[A-Z]|\n---|\n### |$)/g
+  if (!content) {
+    return []
+  }
+  console.log('========== PARSING SCHOOL RECOMMENDATIONS ==========')
+  console.log('Content length:', content.length)
+  console.log('First 1000 chars:', content.substring(0, 1000))
+  console.log('====================================================')
+  
+  // 🔧 修复：支持 "3.8 / 5" 格式的分数
+  const schoolRegex = /Evaluation for:\s*([^-\n]+?)\s*-\s*([^\n]+?)\s*\n+1\.\s*Academic Background Score:\s*([\d.]+)(?:\s*\/\s*5)?\s*\n[\s\S]*?2\.\s*Practical Experience Score:\s*([\d.]+)(?:\s*\/\s*5)?\s*\n[\s\S]*?3\.\s*Language Proficiency Score:\s*([\d.]+)(?:\s*\/\s*5)?\s*\n[\s\S]*?4\.\s*Overall Fit Score:\s*([\d.]+)(?:\s*\/\s*5)?\s*\n[\s\S]*?(?:School\s+)?Tier:\s*(\w+)/gi
+
   let match
   const recommendations = []
+  let displayOrder = 1
 
   while ((match = schoolRegex.exec(content)) !== null) {
-    const id = match[1]
-    let schoolName = match[2].trim()
-    const programName = match[3] ? match[3].trim() : 'Master of Science in Computer Science'
-    const details = match[4]
+    const schoolName = match[1].trim()
+    const programName = match[2].trim()
+    const academicScore = parseFloat(match[3])
+    const practicalScore = parseFloat(match[4])
+    const languageScore = parseFloat(match[5])
+    const fitScore = parseFloat(match[6])
+    const tier = match[7].toLowerCase()
+    const mappedTier = tier === 'reach' ? 'fit' : tier
 
-    // 清理学校名称，移除括号中的内容和额外空格
-    schoolName = schoolName.replace(/\s*\([^)]*\)/, '').trim()
+    console.log(`✅ Parsed school ${displayOrder}: ${schoolName} - ${tier}`)
 
-    // 跳过非学校条目（如描述性文本）
-    if (schoolName.length > 100 || (!schoolName.includes('University') && !schoolName.includes('College') && !schoolName.includes('Institute'))) {
-      continue
-    }
-
-    // 提取评分
-    const academicMatch = details.match(/Academic Background Score:\s*(\d+(?:\.\d+)?)\/5/)
-    const practicalMatch = details.match(/Practical Experience Score:\s*(\d+(?:\.\d+)?)\/5/)
-    const languageMatch = details.match(/Language Proficiency Score:\s*(\d+(?:\.\d+)?)\/5/)
-    const fitMatch = details.match(/Overall Fit Score:\s*(\d+(?:\.\d+)?)\/5/)
-    const noteMatch = details.match(/Strategist's Note:\s*(.*?)(?=\n\d+\.|$)/s)
-
-    // 只有包含评分的才是真正的学校推荐
-    if (!academicMatch && !practicalMatch && !languageMatch && !fitMatch) {
-      continue
-    }
-
-    // 推断学校详细信息
     const schoolInfo = getSchoolInfo(schoolName)
 
     recommendations.push({
-      id,
+      id: displayOrder.toString(),
       schoolName: schoolName,
       programName: programName,
-      academicScore: academicMatch ? parseFloat(academicMatch[1]) : null,
-      practicalScore: practicalMatch ? parseFloat(practicalMatch[1]) : null,
-      languageScore: languageMatch ? parseFloat(languageMatch[1]) : null,
-      fitScore: fitMatch ? parseFloat(fitMatch[1]) : null,
-      strategistNote: noteMatch ? noteMatch[1].trim() : null,
-      analysisContent: details,
+      academicScore: academicScore,
+      practicalScore: practicalScore,
+      languageScore: languageScore,
+      fitScore: fitScore,
+      strategistNote: null,
+      analysisContent: match[0],
       ...schoolInfo,
-      category: getCategoryFromScores({
-        academic: academicMatch ? parseFloat(academicMatch[1]) : 0,
-        fit: fitMatch ? parseFloat(fitMatch[1]) : 0
-      }),
-      displayOrder: parseInt(id) || 0
+      category: mappedTier,
+      displayOrder: displayOrder
     })
+
+    displayOrder++
   }
+
+  // 🔍 增强调试：如果解析失败，打印详细信息
+  if (recommendations.length === 0) {
+    console.log('❌ No schools parsed! Debugging...')
+    console.log('Has "Evaluation for:"?', content.includes('Evaluation for:'))
+    console.log('Has "Academic Background Score:"?', content.includes('Academic Background Score:'))
+    console.log('Has "Overall Fit Score:"?', content.includes('Overall Fit Score:'))
+    console.log('Has "Tier:"?', content.includes('Tier:'))
+    console.log('Has "School Tier:"?', content.includes('School Tier:'))
+    
+    const evalMatches = content.match(/Evaluation for:[\s\S]{0,800}/g)
+    if (evalMatches && evalMatches.length > 0) {
+      console.log(`Found ${evalMatches.length} "Evaluation for:" sections`)
+      console.log('First section sample:')
+      console.log(evalMatches[0])
+    } else {
+      console.log('No "Evaluation for:" found in content!')
+    }
+    
+    const scoreMatches = content.match(/Academic Background Score:\s*[\d.]+(?:\s*\/\s*5)?/g)
+    if (scoreMatches) {
+      console.log('Found score patterns:', scoreMatches.length)
+      console.log('First score sample:', scoreMatches[0])
+    }
+  }
+
+  console.log('========== Parsing Results ==========')
+  console.log(`Total schools parsed: ${recommendations.length}`)
+  console.log('====================================')
 
   return recommendations
 }
@@ -435,8 +441,23 @@ export class ChatController {
         })
 
         if (aiServiceResponse.data && aiServiceResponse.data.message) {
+          console.log('========== RAW AI RESPONSE ==========')
+          console.log('Length:', aiServiceResponse.data.message.length)
+          console.log('First 1000 chars:', aiServiceResponse.data.message.substring(0, 1000))
+          console.log('Last 500 chars:', aiServiceResponse.data.message.substring(aiServiceResponse.data.message.length - 500))
+          console.log('=====================================')
+  
           // 清洗AI回复内容
           const cleanedContent = cleanAiResponse(aiServiceResponse.data.message)
+          
+          console.log('========== CLEANED CONTENT CHECK ==========')
+          console.log('Content length:', cleanedContent.length)
+          console.log('First 500 chars:', cleanedContent.substring(0, 500))
+          console.log('Contains "Evaluation for:"?', cleanedContent.includes('Evaluation for:'))
+          console.log('Contains "Academic Background Score:"?', cleanedContent.includes('Academic Background Score:'))
+          console.log('Contains "Overall Fit Score:"?', cleanedContent.includes('Overall Fit Score:'))
+          console.log('Contains "School Tier:"?', cleanedContent.includes('School Tier:'))
+          console.log('==========================================')
 
           aiResponse = {
             id: 'ai-response-' + Date.now(),
@@ -455,8 +476,8 @@ export class ChatController {
           // 检测是否为学校推荐响应并保存到数据库
           if (userId && isSchoolRecommendationResponse(cleanedContent)) {
             try {
-              // 解析推荐数据
-              const recommendations = parseSchoolRecommendations(cleanedContent)
+              // 解析推荐数据 - 使用原始内容
+              const recommendations = parseSchoolRecommendations(aiServiceResponse.data.message)
 
               // 获取用户资料快照
               const userProfile = await prisma.user_profiles.findUnique({
