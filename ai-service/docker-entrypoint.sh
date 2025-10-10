@@ -22,12 +22,12 @@ check_vector_db_integrity() {
     
     if [ "$db_type" = "faiss" ]; then
         # Check FAISS RAG files
-        if [ ! -f "data/qa_pairs.pkl" ] || [ ! -f "data/faiss.index" ] || [ ! -f "data/embeddings.npy" ] || [ ! -f "data/mapping.pkl" ]; then
+        if [ ! -f "data/qa_pairs.pkl" ] || [ ! -f "data/faiss.index" ] || [ ! -f "data/embeddings.npy" ] || [ ! -f "data/mapping.pkl" ] || [ ! -f "data/rag_config.json" ]; then
             echo "⚠️ FAISS RAG files incomplete or missing"
             is_complete=false
         else
             # Check file sizes (basic integrity check)
-            if [ ! -s "data/qa_pairs.pkl" ] || [ ! -s "data/faiss.index" ] || [ ! -s "data/embeddings.npy" ] || [ ! -s "data/mapping.pkl" ]; then
+            if [ ! -s "data/qa_pairs.pkl" ] || [ ! -s "data/faiss.index" ] || [ ! -s "data/embeddings.npy" ] || [ ! -s "data/mapping.pkl" ] || [ ! -s "data/rag_config.json" ]; then
                 echo "⚠️ FAISS RAG files are empty or corrupted"
                 is_complete=false
             else
@@ -84,9 +84,15 @@ else
     fi
 fi
 
-# Step 3: Final validation and fallback creation
+# Step 3: Final validation and fallback creation (only if needed)
 echo "🔧 Step 3: Final RAG system validation..."
-uv run python src/agents/general_qa_agent/docker_rag_init.py
+# Only run the Python validation if we haven't already confirmed everything is working
+if [ "$(check_vector_db_integrity faiss)" = "true" ] && [ "$(check_vector_db_integrity chromadb)" = "true" ]; then
+    echo "✅ All vector databases are complete - skipping Python validation"
+else
+    echo "🔍 Running detailed Python validation..."
+    uv run python src/agents/general_qa_agent/docker_rag_init.py
+fi
 
 # Check if initialization was successful
 if [ -f "data/rag_config_langchain.json" ]; then

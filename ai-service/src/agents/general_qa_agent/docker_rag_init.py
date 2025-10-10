@@ -38,6 +38,7 @@ def check_vector_db_files_integrity():
         os.path.join(os.path.dirname(config_path), "faiss.index"),
         os.path.join(os.path.dirname(config_path), "embeddings.npy"),
         os.path.join(os.path.dirname(config_path), "mapping.pkl"),
+        os.path.join(os.path.dirname(config_path), "rag_config.json"),
     ]
 
     faiss_complete = True
@@ -163,6 +164,7 @@ def validate_vector_db_functionality():
             os.path.join(os.path.dirname(get_paths()[0]), "faiss.index"),
             os.path.join(os.path.dirname(get_paths()[0]), "embeddings.npy"),
             os.path.join(os.path.dirname(get_paths()[0]), "mapping.pkl"),
+            os.path.join(os.path.dirname(get_paths()[0]), "rag_config.json"),
         ]
 
         # Check if all FAISS files exist and are readable
@@ -209,46 +211,50 @@ async def main():
     print("🐳 Docker RAG Runtime Initialization")
     print("=" * 40)
 
-    # First, validate existing vector database functionality
-    faiss_working, chromadb_working = validate_vector_db_functionality()
-
-    # Check if already initialized and working
+    # First, check if RAG system is already properly initialized
     if check_rag_initialization():
-        print("✅ RAG system already initialized and validated - skipping")
+        print("✅ RAG system already initialized and validated - skipping rebuild")
         return True
 
-    # If vector databases are not working, we need to rebuild
-    if not faiss_working or not chromadb_working:
-        print("🔧 Vector databases need rebuilding...")
+    # If not initialized, validate what we have and decide what to do
+    print("🔍 RAG system not initialized, checking what needs to be done...")
 
-        # Check if we have the required API key
-        if not os.getenv("OPENAI_API_KEY"):
-            print("❌ OPENAI_API_KEY not found in environment")
-            print("⚠️ Creating fallback configuration...")
-            create_fallback_config()
-            return False
+    # Check if we have the required API key
+    if not os.getenv("OPENAI_API_KEY"):
+        print("❌ OPENAI_API_KEY not found in environment")
+        print("⚠️ Creating fallback configuration...")
+        create_fallback_config()
+        return False
 
-        # Check if CSV data exists
-        _, chromadb_path = get_paths()
-        # Get CSV path from same directory as config
-        config_path, _ = get_paths()
-        csv_path = os.path.join(os.path.dirname(config_path), "qa_pairs.csv")
-        if not os.path.exists(csv_path):
-            print(f"❌ QA pairs CSV not found: {csv_path}")
-            print("⚠️ Creating fallback configuration...")
-            create_fallback_config()
-            return False
+    # Check if CSV data exists
+    config_path, _ = get_paths()
+    csv_path = os.path.join(os.path.dirname(config_path), "qa_pairs.csv")
+    if not os.path.exists(csv_path):
+        print(f"❌ QA pairs CSV not found: {csv_path}")
+        print("⚠️ Creating fallback configuration...")
+        create_fallback_config()
+        return False
 
-        # Try to initialize
+    # Check what vector databases we have
+    faiss_working, chromadb_working = validate_vector_db_functionality()
+
+    if not faiss_working and not chromadb_working:
+        print("🔧 No working vector databases found - initializing from scratch...")
         success = await initialize_rag_system()
-
         if not success:
             print("⚠️ Initialization failed - creating fallback configuration...")
             create_fallback_config()
-
         return success
+    elif not faiss_working:
+        print(
+            "⚠️ FAISS database not working, but ChromaDB is OK - continuing with ChromaDB only"
+        )
+        return True
+    elif not chromadb_working:
+        print("⚠️ ChromaDB not working, but FAISS is OK - continuing with FAISS only")
+        return True
     else:
-        print("✅ Vector databases are functional - no rebuild needed")
+        print("✅ Both vector databases are functional - no rebuild needed")
         return True
 
 
