@@ -164,6 +164,7 @@ export default function RecommendationsInterface() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [currentUserProfile, setCurrentUserProfile] = useState<any>(null);
   const [fullAIResponse, setFullAIResponse] = useState<string>("");
+  const [isClientReady, setIsClientReady] = useState<boolean>(false);
 
   // Load AI recommendations from database on component mount
   useEffect(() => {
@@ -180,6 +181,9 @@ export default function RecommendationsInterface() {
     }
 
     console.log('User authenticated:', user?.email);
+
+    // Set client ready for hydration
+    setIsClientReady(true);
 
     // Load current user profile
     const loadCurrentUserProfile = async () => {
@@ -912,12 +916,14 @@ export default function RecommendationsInterface() {
                 </div>
                 <div className="user-details">
                   <div className="user-name">
-                    {currentUserProfile?.user?.name ||
-                     userProfile?.name ||
-                     currentUserProfile?.user?.email?.split('@')[0] ||
-                     userProfile?.email?.split('@')[0] ||
-                     user?.email?.split('@')[0] ||
-                     'User'}
+                    {isClientReady ? (
+                      currentUserProfile?.user?.name ||
+                      userProfile?.name ||
+                      currentUserProfile?.user?.email?.split('@')[0] ||
+                      userProfile?.email?.split('@')[0] ||
+                      user?.email?.split('@')[0] ||
+                      'User'
+                    ) : 'Loading...'}
                   </div>
                   <div className="user-badge">
                     {isAIData ? 'AI Analysis' : 'iOFFER Pro'}

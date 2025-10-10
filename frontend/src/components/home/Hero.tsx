@@ -23,21 +23,17 @@ export default function Hero() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // 构建发送给聊天模型的消息
-    const message = `Hi! I'm looking for personalized school recommendations based on my profile:
+    // 构建发送给聊天模型的消息，请求AI引导完成个人资料收集
+    const message = `Hi! I'd like to complete my academic profile with your help. Here's what I've shared so far:
 
 🎓 Desired Degree: ${formData.degree || 'Not specified'}
 🌍 Country of Interest: ${formData.country || 'Not specified'}
 📚 Desired Major/Program: ${formData.program || 'Not specified'}
 📝 About Me: ${formData.about || 'Not provided'}
 
-Please provide me with personalized school recommendations based on this information, including:
-1. Top recommended universities/colleges
-2. Admission requirements and chances
-3. Application tips specific to my profile
-4. Any additional insights that might be helpful
+Could you please help me build a complete academic profile by guiding me through the important information I should provide? I want to make sure I have all the necessary details for school applications.
 
-Thank you!`
+Please ask me questions step by step to collect my academic background, test scores, experiences, and other relevant information that would be important for university applications.`
 
     // 将消息保存到sessionStorage，然后跳转到聊天页面
     sessionStorage.setItem('initialMessage', message)

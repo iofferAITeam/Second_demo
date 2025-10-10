@@ -25,42 +25,24 @@ export interface Message {
 
 export default function ChatInterface() {
   const router = useRouter()
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      type: 'bot',
-      content: "Hello! I'm School Match Advisor. How can I help you find the perfect school today?",
-      timestamp: new Date()
-    }
-  ])
+  const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [currentSessionId, setCurrentSessionId] = useState<string | undefined>()
+  const [isClientReady, setIsClientReady] = useState(false)
 
 
-  // Function to detect if the response contains school recommendations
-  const isSchoolRecommendationResponse = (content: string): boolean => {
-    const recommendationKeywords = [
-      'Academic Background Score',
-      'Practical Experience Score',
-      'Language Proficiency Score',
-      'Overall Fit Score',
-      'Carnegie Mellon',
-      'UC Berkeley',
-      'Stanford',
-      'University of Washington',
-      'Georgia Tech',
-      'UCLA',
-      'Cornell',
-      'USC',
-      'Purdue',
-      'UC Irvine',
-      'Strategist\'s Note'
+  // Function to detect if the AI used ML team (school recommendation team)
+  const isSchoolRecommendationResponse = (teamUsed: string): boolean => {
+    // Check if the AI model called the ML team (school recommendation team)
+    const mlTeamNames = [
+      'SCHOOL_REC',
+      'SCHOOL_RECOMMENDATION',
+      'SCHOOL_REC_MULTI_AGENT_WORKFLOW',
+      'SCHOOL_REC_MULTI_AGENT_FALLBACK'
     ]
 
-    return recommendationKeywords.some(keyword => content.includes(keyword)) &&
-           content.includes('Score') &&
-           content.includes('University')
+    return mlTeamNames.includes(teamUsed)
   }
 
   // Function to parse school recommendation data
@@ -177,8 +159,9 @@ export default function ChatInterface() {
         const aiResponseData = (response as any).aiResponse || response
         const aiContent = aiResponseData.content || aiResponseData.message || 'No response'
 
-        // Check if this is a school recommendation response
-        if (isSchoolRecommendationResponse(aiContent)) {
+        // Check if this is a school recommendation response (AI called ML team)
+        const teamUsed = aiResponseData.teamUsed || aiResponseData.team_used || ''
+        if (isSchoolRecommendationResponse(teamUsed)) {
           // Parse the recommendations data
           const recommendationsData = parseSchoolRecommendations(aiContent)
 
@@ -284,8 +267,24 @@ export default function ChatInterface() {
     }
   }
 
+  // Initialize component with client-side only timestamps
+  useEffect(() => {
+    // Set client ready and initialize welcome message with timestamp
+    setIsClientReady(true)
+    setMessages([
+      {
+        id: '1',
+        type: 'bot',
+        content: "Hello! I'm School Match Advisor. How can I help you find the perfect school today?",
+        timestamp: new Date()
+      }
+    ])
+  }, [])
+
   // Check for initial message from form submission
   useEffect(() => {
+    if (!isClientReady) return
+
     const initialMessage = sessionStorage.getItem('initialMessage')
     const formData = sessionStorage.getItem('userFormData')
 
@@ -299,7 +298,23 @@ export default function ChatInterface() {
         addMessage(initialMessage)
       }, 1000) // Small delay to ensure component is fully rendered
     }
-  }, []) // Empty dependency array to run only once on mount
+  }, [isClientReady]) // Depend on client ready state
+
+  // Show loading state until client is ready to prevent hydration mismatch
+  if (!isClientReady) {
+    return (
+      <div className="chat-container">
+        <div className="chat-interface-wrapper">
+          <div className="chat-header">
+            <h1>Let's Chat A Bit More for A Better Result!</h1>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="chat-container">

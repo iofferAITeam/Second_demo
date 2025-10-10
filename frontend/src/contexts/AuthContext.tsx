@@ -48,21 +48,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
-  const [isAuth, setIsAuth] = useState<boolean>(() => {
-    // Optimistic: if we have a token and cached user, assume logged in
-    const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null
-    const cachedUser = getCachedUser()
-    return !!(token && cachedUser)
-  })
-  const [isLoading, setIsLoading] = useState<boolean>(false) // Start as not loading
-  const [user, setUser] = useState<UserData | null>(getCachedUser()) // Show cached immediately
+  const [isAuth, setIsAuth] = useState<boolean>(false) // Start as false to avoid hydration mismatch
+  const [isLoading, setIsLoading] = useState<boolean>(true) // Start as loading to handle auth check
+  const [user, setUser] = useState<UserData | null>(null) // Start as null to avoid hydration mismatch
   const [token, setTokenState] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const checkAuth = async () => {
-    // Don't show loading spinner - we're verifying in background
+    setIsLoading(true)
     const currentToken = getToken()
     const authStatus = isAuthenticated()
+
+    // Try to get cached user for optimistic UI
+    const cachedUser = getCachedUser()
+    if (cachedUser && authStatus && currentToken) {
+      // Set optimistic state first
+      setIsAuth(true)
+      setUser(cachedUser)
+      setTokenState(currentToken)
+    }
 
     if (authStatus && currentToken) {
       try {
@@ -111,6 +115,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('cached_user')
       }
     }
+
+    setIsLoading(false)
   }
 
   const login = (newToken: string) => {
