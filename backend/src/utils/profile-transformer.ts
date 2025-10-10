@@ -180,6 +180,7 @@ export function transformDatabaseToFormData(user: User, profile: UserProfile | n
       majorGpa: profile.majorGpa?.toString() || '',
       major: profile.major || '',
       highestDegree: profile.currentEducation || '',
+      graduationYear: (profile as any).graduationYear || '',
       languageTestsData: profile.languageTestsData || [],
       standardizedTestsData: profile.standardizedTestsData || [],
       researchExperience: profile.researchExperience || '',

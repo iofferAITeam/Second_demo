@@ -72,7 +72,7 @@ export class UserController {
         graduationDate: profile.graduationDate || undefined,
         goals: profile.goals || undefined
       } : null
-      const profileData = transformDatabaseToFormData(userForTransform, profileForTransform)
+      const profileData = transformDatabaseToFormData(userForTransform as any, profileForTransform)
 
       const response: StructuredProfileResponse = {
         user: userForTransform,

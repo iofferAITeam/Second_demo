@@ -2,7 +2,11 @@
   "embedding_model": "text-embedding-3-large",
   "embedding_dimensions": 3072,
   "total_qa_pairs": 50,
+<<<<<<< HEAD
   "created_at": "2025-10-10 03:22:30",
+=======
+  "created_at": "2025-10-10 12:49:48",
+>>>>>>> b766e36 (Fix AI service connection and resolve TypeScript errors)
   "source_csv": "/app/data/qa_pairs.csv",
   "preparation_script": "/app/src/agents/general_qa_agent/prepare_rag_data.py"
 }
