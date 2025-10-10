@@ -14,6 +14,13 @@ interface AuthRequest extends Request {
 
 export const authenticateToken = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    // Check for API key authentication (AI service to backend)
+    const apiKey = req.headers['x-api-key']
+    if (apiKey === process.env.AI_SERVICE_API_KEY) {
+      // API key is valid, skip JWT validation and let the controller handle user_id
+      return next()
+    }
+
     const authHeader = req.headers.authorization
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
