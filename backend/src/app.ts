@@ -21,8 +21,23 @@ app.use(helmet({
 }))
 
 // 🌐 CORS配置
+const allowedOrigins = [
+  'http://localhost:3000', 
+  'http://localhost:3001', 
+  'http://localhost:3002', 
+  'http://localhost:3003', 
+  'http://localhost:3004', 
+  'http://localhost:3005', 
+  'http://localhost:3007',
+  // 添加生产环境域名
+  'http://ec2-3-145-150-161.us-east-2.compute.amazonaws.com:3005',
+  'https://ec2-3-145-150-161.us-east-2.compute.amazonaws.com:3005',
+  // 允许所有子域名
+  /^https?:\/\/.*\.us-east-2\.compute\.amazonaws\.com(:\d+)?$/
+]
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003', 'http://localhost:3004', 'http://localhost:3005', 'http://localhost:3007'],
+  origin: process.env.FRONTEND_URL || allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']

@@ -70,6 +70,7 @@ services:
       - JWT_SECRET=${JWT_SECRET:-MFiWT8JxJh/X81vPGkq4O2sY+okSd9hf9tBM/MQO0oo3f06cgdo+HrHpoXhTaudK4JAtsDFnRpQWvMz4DZ04Kw==}
       - PORT=8001
       - NODE_ENV=production
+      - FRONTEND_URL=http://ec2-3-145-150-161.us-east-2.compute.amazonaws.com:3005
       - AI_SERVICE_URL=http://ai-service:8000
       - OPENAI_API_KEY=${OPENAI_API_KEY:-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}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-AIzaSyBFV9S68_FMSjqx6rEqduhrgEzH4YLSzZs}
