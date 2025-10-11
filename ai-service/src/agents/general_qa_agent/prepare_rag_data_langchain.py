@@ -210,7 +210,7 @@ class LangChainRAGDataPreparer:
         print("🗄️ Creating ChromaDB vector store...")
 
         try:
-            # Initialize ChromaDB client with persistent storage
+            # Initialize ChromaDB client with persistent storage and allow_reset
             chroma_client = chromadb.PersistentClient(
                 path=self.chromadb_dir,
                 settings=ChromaSettings(anonymized_telemetry=False, allow_reset=True),
@@ -220,8 +220,20 @@ class LangChainRAGDataPreparer:
             try:
                 chroma_client.delete_collection(name=self.collection_name)
                 print(f"🗑️ Deleted existing collection: {self.collection_name}")
-            except:
-                pass  # Collection doesn't exist, which is fine
+            except Exception as delete_error:
+                print(f"⚠️ Could not delete existing collection: {delete_error}")
+                # Try to reset the client if deletion fails
+                try:
+                    print("🔄 Attempting to reset ChromaDB client...")
+                    chroma_client = chromadb.PersistentClient(
+                        path=self.chromadb_dir,
+                        settings=ChromaSettings(
+                            anonymized_telemetry=False, allow_reset=True
+                        ),
+                    )
+                except Exception as reset_error:
+                    print(f"⚠️ ChromaDB client reset failed: {reset_error}")
+                    pass  # Continue anyway
 
             # Create vector store with documents
             print(f"⚡ Processing {len(documents)} documents in batches...")
@@ -271,10 +283,10 @@ class LangChainRAGDataPreparer:
         print("🔍 Validating ChromaDB setup...")
 
         try:
-            # Initialize ChromaDB client
+            # Initialize ChromaDB client with allow_reset to handle existing instances
             chroma_client = chromadb.PersistentClient(
                 path=self.chromadb_dir,
-                settings=ChromaSettings(anonymized_telemetry=False),
+                settings=ChromaSettings(anonymized_telemetry=False, allow_reset=True),
             )
 
             # Get collection
@@ -291,7 +303,28 @@ class LangChainRAGDataPreparer:
 
         except Exception as e:
             print(f"❌ Validation failed: {e}")
-            return False
+            # If validation fails due to instance conflict, try to reset and retry
+            try:
+                print("🔄 Attempting to reset ChromaDB instance...")
+                chroma_client = chromadb.PersistentClient(
+                    path=self.chromadb_dir,
+                    settings=ChromaSettings(
+                        anonymized_telemetry=False, allow_reset=True
+                    ),
+                )
+                # Try to delete and recreate the collection
+                try:
+                    chroma_client.delete_collection(name=self.collection_name)
+                except:
+                    pass  # Collection might not exist
+
+                # Recreate the collection
+                collection = chroma_client.create_collection(name=self.collection_name)
+                print("✅ ChromaDB instance reset successfully")
+                return True
+            except Exception as reset_error:
+                print(f"❌ ChromaDB reset failed: {reset_error}")
+                return False
 
     def test_similarity_search(self):
         """Test similarity search with a sample query"""

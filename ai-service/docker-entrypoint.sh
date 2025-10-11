@@ -74,6 +74,14 @@ if [ "$(check_vector_db_integrity chromadb)" = "true" ]; then
     echo "✅ LangChain + ChromaDB RAG system files are complete and valid"
 else
     echo "🔧 ChromaDB files incomplete or corrupted, rebuilding..."
+    
+    # Clean up any existing ChromaDB instance to prevent conflicts
+    if [ -d "data/chromadb" ]; then
+        echo "🗑️ Cleaning up existing ChromaDB instance to prevent conflicts..."
+        rm -rf data/chromadb/*
+        echo "✅ ChromaDB directory cleaned"
+    fi
+    
     if [ -n "$OPENAI_API_KEY" ]; then
         echo "🔑 OPENAI_API_KEY found, running full LangChain RAG setup..."
         ./run_langchain_rag_setup_docker.sh || echo "⚠️ LangChain RAG setup failed, will create fallback"

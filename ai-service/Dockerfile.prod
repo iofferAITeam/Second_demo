@@ -55,7 +55,7 @@ RUN pip install --no-cache-dir uv
 # Prepare RAG setup scripts and directories
 RUN chmod +x run_rag_setup.sh && \
   chmod +x run_langchain_rag_setup_docker.sh && \
-  mkdir -p data logs
+  mkdir -p data logs uploads
 
 # Copy and setup entrypoint script
 COPY --chown=appuser:appuser docker-entrypoint.sh /docker-entrypoint.sh

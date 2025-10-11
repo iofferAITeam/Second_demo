@@ -279,7 +279,16 @@ app.add_middleware(
 
 # 创建上传目录
 UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
+try:
+    UPLOAD_DIR.mkdir(exist_ok=True)
+except PermissionError:
+    print(
+        f"⚠️ Warning: Cannot create uploads directory due to permission error. Uploads may not work properly."
+    )
+    print(f"   Please ensure the uploads directory exists and is writable.")
+except Exception as e:
+    print(f"⚠️ Warning: Failed to create uploads directory: {e}")
+    print(f"   Uploads may not work properly.")
 
 
 # HTTP 端点用于测试和文档

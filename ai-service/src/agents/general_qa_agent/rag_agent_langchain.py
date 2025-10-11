@@ -126,10 +126,10 @@ class LangChainRAGRetriever:
                 request_timeout=60,
             )
 
-            # Initialize ChromaDB client
+            # Initialize ChromaDB client with allow_reset to handle existing instances
             chroma_client = chromadb.PersistentClient(
                 path=self.chromadb_dir,
-                settings=ChromaSettings(anonymized_telemetry=False),
+                settings=ChromaSettings(anonymized_telemetry=False, allow_reset=True),
             )
 
             # Load existing vector store
