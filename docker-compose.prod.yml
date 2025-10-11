@@ -64,7 +64,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.prod
     container_name: ioffer-backend
-    command: ["sh", "-c", "if [ -f /app/scripts/start-prod.sh ]; then echo 'Using startup script' && chmod +x /app/scripts/*.sh && /app/scripts/start-prod.sh; else echo 'Script not found, using fallback' && npx wait-port postgres:5432 && sleep 5 && npx prisma db push --accept-data-loss --force-reset && npx prisma generate && node dist/server.js; fi"]
+    command: ["sh", "-c", "echo '🚀 Starting backend...' && npx wait-port postgres:5432 && sleep 5 && echo '🔄 Initializing database...' && npx prisma db push --accept-data-loss --force-reset && npx prisma generate && echo '✅ Starting server...' && node dist/server.js"]
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-ioffer_user}:${POSTGRES_PASSWORD:-ioffer_password_prod_2024}@postgres:5432/${POSTGRES_DB:-ioffer_db}
       - JWT_SECRET=${JWT_SECRET:-MFiWT8JxJh/X81vPGkq4O2sY+okSd9hf9tBM/MQO0oo3f06cgdo+HrHpoXhTaudK4JAtsDFnRpQWvMz4DZ04Kw==}
