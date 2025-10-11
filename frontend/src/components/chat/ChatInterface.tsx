@@ -47,7 +47,7 @@ export default function ChatInterface() {
 
   // Function to parse school recommendation data
   const parseSchoolRecommendations = (content: string) => {
-    const universities = []
+    const universities: any[] = []
 
     // Extract the scoring table
     const tableRegex = /University\s+Academic Background\s+Practical Experience\s+Language Proficiency\s+Overall Fit\s*([\s\S]*?)(?=\d+\.\s+Carnegie|$)/
@@ -90,7 +90,7 @@ export default function ChatInterface() {
       const practicalMatch = details.match(/Practical Experience Score:\s*(\d+)\/5/)
       const languageMatch = details.match(/Language Proficiency Score:\s*(\d+)\/5/)
       const fitMatch = details.match(/Overall Fit Score:\s*(\d+)\/5/)
-      const noteMatch = details.match(/Strategist's Note:\s*(.*?)(?=\n\d+\.|$)/s)
+      const noteMatch = details.match(/Strategist's Note:\s*(.*?)(?=\n\d+\.|$)/)
 
       detailedAnalysis.push({
         id,

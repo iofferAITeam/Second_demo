@@ -30,7 +30,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 # Install only necessary system dependencies
-RUN apk add --no-cache openssl openssl-dev libc6-compat
+RUN apk add --no-cache openssl openssl-dev libc6-compat wget
 
 # Create app user
 RUN addgroup --system --gid 1001 nodejs
@@ -45,6 +45,9 @@ COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 # Copy the start script
 COPY --from=builder --chown=nodejs:nodejs /app/scripts ./scripts
 RUN chmod +x /app/scripts/*.sh
+
+# Create logs directory with correct permissions
+RUN mkdir -p /app/logs && chown -R nodejs:nodejs /app/logs
 
 USER nodejs
 
