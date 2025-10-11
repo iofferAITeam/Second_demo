@@ -23,6 +23,9 @@ RUN npx prisma generate
 # Build the application
 RUN npm run build
 
+# Create a script to verify Prisma setup
+RUN echo '#!/bin/bash\necho "Prisma client generated successfully"\nnpx prisma --version' > /app/verify-prisma.sh && chmod +x /app/verify-prisma.sh
+
 # Production image, copy all the files and run the app
 FROM base AS runner
 WORKDIR /app
@@ -45,7 +48,7 @@ COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
 COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 
-# Copy the start script
+# Copy the start script and database initialization script
 COPY --from=builder --chown=nodejs:nodejs /app/scripts ./scripts
 RUN chmod +x /app/scripts/*.sh
 
