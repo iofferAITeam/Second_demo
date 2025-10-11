@@ -50,7 +50,7 @@ COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma
 
 # Copy the start script and database initialization script
 COPY --from=builder --chown=nodejs:nodejs /app/scripts ./scripts
-RUN chmod +x /app/scripts/*.sh
+RUN chmod +x /app/scripts/*.sh && ls -la /app/scripts/
 
 # Create logs directory with correct permissions
 RUN mkdir -p /app/logs && chown -R nodejs:nodejs /app/logs

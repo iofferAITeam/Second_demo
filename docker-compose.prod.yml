@@ -64,7 +64,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.prod
     container_name: ioffer-backend
-    command: ["/app/scripts/start-prod.sh"]
+    command: ["sh", "-c", "chmod +x /app/scripts/*.sh && /app/scripts/start-prod.sh"]
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER:-ioffer_user}:${POSTGRES_PASSWORD:-ioffer_password_prod_2024}@postgres:5432/${POSTGRES_DB:-ioffer_db}
       - JWT_SECRET=${JWT_SECRET:-MFiWT8JxJh/X81vPGkq4O2sY+okSd9hf9tBM/MQO0oo3f06cgdo+HrHpoXhTaudK4JAtsDFnRpQWvMz4DZ04Kw==}

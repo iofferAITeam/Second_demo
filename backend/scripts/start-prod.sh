@@ -1,6 +1,11 @@
 #!/bin/bash
 
 echo "🚀 Starting backend in production mode..."
+echo "📁 Current directory: $(pwd)"
+echo "📋 Available files:"
+ls -la /app/scripts/ || echo "Scripts directory not found"
+echo "🔧 Script permissions:"
+ls -la /app/scripts/start-prod.sh || echo "start-prod.sh not found"
 
 # 等待数据库可用
 echo "⏳ Waiting for database to be ready..."
