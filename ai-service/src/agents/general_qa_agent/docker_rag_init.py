@@ -28,9 +28,57 @@ def get_paths():
         return config_path, chromadb_path
 
 
+def check_vector_db_files_integrity():
+    """Check if vector database files are complete and valid"""
+    config_path, chromadb_path = get_paths()
+
+    # Check FAISS files
+    faiss_files = [
+        os.path.join(os.path.dirname(config_path), "qa_pairs.pkl"),
+        os.path.join(os.path.dirname(config_path), "faiss.index"),
+        os.path.join(os.path.dirname(config_path), "embeddings.npy"),
+        os.path.join(os.path.dirname(config_path), "mapping.pkl"),
+        os.path.join(os.path.dirname(config_path), "rag_config.json"),
+    ]
+
+    faiss_complete = True
+    for file_path in faiss_files:
+        if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+            print(f"⚠️ FAISS file missing or empty: {os.path.basename(file_path)}")
+            faiss_complete = False
+
+    # Check ChromaDB files
+    chromadb_complete = True
+    if not os.path.exists(config_path):
+        print("⚠️ ChromaDB config file missing")
+        chromadb_complete = False
+    elif not os.path.exists(chromadb_path):
+        print("⚠️ ChromaDB directory missing")
+        chromadb_complete = False
+    elif not os.listdir(chromadb_path):
+        print("⚠️ ChromaDB directory is empty")
+        chromadb_complete = False
+    else:
+        # Check config file content
+        try:
+            with open(config_path, "r") as f:
+                config = json.load(f)
+            if config.get("status") == "not_initialized":
+                print("⚠️ ChromaDB not properly initialized")
+                chromadb_complete = False
+        except (json.JSONDecodeError, KeyError):
+            print("⚠️ ChromaDB config file corrupted")
+            chromadb_complete = False
+
+    return faiss_complete, chromadb_complete
+
+
 def check_rag_initialization():
     """Check if RAG system is properly initialized"""
     config_path, chromadb_path = get_paths()
+
+    # Check vector database file integrity
+    faiss_complete, chromadb_complete = check_vector_db_files_integrity()
 
     # Check if config file exists and is valid
     if os.path.exists(config_path):
@@ -40,15 +88,23 @@ def check_rag_initialization():
 
             # Check if it's a placeholder or real config
             if config.get("status") == "not_initialized":
+                print("⚠️ RAG system not initialized")
                 return False
 
             # Check if ChromaDB directory exists and has content
             if os.path.exists(chromadb_path) and os.listdir(chromadb_path):
-                print("✅ RAG system appears to be initialized")
-                return True
+                if chromadb_complete:
+                    print(
+                        "✅ RAG system appears to be initialized and files are complete"
+                    )
+                    return True
+                else:
+                    print("⚠️ RAG system config exists but files are incomplete")
+                    return False
 
         except (json.JSONDecodeError, KeyError):
-            pass
+            print("⚠️ RAG system config file corrupted")
+            return False
 
     print("⚠️ RAG system not initialized or incomplete")
     return False
@@ -97,15 +153,71 @@ def create_fallback_config():
     print("⚠️ Created fallback configuration")
 
 
+def validate_vector_db_functionality():
+    """Validate that vector databases are actually functional"""
+    print("🔍 Validating vector database functionality...")
+
+    try:
+        # Test FAISS functionality
+        faiss_files = [
+            os.path.join(os.path.dirname(get_paths()[0]), "qa_pairs.pkl"),
+            os.path.join(os.path.dirname(get_paths()[0]), "faiss.index"),
+            os.path.join(os.path.dirname(get_paths()[0]), "embeddings.npy"),
+            os.path.join(os.path.dirname(get_paths()[0]), "mapping.pkl"),
+            os.path.join(os.path.dirname(get_paths()[0]), "rag_config.json"),
+        ]
+
+        # Check if all FAISS files exist and are readable
+        faiss_working = True
+        for file_path in faiss_files:
+            if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+                faiss_working = False
+                break
+
+        if faiss_working:
+            print("✅ FAISS vector database appears functional")
+        else:
+            print("⚠️ FAISS vector database files are missing or corrupted")
+
+        # Test ChromaDB functionality
+        config_path, chromadb_path = get_paths()
+        chromadb_working = True
+
+        if not os.path.exists(config_path) or not os.path.exists(chromadb_path):
+            chromadb_working = False
+        else:
+            try:
+                with open(config_path, "r") as f:
+                    config = json.load(f)
+                if config.get("status") == "not_initialized":
+                    chromadb_working = False
+            except (json.JSONDecodeError, KeyError):
+                chromadb_working = False
+
+        if chromadb_working:
+            print("✅ ChromaDB vector database appears functional")
+        else:
+            print("⚠️ ChromaDB vector database is not properly initialized")
+
+        return faiss_working, chromadb_working
+
+    except Exception as e:
+        print(f"❌ Error validating vector databases: {e}")
+        return False, False
+
+
 async def main():
     """Main initialization function for Docker runtime"""
     print("🐳 Docker RAG Runtime Initialization")
     print("=" * 40)
 
-    # Check if already initialized
+    # First, check if RAG system is already properly initialized
     if check_rag_initialization():
-        print("✅ RAG system already initialized - skipping")
+        print("✅ RAG system already initialized and validated - skipping rebuild")
         return True
+
+    # If not initialized, validate what we have and decide what to do
+    print("🔍 RAG system not initialized, checking what needs to be done...")
 
     # Check if we have the required API key
     if not os.getenv("OPENAI_API_KEY"):
@@ -115,8 +227,6 @@ async def main():
         return False
 
     # Check if CSV data exists
-    _, chromadb_path = get_paths()
-    # Get CSV path from same directory as config
     config_path, _ = get_paths()
     csv_path = os.path.join(os.path.dirname(config_path), "qa_pairs.csv")
     if not os.path.exists(csv_path):
@@ -125,14 +235,27 @@ async def main():
         create_fallback_config()
         return False
 
-    # Try to initialize
-    success = await initialize_rag_system()
+    # Check what vector databases we have
+    faiss_working, chromadb_working = validate_vector_db_functionality()
 
-    if not success:
-        print("⚠️ Initialization failed - creating fallback configuration...")
-        create_fallback_config()
-
-    return success
+    if not faiss_working and not chromadb_working:
+        print("🔧 No working vector databases found - initializing from scratch...")
+        success = await initialize_rag_system()
+        if not success:
+            print("⚠️ Initialization failed - creating fallback configuration...")
+            create_fallback_config()
+        return success
+    elif not faiss_working:
+        print(
+            "⚠️ FAISS database not working, but ChromaDB is OK - continuing with ChromaDB only"
+        )
+        return True
+    elif not chromadb_working:
+        print("⚠️ ChromaDB not working, but FAISS is OK - continuing with FAISS only")
+        return True
+    else:
+        print("✅ Both vector databases are functional - no rebuild needed")
+        return True
 
 
 if __name__ == "__main__":

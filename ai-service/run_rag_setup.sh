@@ -102,7 +102,7 @@ if [ $? -eq 0 ]; then
     echo "  • Run test mode: python src/agents/hybrid_qa_agent.py --test"
     echo "  • Test RAG only: python src/agents/general_qa_agent/rag_agent.py"
     echo ""
-    echo "📊 Files created in data/ directory:"
+    echo "📊 Files available in data/ directory:"
     ls -la data/*.pkl data/*.index data/*.npy data/*.json 2>/dev/null || echo "No files found"
 else
     cd ../../..
