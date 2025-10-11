@@ -36,8 +36,11 @@ RUN apk add --no-cache openssl openssl-dev libc6-compat wget
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nodejs
 
+# NEW: Prune development dependencies after copying to keep the final image small
+RUN npm prune --production
+
 # Copy the build output and dependencies
-COPY --from=deps --chown=nodejs:nodejs /app/node_modules ./node_modules
+COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
 COPY --from=builder --chown=nodejs:nodejs /app/prisma ./prisma

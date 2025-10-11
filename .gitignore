@@ -23,6 +23,11 @@ backend/dist/
 # Database
 *.db
 *.sqlite
+ai-service/data/embeddings.npy
+ai-service/data/faiss.index
+ai-service/data/rag_config.json
+ai-service/data/qa_pairs.pkl
+ai-service/data/mapping.pkl
 
 # Environment variables
 .env*
@@ -65,6 +70,7 @@ next-env.d.ts
 .idea/
 *.swp
 *.swo
+.cursor/
 
 # Temporary folders
 tmp/

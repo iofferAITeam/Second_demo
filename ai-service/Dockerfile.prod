@@ -52,6 +52,15 @@ COPY --chown=appuser:appuser . .
 # Install uv in production image for running commands
 RUN pip install --no-cache-dir uv
 
+# Prepare RAG setup scripts and directories
+RUN chmod +x run_rag_setup.sh && \
+  chmod +x run_langchain_rag_setup_docker.sh && \
+  mkdir -p data logs
+
+# Copy and setup entrypoint script
+COPY --chown=appuser:appuser docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 USER appuser
 
 # Expose port
@@ -61,5 +70,6 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:8000/health || exit 1
 
-# Start the application
+# Start the application with RAG initialization
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["uv", "run", "python", "api_server.py"]
