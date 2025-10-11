@@ -1172,20 +1172,47 @@ def setup_logging():
 
     # 确保 logs 目录存在
     logs_dir = "logs"
-    os.makedirs(logs_dir, exist_ok=True)
+    try:
+        os.makedirs(logs_dir, exist_ok=True)
+    except PermissionError:
+        print(
+            f"⚠️ Warning: Cannot create logs directory due to permission error. Using console logging only."
+        )
+        # 只使用控制台日志
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s | %(levelname)-8s | %(message)s",
+            handlers=[
+                logging.StreamHandler(),  # 只输出到控制台
+            ],
+        )
+        return logging.getLogger(__name__)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     log_filename = os.path.join(logs_dir, f"api_server_detailed_{timestamp}.log")
 
     # 配置日志格式
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s | %(levelname)-8s | %(message)s",
-        handlers=[
-            logging.FileHandler(log_filename, encoding="utf-8"),
-            logging.StreamHandler(),  # 同时输出到控制台
-        ],
-    )
+    try:
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s | %(levelname)-8s | %(message)s",
+            handlers=[
+                logging.FileHandler(log_filename, encoding="utf-8"),
+                logging.StreamHandler(),  # 同时输出到控制台
+            ],
+        )
+    except PermissionError:
+        print(
+            f"⚠️ Warning: Cannot create log file due to permission error. Using console logging only."
+        )
+        # 回退到只使用控制台日志
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s | %(levelname)-8s | %(message)s",
+            handlers=[
+                logging.StreamHandler(),  # 只输出到控制台
+            ],
+        )
 
     logger = logging.getLogger(__name__)
 
