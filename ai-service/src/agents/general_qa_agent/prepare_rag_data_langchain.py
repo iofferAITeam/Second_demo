@@ -376,7 +376,12 @@ class LangChainRAGDataPreparer:
                     import shutil
 
                     if os.path.exists(self.chromadb_dir):
-                        shutil.rmtree(self.chromadb_dir)
+                        try:
+                            shutil.rmtree(self.chromadb_dir)
+                            print("✅ ChromaDB directory removed successfully")
+                        except Exception as e:
+                            print(f"⚠️ Could not remove ChromaDB directory: {e}")
+                            print("   Continuing with existing directory...")
                         os.makedirs(self.chromadb_dir, exist_ok=True)
 
                     # Retry the test

@@ -68,6 +68,15 @@ if [ -f "data/.rag_initialized" ]; then
     exit 0
 fi
 
+# Additional check: if both vector databases are complete, skip all initialization
+if [ "$(check_vector_db_integrity faiss)" = "true" ] && [ "$(check_vector_db_integrity chromadb)" = "true" ]; then
+    echo "✅ All vector databases are complete and valid - skipping all initialization"
+    echo "🚀 Starting AI Service..."
+    echo "========================"
+    exec "$@"
+    exit 0
+fi
+
 # Step 1: Check and setup FAISS RAG system
 echo "🔧 Step 1: Checking FAISS RAG system..."
 if [ "$(check_vector_db_integrity faiss)" = "true" ]; then
@@ -84,24 +93,8 @@ if [ "$(check_vector_db_integrity chromadb)" = "true" ]; then
 else
     echo "🔧 ChromaDB files incomplete or corrupted, rebuilding..."
     
-    # Only clean up if we're sure we need to rebuild
     if [ -n "$OPENAI_API_KEY" ]; then
         echo "🔑 OPENAI_API_KEY found, running full LangChain RAG setup..."
-        
-        # Clean up any existing ChromaDB instance to prevent conflicts
-        if [ -d "data/chromadb" ]; then
-            echo "🗑️ Cleaning up existing ChromaDB instance to prevent conflicts..."
-            rm -rf data/chromadb
-            echo "✅ ChromaDB directory completely removed"
-        fi
-        
-        # Also clean up any existing config file that might cause conflicts
-        if [ -f "data/rag_config_langchain.json" ]; then
-            echo "🗑️ Removing existing ChromaDB config to prevent conflicts..."
-            rm -f data/rag_config_langchain.json
-            echo "✅ ChromaDB config removed"
-        fi
-        
         ./run_langchain_rag_setup_docker.sh || echo "⚠️ LangChain RAG setup failed, will create fallback"
     else
         echo "⚠️ OPENAI_API_KEY not set, creating fallback configuration..."
