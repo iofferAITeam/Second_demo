@@ -334,10 +334,10 @@ class LangChainRAGDataPreparer:
             # Setup embeddings and vector store
             embeddings = self.setup_embeddings()
 
-            # Load existing vector store
+            # Load existing vector store with allow_reset to handle existing instances
             chroma_client = chromadb.PersistentClient(
                 path=self.chromadb_dir,
-                settings=ChromaSettings(anonymized_telemetry=False),
+                settings=ChromaSettings(anonymized_telemetry=False, allow_reset=True),
             )
 
             vectorstore = Chroma(
@@ -368,6 +368,23 @@ class LangChainRAGDataPreparer:
 
         except Exception as e:
             print(f"❌ Similarity search test failed: {e}")
+            # If it's a ChromaDB instance conflict, try to reset and retry
+            if "An instance of Chroma already exists" in str(e):
+                print("🔄 ChromaDB instance conflict detected, attempting to reset...")
+                try:
+                    # Force reset ChromaDB instance
+                    import shutil
+
+                    if os.path.exists(self.chromadb_dir):
+                        shutil.rmtree(self.chromadb_dir)
+                        os.makedirs(self.chromadb_dir, exist_ok=True)
+
+                    # Retry the test
+                    print("🔄 Retrying similarity search test...")
+                    return self.test_similarity_search()
+                except Exception as reset_error:
+                    print(f"❌ ChromaDB reset failed: {reset_error}")
+                    return False
             return False
 
     def print_summary(self, qa_pairs: List[Dict]):

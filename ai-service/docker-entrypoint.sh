@@ -78,8 +78,15 @@ else
     # Clean up any existing ChromaDB instance to prevent conflicts
     if [ -d "data/chromadb" ]; then
         echo "🗑️ Cleaning up existing ChromaDB instance to prevent conflicts..."
-        rm -rf data/chromadb/*
-        echo "✅ ChromaDB directory cleaned"
+        rm -rf data/chromadb
+        echo "✅ ChromaDB directory completely removed"
+    fi
+    
+    # Also clean up any existing config file that might cause conflicts
+    if [ -f "data/rag_config_langchain.json" ]; then
+        echo "🗑️ Removing existing ChromaDB config to prevent conflicts..."
+        rm -f data/rag_config_langchain.json
+        echo "✅ ChromaDB config removed"
     fi
     
     if [ -n "$OPENAI_API_KEY" ]; then

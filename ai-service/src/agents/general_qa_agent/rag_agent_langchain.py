@@ -257,7 +257,7 @@ class LangChainRAGRetriever:
         try:
             chroma_client = chromadb.PersistentClient(
                 path=self.chromadb_dir,
-                settings=ChromaSettings(anonymized_telemetry=False),
+                settings=ChromaSettings(anonymized_telemetry=False, allow_reset=True),
             )
 
             collection = chroma_client.get_collection(name=self.collection_name)
